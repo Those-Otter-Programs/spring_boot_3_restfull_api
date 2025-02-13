@@ -95,4 +95,36 @@ class InfoControllerTest {
 	response.andDo(print())
 		.andExpect(status().isForbidden());
     }
+    
+    @DisplayName("test Info_when Do Request Accepting XML Media Type_then Return HTTP 200")
+    @ParameterizedTest
+    @ValueSource(strings = { "", "/", "/info", "/info/" })
+    void testInfo_whenDoRequestAcceptingXMLMediaType_thenReturnHTTP200(String route) throws Exception {
+	// g
+	RequestBuilder requestBuilder = MockMvcRequestBuilders.get(baseRoute + route)
+		.header("Origin", "http://localhost:3000")
+		.header("Accept", "application/xml")
+		.accept(MediaType.APPLICATION_JSON_VALUE);
+	// w
+	ResultActions response = mockMvc.perform(requestBuilder);
+	// t
+	response.andDo(print())
+		.andExpect(status().isOk());
+    }
+    
+    @DisplayName("test Info_when Do Request Accepting YML Media Type_then Return HTTP 200")
+    @ParameterizedTest
+    @ValueSource(strings = { "", "/", "/info", "/info/" })
+    void testInfo_whenDoRequestAcceptingYMLMediaType_thenReturnHTTP200(String route) throws Exception {
+	// g
+	RequestBuilder requestBuilder = MockMvcRequestBuilders.get(baseRoute + route)
+		.header("Origin", "http://localhost:3000")
+		.header("Accept", "application/x-yaml")
+		.accept(MediaType.APPLICATION_JSON_VALUE);
+	// w
+	ResultActions response = mockMvc.perform(requestBuilder);
+	// t
+	response.andDo(print())
+		.andExpect(status().isOk());
+    }
 }
