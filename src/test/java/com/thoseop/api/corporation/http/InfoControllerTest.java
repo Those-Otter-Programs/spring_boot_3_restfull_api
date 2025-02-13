@@ -29,12 +29,13 @@ class InfoControllerTest {
     
     @Value("${spring.application.name}")
     private String appName;
-    
+
     private String baseRoute = "/api/corporation/v1";
 
     @BeforeEach
     void setUp() throws Exception {}
 
+    @DisplayName("")
     @ParameterizedTest
     @ValueSource(strings = { "", "/", "/info", "/info/" })
     void testInfo_whenDoRequest_thenReturnHTTP200(String route) throws Exception {
@@ -48,6 +49,7 @@ class InfoControllerTest {
 		.andExpect(status().isOk());
     }
 
+    @DisplayName("")
     @ParameterizedTest
     @ValueSource(strings = { "", "/", "/info", "/info/" })
     void testInfo_whenDoRequest_thenReturnExpectedData(String route) throws Exception {
@@ -62,5 +64,35 @@ class InfoControllerTest {
 	response.andDo(print())
 		.andExpect(jsonPath("$.Application", is(this.appName)))
 		.andExpect(jsonPath("$.Description", is(appDescription)));
+    }
+
+    @DisplayName("")
+    @ParameterizedTest
+    @ValueSource(strings = { "", "/", "/info", "/info/" })
+    void testInfo_whenDoRequestAllowedCORSOrigin_thenReturnHTTP200(String route) throws Exception {
+	// g
+	RequestBuilder requestBuilder = MockMvcRequestBuilders.get(baseRoute + route)
+		.header("Origin", "http://localhost:3000")
+		.accept(MediaType.APPLICATION_JSON_VALUE);
+	// w
+	ResultActions response = mockMvc.perform(requestBuilder);
+	// t
+	response.andDo(print())
+		.andExpect(status().isOk());
+    }
+    
+    @DisplayName("")
+    @ParameterizedTest
+    @ValueSource(strings = { "", "/", "/info", "/info/" })
+    void testInfo_whenDoRequestInvalidCORSOrigin_thenReturnHTTP200(String route) throws Exception {
+	// g
+	RequestBuilder requestBuilder = MockMvcRequestBuilders.get(baseRoute + route)
+		.header("Origin", "http://localhost:3001")
+		.accept(MediaType.APPLICATION_JSON_VALUE);
+	// w
+	ResultActions response = mockMvc.perform(requestBuilder);
+	// t
+	response.andDo(print())
+		.andExpect(status().isForbidden());
     }
 }
