@@ -35,7 +35,7 @@ class InfoControllerTest {
     @BeforeEach
     void setUp() throws Exception {}
 
-    @DisplayName("")
+    @DisplayName("test Info_when Do Request_then Return HTTP 200")
     @ParameterizedTest
     @ValueSource(strings = { "", "/", "/info", "/info/" })
     void testInfo_whenDoRequest_thenReturnHTTP200(String route) throws Exception {
@@ -49,7 +49,7 @@ class InfoControllerTest {
 		.andExpect(status().isOk());
     }
 
-    @DisplayName("")
+    @DisplayName("test Info_when Do Request_then Return Expected Data")
     @ParameterizedTest
     @ValueSource(strings = { "", "/", "/info", "/info/" })
     void testInfo_whenDoRequest_thenReturnExpectedData(String route) throws Exception {
@@ -66,7 +66,7 @@ class InfoControllerTest {
 		.andExpect(jsonPath("$.Description", is(appDescription)));
     }
 
-    @DisplayName("")
+    @DisplayName("test Info_when Do Request Allowed CORS Origin_then Return HTTP 200")
     @ParameterizedTest
     @ValueSource(strings = { "", "/", "/info", "/info/" })
     void testInfo_whenDoRequestAllowedCORSOrigin_thenReturnHTTP200(String route) throws Exception {
@@ -81,10 +81,10 @@ class InfoControllerTest {
 		.andExpect(status().isOk());
     }
     
-    @DisplayName("")
+    @DisplayName("test Info_when Do Request Invalid CORS Origin_then Return HTTP 403")
     @ParameterizedTest
     @ValueSource(strings = { "", "/", "/info", "/info/" })
-    void testInfo_whenDoRequestInvalidCORSOrigin_thenReturnHTTP200(String route) throws Exception {
+    void testInfo_whenDoRequestInvalidCORSOrigin_thenReturnHTTP403(String route) throws Exception {
 	// g
 	RequestBuilder requestBuilder = MockMvcRequestBuilders.get(baseRoute + route)
 		.header("Origin", "http://localhost:3001")
