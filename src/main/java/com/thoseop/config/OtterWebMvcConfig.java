@@ -21,33 +21,27 @@ public class OtterWebMvcConfig implements WebMvcConfigurer {
     private String corsAllowedOrigins;
 
     @Override
-    public void extendMessageConverters(List<HttpMessageConverter<?>> converters)
-    {
-        converters.add(new OtterYamlJackson2HttpMessageConverter());
+    public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+	converters.add(new OtterYamlJackson2HttpMessageConverter());
     }
 
     @Override
-    public void addCorsMappings(CorsRegistry corsRegistry)
-    {
-        String[] allowedOrigins = this.corsAllowedOrigins.split(" ");
+    public void addCorsMappings(CorsRegistry corsRegistry) {
+	String[] allowedOrigins = this.corsAllowedOrigins.split(" ");
 
-        corsRegistry.addMapping("/**")
-                //		.allowedMethods("*") // allow all HTTP methods
-                .allowedMethods("GET", "POST", "PUT", "PATCH") // allow only the specified HTTP methods
-                .allowedOrigins(allowedOrigins)
-                .maxAge(600) // how long in seconds the response from a pre-flight request can be cached by clients.
-                .allowCredentials(true);
+	corsRegistry.addMapping("/**")
+		//		.allowedMethods("*") // allow all HTTP methods
+		.allowedMethods("GET", "POST", "PUT", "PATCH") // allow only the specified HTTP methods
+		.allowedOrigins(allowedOrigins).maxAge(600) // how long in seconds the response from a pre-flight request can be cached by clients.
+		.allowCredentials(true);
     }
 
     @Override
-    public void configureContentNegotiation(ContentNegotiationConfigurer configurer)
-    {
-        configurer.favorParameter(false) // not accepting parameters
-                .ignoreAcceptHeader(false) // accept header params
-                .useRegisteredExtensionsOnly(false)
-                .defaultContentType(MediaType.APPLICATION_JSON) // default responses format is JSON
-                .mediaType("json", MediaType.APPLICATION_JSON)
-                .mediaType("x-yaml", MEDIA_TYPE_APPLICATION_YAML)
-                .mediaType("xml", MediaType.APPLICATION_XML); // additional supported media types
+    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+	configurer.favorParameter(false) // not accepting parameters
+		.ignoreAcceptHeader(false) // accept header params
+		.useRegisteredExtensionsOnly(false).defaultContentType(MediaType.APPLICATION_JSON) // default responses format is JSON
+		.mediaType("json", MediaType.APPLICATION_JSON).mediaType("x-yaml", MEDIA_TYPE_APPLICATION_YAML)
+		.mediaType("xml", MediaType.APPLICATION_XML); // additional supported media types
     }
 }
