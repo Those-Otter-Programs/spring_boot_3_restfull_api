@@ -1,49 +1,39 @@
 package com.thoseop.api.corporation.http;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequestMapping("/api/corporation/v1")
-public class InfoController {
+import com.thoseop.api.corporation.http.response.InfoCorpResponse;
+import com.thoseop.exception.response.OtterAPIErrorResponse;
 
-    static final String _APPLICATION_YAML_VALUE = "application/x-yaml";
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
-    @Value("${spring.application.name}")
-    private String appName;
-    
-    /**
-       ------------- JSON --------------
-       curl -s -H 'Accept: application/json' -L -X GET 'http://localhost:8080/api/corporation/v1/info' | jq
+@Tag(name = "InfoController", description = "Endpoints for InfoController actions requests")
+public interface InfoController {
 
-       -------------- XML --------------
-       curl -s -H 'Accept: application/xml' -L -X GET 'http://localhost:8080/api/corporation/v1/info' | xmllint --format -
-       
-       ------------- YAML --------------
-       curl -s -H 'Accept: application/x-yaml' -L -X GET 'http://localhost:8080/api/corporation/v1/info' | yq
+    @Operation(summary = "Info page - it displays public information data.", 
+	    description = "Info page - it displays public information data.", 
+	    tags = {"InfoController"},
+	    responses = {
+		    @ApiResponse(description = "Success", responseCode = "200"),
+                    @ApiResponse(description = "Bad Credentials", responseCode = "401", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+                    @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class)))
+	    }) 
+    public ResponseEntity<Model> info(Model model);
 
-       ------------- CORS --------------
-       curl -s -H 'Accept: application/json' -H 'Origin: http://localhost:3000' \
-       	-L -X GET 'http://localhost:8080/api/corporation/v1/info' | jq
-        
-     * @param model
-     * @return
-     */
-    @GetMapping(value = {"", "/", "/info", "/info/"},
-    		produces = { MediaType.APPLICATION_JSON_VALUE, 
-    			MediaType.APPLICATION_XML_VALUE, 
-    			_APPLICATION_YAML_VALUE })
-    public @ResponseBody ResponseEntity<Model> info(Model model) {
-	
-	model.addAttribute("Application", appName);
-	model.addAttribute("Description", "A Spring Boot 3 RESTfull API sample");
-	
-	return ResponseEntity.ok(model);
-    }
+    @Operation(summary = "Info page - it displays corporative information data.", 
+	    description = "Info page - it displays corporative information data.", 
+	    tags = {"InfoController"},
+	    responses = {
+		    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = InfoCorpResponse.class))),
+                    @ApiResponse(description = "Bad Credentials", responseCode = "401", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+                    @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class)))
+	    }) 
+    public ResponseEntity<InfoCorpResponse> infoCorp();
 }
