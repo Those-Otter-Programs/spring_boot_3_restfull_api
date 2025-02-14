@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -47,7 +48,13 @@ public class OtterSpringSecurityConf {
      */
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-	
+
+	http.sessionManagement(smc -> {
+	    smc.maximumSessions(2) // ONLY 2 LOGGED USERS WITH THE SAME CREDENTIALS ARE ALLOWED
+		.maxSessionsPreventsLogin(false); // If true, prevents a user from authenticating when the {@link #maximumSessions(int)} has been reached.
+	    smc.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+	});  
+
 	http.authorizeHttpRequests((requestFilter) -> requestFilter
 		// AUTHENTICATED
 		.requestMatchers(HttpMethod.GET, 
