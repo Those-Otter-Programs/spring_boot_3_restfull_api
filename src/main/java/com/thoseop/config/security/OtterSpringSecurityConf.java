@@ -4,11 +4,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.thoseop.exception.OtterAccessDeniedHandler;
@@ -22,23 +22,6 @@ import lombok.RequiredArgsConstructor;
 public class OtterSpringSecurityConf {
 
     private final OtterBasicAuthenticationEntryPoint otterBasicAuthenticationEntryPoint;
-
-    /**
-     * 
-     * @return
-     */
-    @Bean
-    InMemoryUserDetailsManager userDetailsManager() {
-
-	UserDetails associate = User.builder()
-		.username("johnwart@corp.com")
-		.password("{noop}johns_pass")
-		.roles("ASSOCIATE")
-		.authorities("VIEWINFOCORP")
-		.build();
-
-	return new InMemoryUserDetailsManager(associate);
-    }
 
     /**
      * 
@@ -56,26 +39,39 @@ public class OtterSpringSecurityConf {
 	});  
 
 	http.authorizeHttpRequests((requestFilter) -> requestFilter
+		// AUTHENTICATED AND AUTHORIZED
+
 		// AUTHENTICATED
 		.requestMatchers(HttpMethod.GET, 
-			"/api/corporation/v1/info-corp","/api/corporation/v1/info-corp/"
+			"/api/corporation/v1/info-corp", "/api/corporation/v1/info-corp/"
 			).authenticated()
 
 		// NON-AUTHENTICATED
-		.requestMatchers("/swagger-ui/**", "/v3/**").permitAll()
+		.requestMatchers("/swagger-ui/**", "/v3/**").denyAll() // OpenAPI
+		.requestMatchers("/h2/**").denyAll() // H2
+
 		.requestMatchers(HttpMethod.GET, 
-			"/api/corporation/v1","/api/corporation/v1/",
-			"/api/corporation/v1/info","/api/corporation/v1/info/"
+			"/api/corporation/v1", "/api/corporation/v1/",
+			"/api/corporation/v1/info", "/api/corporation/v1/info/"
 			).permitAll()
 	);
 
-	http.formLogin(formLogin -> formLogin.disable()); // disable default Spring's login form
+	http.formLogin(Customizer.withDefaults()); 
 	http.httpBasic(httpBasic -> httpBasic.authenticationEntryPoint(this.otterBasicAuthenticationEntryPoint));
         
         http.exceptionHandling(excepConf -> {
                 excepConf.accessDeniedHandler(new OtterAccessDeniedHandler()); // deal with HTTP 403
         });
 
+        http.csrf(csrf -> csrf.disable()); // CSRF doesn't make sense most of the time for REST APIs 
+
+//        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable())); // to enable h2 console access
+
 	return http.build();
+    }
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+	return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 }
