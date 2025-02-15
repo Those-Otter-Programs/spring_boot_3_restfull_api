@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.thoseop.api.corporation.http.response.InfoCorpResponse;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("/api/corporation/v1")
 public class InfoControllerImpl implements InfoController {
@@ -24,6 +27,8 @@ public class InfoControllerImpl implements InfoController {
     private String appName;
     
     /**
+       ------------- cURL --------------
+
        ------------- JSON --------------
        curl -s -H 'Accept: application/json' -L -X GET 'http://localhost:8080/api/corporation/v1/info' | jq
 
@@ -54,17 +59,28 @@ public class InfoControllerImpl implements InfoController {
     }
 
     /**
+       ------------- cURL --------------
+
        ------------- JSON --------------
-       curl -s -H 'Accept: application/json' -L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | jq
+       curl -s -u 'ayrton.senna@bravo.com' -H 'Accept: application/json' -L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | jq
+       -- 
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/json' -L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | jq
 
        -------------- XML --------------
-       curl -s -H 'Accept: application/xml' -L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | xmllint --format -
+       curl -s -u 'ayrton.senna@bravo.com' -H 'Accept: application/xml' -L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | xmllint --format -
+       --
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/xml' -L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | xmllint --format -
        
        ------------- YAML --------------
-       curl -s -H 'Accept: application/x-yaml' -L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | yq
+       curl -s -u 'ayrton.senna@bravo.com' -H 'Accept: application/x-yaml' -L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | yq
+       --
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/x-yaml' -L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | yq
 
        ------------- CORS --------------
-       curl -s -H 'Accept: application/json' -H 'Origin: http://localhost:3000' \
+       curl -s -u 'ayrton.senna@bravo.com' -H 'Accept: application/json' -H 'Origin: http://localhost:3000' \
+       	-L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | jq
+       --
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/json' -H 'Origin: http://localhost:3000' \
        	-L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | jq
         
      * @param InfoCorpResponse
