@@ -5,14 +5,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,6 +25,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @DisplayName("Testing InfoController")
+@ActiveProfiles(value = {"prod","test"})
 @WebMvcTest(controllers = InfoControllerImpl.class) 
 @TestPropertySource(properties = { 
 	"spring.main.allow-bean-definition-overriding=true",
@@ -31,11 +36,21 @@ class InfoControllerAuthWebLayerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private Environment environment;
     
     private String baseRoute = "/api/corporation/v1";
 
     @BeforeEach
     void setUp() throws Exception {}
+    
+    @DisplayName("when Testing_then Active Profile Should Be Prod And Test")
+    @Test
+    void whenTesting_thenActiveProfileShouldBeProdAndTest() {
+        Assertions.assertEquals("prod", environment.getActiveProfiles()[0]);
+        Assertions.assertEquals("test", environment.getActiveProfiles()[1]);
+    }
 
     @DisplayName("test Info Corp_when Do Request With Auth_then Return HTTP 200")
     @ParameterizedTest
