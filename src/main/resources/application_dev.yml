@@ -4,20 +4,55 @@
 # 
 #       export SPRING_PROFILES_ACTIVE=prod
 #       export SPRING_PROFILES_ACTIVE=dev
+# or:
+#       java -jar -Dspring.profiles.active=prod {YOUR-APPLICATION}.jar
+#       java -jar -Dspring.profiles.active=dev {YOUR-APPLICATION}.jar
 # 
 const_1: &serverPort ${SPRING_APP_SERVER_PORT:8080}
-const_2: &appName ${SPRING_APP_NAME:spring_boot_3_restfull_api}
+const_2: &appName ${SPRING_APP_NAME:spring_boot_3_restfull_api-dev}
 
 server:
     port: *serverPort
 spring:
   application.name: *appName
   config.activate.on-profile: dev
-  # Spring Security credentials
-  security:
-      user:
-         name: admin
-         password: password
+  output.ansi.enabled: ALWAYS
+#  # Spring Security credentials
+#  security:
+#      user:
+#         name: admin
+#         password: password
+  sql.init.mode: never # never run 'schema.sql' nor 'data.sql'
+  datasource:
+      url: jdbc:h2:file:./data/test_dev_db;MODE=MySQL;DATABASE_TO_LOWER=TRUE # do not create tables for entities - jdbc:h2:file:./data/testdb
+      username: sa
+      password:
+      driverClassName: org.h2.Driver
+  jpa:
+      database-platform: org.hibernate.dialect.H2Dialect
+      hibernate.ddl-auto: none
+#      generate-ddl: false
+      properties:
+          hibernate:
+              formatSql: true
+              showSql: true
+  h2:
+      console:
+          enabled: true
+          path: /h2
+          settings.trace: false
+          settings.web-allow-others: false
+  flyway:
+      enabled: true
+      baselineOnMigrate: true
+      url: jdbc:h2:file:./data/test_dev_db;MODE=MySQL;DATABASE_TO_LOWER=TRUE
+      user: sa
+      password:
+      locations: classpath:db/migration
+# OpenAPI and Swagger-UI
+springdoc:
+    pathsToMatch: /api/**
+    swagger-ui.use-root-path: true
 # LOGGING
 logging:
   pattern.console: ${LOGPATTERN_CONSOLE:%cyan(%d{HH:mm:ss.SSS}) %clr(%-5p) %magenta([%thread]) %green(%logger{15}) - %msg%n}
@@ -28,7 +63,20 @@ logging:
       springframework:
         # SPRING SECURITY CONFIG
         security: ${SPRING_SECURITY_LOG_LEVEL:DEBUG}
+        # INTEGRATION TESTS CONFIG
+        boot:
+          test:
+            context:
+              SpringBootTestContextBootstrapper: DEBUG
+        test:
+          context:
+            support:
+              AbstractContextLoader: DEBUG
+              AnnotationConfigContextLoaderUtils: DEBUG
 
 corsAllowedOrigins: >
   http://localhost:3000
   http://localhost:${server.port}
+
+
+ 
