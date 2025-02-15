@@ -13,6 +13,7 @@ const_2: &appName ${SPRING_APP_NAME:spring_boot_3_restfull_api-prod}
 
 server:
     port: *serverPort
+    servlet.session.timeout: ${SPRING_SESSION_TIMEOUT:5m}
 spring:
   application.name: *appName
   config.activate.on-profile: prod
@@ -38,7 +39,8 @@ spring:
               showSql: true
   h2:
       console:
-          enabled: true
+#          enabled: true
+          enabled: false
           path: /h2
           settings.trace: false
           settings.web-allow-others: false
@@ -51,8 +53,10 @@ spring:
       locations: classpath:db/migration
 # OpenAPI and Swagger-UI
 springdoc:
-    pathsToMatch: /api/**
-    swagger-ui.use-root-path: true
+#    pathsToMatch: /api/**
+#    swagger-ui.use-root-path: true
+    springdoc.api-docs.enabled: false # disabling the /v3/api-docs endpoint
+    springdoc.swagger-ui.enabled: false # disabling the swagger-ui
 # LOGGING
 logging:
   pattern.console: ${LOGPATTERN_CONSOLE:%cyan(%d{HH:mm:ss.SSS}) %clr(%-5p) %magenta([%thread]) %green(%logger{15}) - %msg%n}
