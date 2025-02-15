@@ -1,5 +1,7 @@
 HELP.md
 target/
+data/test_dev_db.mv.db
+data/test_prod_db.mv.db
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
