@@ -44,7 +44,9 @@ public class OtterDevSpringSecurityConf {
 			).authenticated()
 
 		// ROLE BASED AUTHENTICATED ROUTES
-		.requestMatchers(HttpMethod.GET, "/api/member/v1/member/**").hasAnyRole("ADMIN", "MANAGER", "SUPERVISOR")
+		.requestMatchers(HttpMethod.PATCH, "/api/member/v1/member-disable/**",
+						"/api/member/v1/member-enable/**").hasAnyRole("ADMIN", "MANAGER", "SUPERVISOR")
+		.requestMatchers(HttpMethod.GET, "/api/member/v1/member-details/**").hasAnyRole("ADMIN", "MANAGER", "SUPERVISOR")
 		.requestMatchers(HttpMethod.GET, "/api/member/v1/list/**").hasAnyRole("ADMIN", "MANAGER")
 
 		// NON-AUTHENTICATED ROUTES
