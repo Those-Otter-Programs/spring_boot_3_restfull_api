@@ -26,8 +26,7 @@ public class InfoControllerImpl implements InfoController {
     @Value("${spring.application.name}")
     private String appName;
     
-    /**
-       ------------- cURL --------------
+    /* ============= cURL ==============
 
        ------------- JSON --------------
        curl -s -H 'Accept: application/json' -L -X GET 'http://localhost:8080/api/corporation/v1/info' | jq
@@ -41,9 +40,6 @@ public class InfoControllerImpl implements InfoController {
        ------------- CORS --------------
        curl -s -H 'Accept: application/json' -H 'Origin: http://localhost:3000' \
        	-L -X GET 'http://localhost:8080/api/corporation/v1/info' | jq
-        
-     * @param model
-     * @return
      */
     @Override
     @GetMapping(value = {"", "/", "/info", "/info/"},
@@ -58,8 +54,7 @@ public class InfoControllerImpl implements InfoController {
 	return ResponseEntity.ok(model);
     }
 
-    /**
-       ------------- cURL --------------
+    /* ============= cURL ==============
 
        ------------- JSON --------------
        curl -s -u 'ayrton.senna@bravo.com' -H 'Accept: application/json' -L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | jq
@@ -82,9 +77,6 @@ public class InfoControllerImpl implements InfoController {
        --
        curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/json' -H 'Origin: http://localhost:3000' \
        	-L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | jq
-        
-     * @param InfoCorpResponse
-     * @return
      */
     @Override
     @GetMapping(value = {"/info-corp", "/info-corp/"},
