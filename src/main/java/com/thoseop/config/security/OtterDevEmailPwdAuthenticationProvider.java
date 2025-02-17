@@ -11,9 +11,9 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 
-@Profile("!prod")
+//@Profile("!prod")
 @RequiredArgsConstructor
-@Component
+//@Component
 public class OtterDevEmailPwdAuthenticationProvider implements AuthenticationProvider {
 
     private final UserDetailsService userDetailsService;
