@@ -21,7 +21,8 @@ public interface MemberMapper {
             @Mapping(target = "memberCreatedAt", source = "createdAt"),
             @Mapping(target = "memberUpdatedAt", source = "updatedAt"),
             @Mapping(target = "memberAuthorities", ignore = true), 
-            @Mapping(target = "add", ignore = true) 
+//            @Mapping(target = "add", ignore = true), 
+            @Mapping(target = "links", ignore = true), 
             //	@Mapping(target = "memberPwd", expression = "java(user.getAuthorities().toString())"), 
     })
     MemberResponse mapToResponse(MemberEntity memberEntity);
@@ -47,7 +48,8 @@ public interface MemberMapper {
             @Mapping(target = "memberCreatedAt", source = "memberCreatedAt"),
             @Mapping(target = "memberUpdatedAt", source = "memberUpdatedAt"),
             @Mapping(target = "memberAuthorities", ignore = true), 
-            @Mapping(target = "add", ignore = true) 
+//            @Mapping(target = "add", ignore = true), 
+            @Mapping(target = "links", ignore = true), 
     })
     MemberResponse mapRequestToResponse(MemberRequest member);
 }
