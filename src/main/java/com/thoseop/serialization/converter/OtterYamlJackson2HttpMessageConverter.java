@@ -9,10 +9,8 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 public class OtterYamlJackson2HttpMessageConverter extends AbstractJackson2HttpMessageConverter {
 
     public OtterYamlJackson2HttpMessageConverter() {
-	// JsonInclude.Include.NON_NULL - sinaliza a engine para serializar somente as propriedades
-	// que não tiverem valor null.
-	super(new YAMLMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL), // só serializa props. com valor não null
-		MediaType.parseMediaType("application/x-yaml") // message converter customizado - yaml 
+	super(new YAMLMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL), // only serializes not null props
+		MediaType.parseMediaType("application/x-yaml") // customized message converter  - yaml 
 	);
     }
 }
