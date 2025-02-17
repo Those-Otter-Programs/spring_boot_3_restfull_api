@@ -39,14 +39,16 @@ public class OtterSpringSecurityConf {
 	});  
 
 	http.authorizeHttpRequests((requestFilter) -> requestFilter
-		// AUTHENTICATED AND AUTHORIZED
-
-		// AUTHENTICATED
+		// AUTHENTICATED ROUTES
 		.requestMatchers(HttpMethod.GET, 
 			"/api/corporation/v1/info-corp", "/api/corporation/v1/info-corp/"
 			).authenticated()
 
-		// NON-AUTHENTICATED
+		// ROLE BASED AUTHENTICATED ROUTES
+		.requestMatchers(HttpMethod.GET, "/api/member/v1/member/**").hasAnyRole("ADMIN", "MANAGER", "SUPERVISOR")
+		.requestMatchers(HttpMethod.GET, "/api/member/v1/list/**").hasAnyRole("ADMIN", "MANAGER")
+
+		// NON-AUTHENTICATED ROUTES
 		.requestMatchers("/swagger-ui/**", "/v3/**").denyAll() // OpenAPI
 		.requestMatchers("/h2/**").denyAll() // H2
 
