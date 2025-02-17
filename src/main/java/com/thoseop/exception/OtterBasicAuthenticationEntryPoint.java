@@ -32,7 +32,7 @@ public class OtterBasicAuthenticationEntryPoint implements AuthenticationEntryPo
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
 	    AuthenticationException authException) throws IOException, ServletException {
-	response.setHeader("Otter-Spring_Boot_3_RESTfull_API", "Custom Handling HTTP 403");
+	response.setHeader("Otter-Spring_Boot_3_RESTfull_API", "Custom Handling HTTP 401");
 	response.setStatus(HttpStatus.UNAUTHORIZED.value());
 	response.setContentType("application/json;charset=UTF-8");
 
