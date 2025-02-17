@@ -15,17 +15,24 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "InfoController", description = "Endpoints for InfoController actions requests")
 public interface InfoController {
 
+    /**
+     * 
+     * @param model
+     * @return
+     */
     @Operation(summary = "Info page - it displays public information data.", 
 	    description = "Info page - it displays public information data.", 
 	    tags = {"InfoController"},
 	    responses = {
 		    @ApiResponse(description = "Success", responseCode = "200"),
-                    @ApiResponse(description = "Bad Credentials", responseCode = "401", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
-                    @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
 		    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class)))
 	    }) 
     public ResponseEntity<Model> info(Model model);
 
+    /**
+     * 
+     * @return
+     */
     @Operation(summary = "Info page - it displays corporative information data.", 
 	    description = "Info page - it displays corporative information data.", 
 	    tags = {"InfoController"},
