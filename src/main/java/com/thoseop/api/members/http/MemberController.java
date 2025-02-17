@@ -53,7 +53,6 @@ public interface MemberController {
     public ResponseEntity<PagedModel<EntityModel<MemberResponse>>> getMembers(
 	    Integer page, Integer size, String sort);
 
-
     /**
      * 
      * @param memberUsername
@@ -71,4 +70,38 @@ public interface MemberController {
 		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))), 
     		})
     public ResponseEntity<MemberResponse> getMemberByUsername(String memberUsername);
+
+    /**
+     * 
+     * @param memberUsername
+     * @return
+     */
+    @Operation(summary = "Activates a member", 
+	    description = "Activates a member", 
+	    tags = { "MemberController" }, 
+	    responses = {
+		    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = MemberResponse.class))),
+		    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))), 
+    		})
+    public ResponseEntity<MemberResponse> activateMember(Long id);
+    
+    /**
+     * 
+     * @param memberUsername
+     * @return
+     */
+    @Operation(summary = "Inactivates a member", 
+	    description = "Inactivates a member", 
+	    tags = { "MemberController" }, 
+	    responses = {
+		    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = MemberResponse.class))),
+		    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))), 
+    		})
+    public ResponseEntity<MemberResponse> inactivateMember(Long id);
 }
