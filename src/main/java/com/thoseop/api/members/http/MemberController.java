@@ -26,11 +26,11 @@ public interface MemberController {
 	    description = "Creates a member", 
 	    tags = { "MemberControler" }, 
 	    responses = { 
-		@ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = MemberResponse.class))),
-                @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
-                @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
-                @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))) 
-    	})
+		    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = MemberResponse.class))),
+		    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))) 
+    		})
     public ResponseEntity<MemberResponse> createMember(MemberRequest request) throws Exception;
 
     /**
@@ -73,7 +73,7 @@ public interface MemberController {
 
     /**
      * 
-     * @param memberUsername
+     * @param id
      * @return
      */
     @Operation(summary = "Activates a member", 
@@ -90,7 +90,7 @@ public interface MemberController {
     
     /**
      * 
-     * @param memberUsername
+     * @param id
      * @return
      */
     @Operation(summary = "Inactivates a member", 
