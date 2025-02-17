@@ -78,7 +78,8 @@ public class MemberControllerImpl implements MemberController {
 	MemberResponse savedMember;
         try {
             savedMember = this.memberService.saveMember(request);
-            savedMember.add(linkTo(methodOn(MemberControllerImpl.class).getMemberByUsername(savedMember.getMemberEmail())).withSelfRel());
+            savedMember.add(linkTo(methodOn(MemberControllerImpl.class)
+        	    .getMemberByUsername(savedMember.getMemberEmail())).withSelfRel());
         } catch (Exception ex) {
             throw new Exception(ex);
         }
@@ -160,12 +161,36 @@ public class MemberControllerImpl implements MemberController {
         log.info("Reading user by Id");
 
 	MemberResponse member = memberService.readMemberByEmail(username);
-	member.add(linkTo(methodOn(MemberControllerImpl.class).getMemberByUsername(member.getMemberEmail())).withSelfRel());
+	member.add(linkTo(methodOn(MemberControllerImpl.class)
+		.getMemberByUsername(member.getMemberEmail())).withSelfRel());
 
 //	return new ResponseEntity<MemberResponse>(member, HttpStatus.OK);
 	return ResponseEntity.ok(member);
     }
 
+
+    /* ============= cURL ==============
+      
+       ------------- JSON --------------
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' 
+       -L -X GET 'http://localhost:8080/api/member/v1/member-disable/3' | jq
+    
+     * Base64: 
+       curl -s -u 'YXlydG9uLnNlbm5hQGJlc3QuY29tOmF5cnRvbl9wYXNz' \
+       -L -X GET 'http://localhost:8080/api/member/v1/member-disable/3' | jq
+    
+       -------------- XML --------------
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/xml' \
+       -L -X GET 'http://localhost:8080/api/member/v1/member-disable/3' | xmllint --format -
+       
+       ------------- YAML --------------
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/x-yaml' \
+       -L -X GET 'http://localhost:8080/api/member/v1/member-disable/3' | yq
+    
+       ------------- CORS --------------
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Origin: http://localhost:3000' \
+       -L -X GET 'http://localhost:8080/api/member/v1/member-disable/3' | jq
+    */
     @Override
     @PatchMapping(value = "/member-disable/{id}",
 	    produces = { _APPLICATION_YAML_VALUE, 
@@ -177,7 +202,7 @@ public class MemberControllerImpl implements MemberController {
 	MemberResponse member = memberService.changeMemberStatus(id, MemberStatus.DISABLE);
 
 	member.add(linkTo(methodOn(MemberControllerImpl.class)
-		.activateMember(id)).withSelfRel());
+		.getMemberByUsername(member.getMemberEmail())).withSelfRel());
 
 	return ResponseEntity.ok(member);
     }
@@ -215,7 +240,7 @@ public class MemberControllerImpl implements MemberController {
 	MemberResponse member = memberService.changeMemberStatus(id, MemberStatus.ENABLE);
 
 	member.add(linkTo(methodOn(MemberControllerImpl.class)
-		.inactivateMember(id)).withSelfRel());
+		.getMemberByUsername(member.getMemberEmail())).withSelfRel());
 
 	return ResponseEntity.ok(member);
     }
