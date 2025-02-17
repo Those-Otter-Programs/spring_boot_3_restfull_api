@@ -22,6 +22,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+
 @Getter
 @Setter
 @Accessors(chain = true)
@@ -51,6 +52,9 @@ public class MemberEntity implements Serializable {
     
     @Column(name = "password")
     private String password;
+    
+    @Column(name = "enabled")  
+    private Boolean enabled;
 
     @Column(name = "created_at")
     @JsonIgnore
