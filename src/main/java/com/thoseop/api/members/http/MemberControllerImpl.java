@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.thoseop.api.members.entity.enums.MemberStatus;
 import com.thoseop.api.members.http.request.MemberRequest;
 import com.thoseop.api.members.http.response.MemberResponse;
 import com.thoseop.api.members.service.MemberService;
@@ -135,22 +137,22 @@ public class MemberControllerImpl implements MemberController {
       
        ------------- JSON --------------
        curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' 
-       -L -X GET 'http://localhost:8080/api/member/v1/member/ayrton.senna@bravo.com' | jq
+       -L -X GET 'http://localhost:8080/api/member/v1/member-details/ayrton.senna@bravo.com' | jq
 
        -------------- XML --------------
        curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/xml' \
-       -L -X GET 'http://localhost:8080/api/member/v1/member/ayrton.senna@bravo.com' | xmllint --format -
+       -L -X GET 'http://localhost:8080/api/member/v1/member-details/ayrton.senna@bravo.com' | xmllint --format -
        
        ------------- YAML --------------
        curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/x-yaml' \
-       -L -X GET 'http://localhost:8080/api/member/v1/member/ayrton.senna@bravo.com' | yq
+       -L -X GET 'http://localhost:8080/api/member/v1/member-details/ayrton.senna@bravo.com' | yq
 
        ------------- CORS --------------
        curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Origin: http://localhost:3000' \
-       -L -X GET 'http://localhost:8080/api/member/v1/member/ayrton.senna@bravo.com' | jq
+       -L -X GET 'http://localhost:8080/api/member/v1/member-details/ayrton.senna@bravo.com' | jq
      */
     @Override
-    @GetMapping(value = "/member/{username}", 
+    @GetMapping(value = "/member-details/{username}", 
 	    produces = { _APPLICATION_YAML_VALUE, 
 		    MediaType.APPLICATION_JSON_VALUE, 
 		    MediaType.APPLICATION_XML_VALUE })
@@ -161,6 +163,60 @@ public class MemberControllerImpl implements MemberController {
 	member.add(linkTo(methodOn(MemberControllerImpl.class).getMemberByUsername(member.getMemberEmail())).withSelfRel());
 
 //	return new ResponseEntity<MemberResponse>(member, HttpStatus.OK);
+	return ResponseEntity.ok(member);
+    }
+
+    @Override
+    @PatchMapping(value = "/member-disable/{id}",
+	    produces = { _APPLICATION_YAML_VALUE, 
+		    MediaType.APPLICATION_JSON_VALUE, 
+		    MediaType.APPLICATION_XML_VALUE })
+    public @ResponseBody ResponseEntity<MemberResponse> inactivateMember(@PathVariable Long id) {
+        log.info("Enable member");
+
+	MemberResponse member = memberService.changeMemberStatus(id, MemberStatus.DISABLE);
+
+	member.add(linkTo(methodOn(MemberControllerImpl.class)
+		.activateMember(id)).withSelfRel());
+
+	return ResponseEntity.ok(member);
+    }
+
+    /* ============= cURL ==============
+      
+       ------------- JSON --------------
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' 
+       -L -X GET 'http://localhost:8080/api/member/v1/member-enable/3' | jq
+
+     * Base64: 
+       curl -s -u 'YXlydG9uLnNlbm5hQGJlc3QuY29tOmF5cnRvbl9wYXNz' \
+       -L -X GET 'http://localhost:8080/api/member/v1/member-enable/3' | jq
+
+       -------------- XML --------------
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/xml' \
+       -L -X GET 'http://localhost:8080/api/member/v1/member-enable/3' | xmllint --format -
+       
+       ------------- YAML --------------
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/x-yaml' \
+       -L -X GET 'http://localhost:8080/api/member/v1/member-enable/3' | yq
+
+       ------------- CORS --------------
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Origin: http://localhost:3000' \
+       -L -X GET 'http://localhost:8080/api/member/v1/member-enable/3' | jq
+     */
+    @Override
+    @PatchMapping(value = "/member-enable/{id}",
+	    produces = { _APPLICATION_YAML_VALUE, 
+		    MediaType.APPLICATION_JSON_VALUE, 
+		    MediaType.APPLICATION_XML_VALUE })
+    public @ResponseBody ResponseEntity<MemberResponse> activateMember(@PathVariable Long id) {
+        log.info("Disable member");
+
+	MemberResponse member = memberService.changeMemberStatus(id, MemberStatus.ENABLE);
+
+	member.add(linkTo(methodOn(MemberControllerImpl.class)
+		.inactivateMember(id)).withSelfRel());
+
 	return ResponseEntity.ok(member);
     }
 }
