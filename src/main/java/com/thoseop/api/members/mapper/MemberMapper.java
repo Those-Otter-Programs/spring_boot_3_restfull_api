@@ -13,16 +13,16 @@ import com.thoseop.api.members.http.response.MemberResponse;
 public interface MemberMapper {
 
     @Mappings({
-            @Mapping(target = "memberId", ignore = true), 
+            @Mapping(target = "memberId", source = "id"), 
             @Mapping(target = "memberName", source = "name"),
             @Mapping(target = "memberEmail", source = "email"),
             @Mapping(target = "memberMobileNumber", source = "mobileNumber"),
-            @Mapping(target = "memberPassword", source = "password"), 
+//            @Mapping(target = "memberPassword", source = "password"), 
             @Mapping(target = "memberCreatedAt", source = "createdAt"),
             @Mapping(target = "memberUpdatedAt", source = "updatedAt"),
             @Mapping(target = "memberAuthorities", ignore = true), 
+            @Mapping(target = "add", ignore = true) 
             //	@Mapping(target = "memberPwd", expression = "java(user.getAuthorities().toString())"), 
-            //	@Mapping(target = "userRoles", ignore = true) 
     })
     MemberResponse mapToResponse(MemberEntity memberEntity);
 
@@ -43,10 +43,11 @@ public interface MemberMapper {
             @Mapping(target = "memberName", source = "memberName"),
             @Mapping(target = "memberEmail", source = "memberEmail"),
             @Mapping(target = "memberMobileNumber", source = "memberMobileNumber"),
-            @Mapping(target = "memberPassword", source = "memberPassword"),
+//            @Mapping(target = "memberPassword", source = "memberPassword"),
             @Mapping(target = "memberCreatedAt", source = "memberCreatedAt"),
             @Mapping(target = "memberUpdatedAt", source = "memberUpdatedAt"),
             @Mapping(target = "memberAuthorities", ignore = true), 
+            @Mapping(target = "add", ignore = true) 
     })
     MemberResponse mapRequestToResponse(MemberRequest member);
 }
