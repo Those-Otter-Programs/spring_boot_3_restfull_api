@@ -9,6 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder.BCryptVe
 import org.springframework.stereotype.Service;
 
 import com.thoseop.api.members.entity.MemberEntity;
+import com.thoseop.api.members.entity.enums.MemberStatus;
 import com.thoseop.api.members.http.request.MemberRequest;
 import com.thoseop.api.members.http.response.MemberResponse;
 import com.thoseop.api.members.mapper.MemberMapper;
@@ -66,8 +67,26 @@ public class MemberService {
 	log.info("Reading member by email");
 
 	Optional<MemberEntity> result = this.memberRepository.findByEmail(email);
-	 return (result.isPresent())? 
-		 this.memberMapper.mapToResponse(result.get())
-		 : new MemberResponse();
+	return (result.isPresent())? 
+		this.memberMapper.mapToResponse(result.get())
+		: new MemberResponse();
+    }
+    
+    /**
+     * 
+     * @param id
+     * @return
+     */
+    public MemberResponse changeMemberStatus(Long id, MemberStatus status) {
+        log.info("Changing member id[{}] status to {}", id, status.getStatus());
+
+	int res = this.memberRepository.setMemberStatus(id, status.getStatus());
+
+	MemberEntity entity = null;
+	if (res == 1) {
+	    entity = this.memberRepository.findOneById(id).get();
+	}
+
+	return this.memberMapper.mapToResponse(entity);
     }
 }
