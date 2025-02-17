@@ -25,16 +25,19 @@ public class OtterUserDetailsService implements UserDetailsService
 
     /**
      * 
+     * @param username
+     * @return
      */
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
-    {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         MemberEntity member = memberRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User details not found for the user: " + username));
-        //	Filer
+        //	Filter
         List<GrantedAuthority> authorities = member.getAuthorities().stream().map(
                 authority -> new SimpleGrantedAuthority(authority.getName())).collect(Collectors.toList()); 
-
-        return new User(member.getEmail(), member.getPassword(), authorities);
+        
+        return new User(member.getEmail(), member.getPassword(), 
+        	member.getEnabled(), member.getEnabled(), member.getEnabled(), member.getEnabled(),
+		authorities);
     }
 }
