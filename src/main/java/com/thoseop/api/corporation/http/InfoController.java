@@ -25,7 +25,8 @@ public interface InfoController {
 	    tags = {"InfoController"},
 	    responses = {
 		    @ApiResponse(description = "Success", responseCode = "200"),
-		    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class)))
+		    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))) 
 	    }) 
     public ResponseEntity<Model> info(Model model);
 
@@ -38,9 +39,10 @@ public interface InfoController {
 	    tags = {"InfoController"},
 	    responses = {
 		    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = InfoCorpResponse.class))),
-                    @ApiResponse(description = "Bad Credentials", responseCode = "401", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
-                    @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
-		    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class)))
+		    @ApiResponse(description = "Bad Credentials", responseCode = "401", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Forbidden", responseCode = "403", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))) 
 	    }) 
     public ResponseEntity<InfoCorpResponse> infoCorp();
 }
