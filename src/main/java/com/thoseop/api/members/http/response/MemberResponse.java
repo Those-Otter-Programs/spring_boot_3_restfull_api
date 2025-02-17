@@ -31,7 +31,7 @@ public class MemberResponse extends RepresentationModel<MemberResponse> implemen
     private String memberName;
     private String memberEmail;
     private String memberMobileNumber;
-//    private String memberPassword;
+    private boolean memberEnabled;
     private Date memberCreatedAt;
     private Date memberUpdatedAt;
     private Set<AuthorityEntity> memberAuthorities;
