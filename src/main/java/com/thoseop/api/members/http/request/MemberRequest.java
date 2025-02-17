@@ -29,6 +29,7 @@ public class MemberRequest implements Serializable {
     private String memberEmail;
     private String memberMobileNumber;
     private String memberPassword;
+    private boolean memberEnabled;
     private Date memberCreatedAt;
     private Date memberUpdatedAt;
     private Set<AuthorityEntity> memberAuthorities;
