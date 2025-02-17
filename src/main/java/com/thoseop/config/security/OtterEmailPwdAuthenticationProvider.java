@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 
+//@Profile("prod")
 @RequiredArgsConstructor
 @Component
 public class OtterEmailPwdAuthenticationProvider implements AuthenticationProvider {
@@ -26,11 +27,10 @@ public class OtterEmailPwdAuthenticationProvider implements AuthenticationProvid
 
 	UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-	if (passwordEncoder.matches(pwd, userDetails.getPassword())) {
+	if (passwordEncoder.matches(pwd, userDetails.getPassword()) && userDetails.isEnabled())
 	    return new UsernamePasswordAuthenticationToken(username, pwd, userDetails.getAuthorities());
-	} else {
-	    throw new BadCredentialsException("Invalid password");
-	}
+	else 
+	    throw new BadCredentialsException("Invalid password or inactivated user.");
     }
 
     @Override
