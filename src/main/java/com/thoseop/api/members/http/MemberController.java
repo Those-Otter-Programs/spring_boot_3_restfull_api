@@ -97,8 +97,8 @@ public interface MemberController {
      * @param request
      * @return
      */
-    @Operation(summary = "Updates a member's password", 
-	    description = "Updates a member's password", 
+    @Operation(summary = "Updates an authenticated member's own password", 
+	    description = "Updates an authenticated member's own password", 
 	    tags = { "MemberController" }, 
 	    responses = {
 		    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = MemberResponse.class))),
