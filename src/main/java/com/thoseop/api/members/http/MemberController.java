@@ -3,8 +3,11 @@ package com.thoseop.api.members.http;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 
 import com.thoseop.api.members.http.request.MemberCreateRequest;
+import com.thoseop.api.members.http.request.MemberManagePasswordRequest;
+import com.thoseop.api.members.http.request.MemberUpdatePasswordRequest;
 import com.thoseop.api.members.http.request.MemberUpdateRequest;
 import com.thoseop.api.members.http.response.MemberResponse;
 import com.thoseop.exception.response.OtterAPIErrorResponse;
@@ -50,6 +53,7 @@ public interface MemberController {
 		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))) 
     		})
     public ResponseEntity<MemberResponse> updateMember(MemberUpdateRequest memberRequest);
+
     /**
      * 
      * @param page
@@ -87,6 +91,41 @@ public interface MemberController {
 		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))), 
     		})
     public ResponseEntity<MemberResponse> getMemberByUsername(String memberUsername);
+
+    /**
+     * 
+     * @param request
+     * @return
+     */
+    @Operation(summary = "Updates a member's password", 
+	    description = "Updates a member's password", 
+	    tags = { "MemberController" }, 
+	    responses = {
+		    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = MemberResponse.class))),
+		    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))), 
+    		})
+    public ResponseEntity<MemberResponse> updateMemberPassword(MemberUpdatePasswordRequest request,Authentication userAuth);
+
+
+    /**
+     * 
+     * @param request
+     * @return
+     */
+    @Operation(summary = "Used by admin users to manage a member's password", 
+	    description = "Used by admin users to manage a member's password", 
+	    tags = { "MemberController" }, 
+	    responses = {
+		    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = MemberResponse.class))),
+		    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))), 
+    		})
+    public ResponseEntity<MemberResponse> manageMemberPassword(MemberManagePasswordRequest request);
 
     /**
      * 
