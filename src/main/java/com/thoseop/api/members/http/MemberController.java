@@ -4,7 +4,8 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 
-import com.thoseop.api.members.http.request.MemberRequest;
+import com.thoseop.api.members.http.request.MemberCreateRequest;
+import com.thoseop.api.members.http.request.MemberUpdateRequest;
 import com.thoseop.api.members.http.response.MemberResponse;
 import com.thoseop.exception.response.OtterAPIErrorResponse;
 
@@ -24,15 +25,31 @@ public interface MemberController {
      */
     @Operation(summary = "Creates a member", 
 	    description = "Creates a member", 
-	    tags = { "MemberControler" }, 
+	    tags = { "MemberController" }, 
 	    responses = { 
 		    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = MemberResponse.class))),
 		    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
 		    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
 		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))) 
     		})
-    public ResponseEntity<MemberResponse> createMember(MemberRequest request) throws Exception;
+    public ResponseEntity<MemberResponse> createMember(MemberCreateRequest memberRequest) throws Exception;
 
+    /**
+     * 
+     * @param memberRequest
+     * @return
+     */
+    @Operation(summary = "Update a member", 
+	    description = "Update a member", 
+	    tags = { "MemberController" }, 
+	    responses = { 
+		    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = MemberResponse.class))),
+		    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))) 
+    		})
+    public ResponseEntity<MemberResponse> updateMember(MemberUpdateRequest memberRequest);
     /**
      * 
      * @param page
