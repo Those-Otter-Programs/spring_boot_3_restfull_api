@@ -1,16 +1,18 @@
 package com.thoseop.api.members.service;
 
+import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder.BCryptVersion;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.thoseop.api.members.entity.AuthorityEntity;
 import com.thoseop.api.members.entity.MemberEntity;
 import com.thoseop.api.members.entity.enums.MemberStatus;
-import com.thoseop.api.members.http.request.MemberRequest;
+import com.thoseop.api.members.http.request.MemberCreateRequest;
+import com.thoseop.api.members.http.request.MemberUpdateRequest;
 import com.thoseop.api.members.http.response.MemberResponse;
 import com.thoseop.api.members.mapper.MemberMapper;
 import com.thoseop.api.members.repository.MemberRepository;
@@ -25,19 +27,42 @@ public class MemberService {
     
     private final MemberRepository memberRepository;
     private final MemberMapper memberMapper;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 
      * @param request
      * @return
      */
-    public MemberResponse saveMember(MemberRequest request) {
+    public MemberResponse saveMember(MemberCreateRequest request) {
 	log.info("Saving member");
 
         MemberEntity entity = this.memberMapper.mapRequestToEntity(request);
 
-        String hashPwd = new BCryptPasswordEncoder(BCryptVersion.$2B, 12).encode(entity.getPassword());
+        String hashPwd = passwordEncoder.encode(request.getMemberPassword());
         entity.setPassword(hashPwd);
+        entity.setEnabled(false)
+        	.setCreatedAt(new Date())
+        	.setUpdatedAt(new Date());
+
+	for (String rawAuthority : request.getMemberAuthorities()) { 
+	    entity.addAuthority(new AuthorityEntity().setName(rawAuthority));
+	}
+	
+        MemberEntity savedEntity = memberRepository.save(entity);
+
+	return memberMapper.mapToResponse(savedEntity);
+    }
+    
+    /**
+     * 
+     * @param request
+     * @return
+     */
+    public MemberResponse modifyMember(MemberUpdateRequest request) {
+	log.info("Updating member {}", request.getMemberEmail());
+
+        MemberEntity entity = this.memberMapper.mapRequestToEntity(request);
 
         MemberEntity savedEntity = memberRepository.save(entity);
 
