@@ -20,7 +20,6 @@ public interface MemberRepository extends CrudRepository<MemberEntity, Long> {
 
     Page<MemberEntity> findAll(Pageable pageable);
 
-    @Transactional
     @Modifying
     @Query("""
     	UPDATE MemberEntity m
@@ -28,4 +27,12 @@ public interface MemberRepository extends CrudRepository<MemberEntity, Long> {
     	WHERE m.id = ?1
     		""")
     int setMemberStatus(Long id, boolean enabled);
+
+    @Modifying
+    @Query("""
+    	UPDATE MemberEntity m
+    	SET m.password = ?2
+    	WHERE m.email = ?1
+    		""")
+    int setMemberPassword(String email, String password);
 }

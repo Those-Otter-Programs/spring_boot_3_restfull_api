@@ -15,6 +15,7 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +29,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.thoseop.api.members.entity.enums.MemberStatus;
 import com.thoseop.api.members.http.request.MemberCreateRequest;
+import com.thoseop.api.members.http.request.MemberManagePasswordRequest;
+import com.thoseop.api.members.http.request.MemberUpdatePasswordRequest;
 import com.thoseop.api.members.http.request.MemberUpdateRequest;
 import com.thoseop.api.members.http.response.MemberResponse;
 import com.thoseop.api.members.service.MemberService;
@@ -51,12 +54,14 @@ public class MemberControllerImpl implements MemberController {
        ------------- JSON --------------
        curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Content-Type: application/json' \ 
        -L -X POST 'http://localhost:8080/api/member/v1/member-create' \
-       -d '{"memberName":"Ayrton Senna","memberEmail":"ayrton.senna@bravo.com","memberMobileNumber":"(11) 98765-4321","memberAuthorities":null}' | jq
+       -d '{"memberName":"Ayrton Senna","memberEmail":"ayrton.senna@bravo.com","memberMobileNumber":"(11) 98765-4321","memberAuthorities":null}' \
+       | jq
 
        -------------- XML --------------
        curl -s -u 'ayrton.senna@bravo.com' -H 'Accept: application/xml' -H 'Content-Type: application/xml' \
        -L -X POST 'http://localhost:8080/api/member/v1/member-create' \
-       -d '<MemberResponse><memberId>1</memberId><memberName>Ayrton Senna</memberName><memberEmail>ayrton.senna@bravo.com</memberEmail><memberMobileNumber>(11) 98765-4321</memberMobileNumber></MemberResponse>' | xmllint --format -       
+       -d '<MemberCreateRequest><memberId>1</memberId><memberName>Ayrton Senna</memberName><memberEmail>ayrton.senna@bravo.com</memberEmail><memberMobileNumber>(11) 98765-4321</memberMobileNumber></MemberCreateRequest>' \
+       | xmllint --format - 
        
        ------------- YAML --------------
        to be continued...
@@ -64,7 +69,8 @@ public class MemberControllerImpl implements MemberController {
        ------------- CORS --------------
        curl -s -u 'ayrton.senna@bravo.com' -H 'Origin: http://localhost:3000' -H 'Content-Type: application/json' \
        -L -X POST 'http://localhost:8080/api/member/v1/member-create' \
-       -d '{"memberName":"Ayrton Senna","memberEmail":"ayrton.senna@bravo.com","memberMobileNumber":"(11) 98765-4321","memberAuthorities":null}' | jq
+       -d '{"memberName":"Ayrton Senna","memberEmail":"ayrton.senna@bravo.com","memberMobileNumber":"(11) 98765-4321","memberAuthorities":null}' \
+       | jq
      */
     @Override
     @PostMapping(value = "/member-create",
@@ -119,6 +125,7 @@ public class MemberControllerImpl implements MemberController {
 		    MediaType.APPLICATION_JSON_VALUE, 
 		    MediaType.APPLICATION_XML_VALUE })
     public @ResponseBody ResponseEntity<MemberResponse> updateMember(@RequestBody @Valid MemberUpdateRequest memberRequest) {
+
         log.info("Updating user");
 
 	MemberResponse user = memberService.modifyMember(memberRequest);
@@ -179,7 +186,7 @@ public class MemberControllerImpl implements MemberController {
     /* ============= cURL ==============
       
        ------------- JSON --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' 
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
        -L -X GET 'http://localhost:8080/api/member/v1/member-details/ayrton.senna@bravo.com' | jq
 
        -------------- XML --------------
@@ -212,11 +219,106 @@ public class MemberControllerImpl implements MemberController {
 	return ResponseEntity.status(HttpStatus.FOUND).body(member);
     }
 
+    /* ============= cURL ==============
+      
+       ------------- JSON --------------
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
+       -L -X GET 'http://localhost:8080/api/member/v1/member-password' \
+       -d '{"newPassword": "mynewpassword"}' \
+       | jq
+    
+     * Base64: 
+       curl -s -u 'YXlydG9uLnNlbm5hQGJlc3QuY29tOmF5cnRvbl9wYXNz' \
+       -L -X GET 'http://localhost:8080/api/member/v1/member-password' \
+       -d '{"newPassword": "mynewpassword"}' \
+       | jq
+    
+       -------------- XML --------------
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/xml' \
+       -L -X GET 'http://localhost:8080/api/member/v1/member-password' \
+       -d '<MemberUpdatePasswordRequest><newPassword>mynewpassword</newPassword></MemberUpdatePasswordRequest>' \
+       | xmllint --format -
+       
+       ------------- YAML --------------
+       to be continued...
+    
+       ------------- CORS --------------
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Origin: http://localhost:3000' \
+       -L -X GET 'http://localhost:8080/api/member/v1/member-password' \
+       -d '{"newPassword": "mynewpassword"}' \
+       | jq
+    */
+    @Override
+    @PatchMapping(value = "/member-password",
+	    consumes = { _APPLICATION_YAML_VALUE,
+		    MediaType.APPLICATION_JSON_VALUE, 
+		    MediaType.APPLICATION_XML_VALUE}, 
+	    produces = { _APPLICATION_YAML_VALUE, 
+		    MediaType.APPLICATION_JSON_VALUE, 
+		    MediaType.APPLICATION_XML_VALUE })
+    public @ResponseBody ResponseEntity<MemberResponse> updateMemberPassword(@RequestBody MemberUpdatePasswordRequest request, Authentication userAuth) {
+
+        log.info("MemberController - updating member {} password", userAuth.getName());
+
+	MemberResponse member = memberService.changeMemberPassword(userAuth.getName(), request);
+	member.add(linkTo(methodOn(MemberControllerImpl.class)
+		.getMemberByUsername(member.getMemberEmail())).withSelfRel());
+
+	return ResponseEntity.ok(member);
+    }
 
     /* ============= cURL ==============
       
        ------------- JSON --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' 
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
+       -L -X GET 'http://localhost:8080/api/member/v1/manage-member-password' \
+       -d '{"memberUsername": "mfredson2@amazon.com", "memberPassword": "mynewpassword"}' \
+       | jq
+    
+     * Base64: 
+       curl -s -u 'YXlydG9uLnNlbm5hQGJlc3QuY29tOmF5cnRvbl9wYXNz' \
+       -L -X GET 'http://localhost:8080/api/member/v1/manage-member-password' \
+       -d '{"memberUsername": "mfredson2@amazon.com", "memberPassword": "mynewpassword"}' \
+       | jq
+    
+       -------------- XML --------------
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/xml' \
+       -L -X GET 'http://localhost:8080/api/member/v1/manage-member-password' \
+       -d '<MemberUpdatePasswordRequest><memberUsername>mfredson2@amazon.com</memberUsername><memberPassword>mynewpassword</memberPassword></MemberUpdatePasswordRequest>' \
+       | xmllint --format -
+       
+       ------------- YAML --------------
+       to be continued...
+    
+       ------------- CORS --------------
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Origin: http://localhost:3000' \
+       -L -X GET 'http://localhost:8080/api/member/v1/manage-member-password' \
+       -d '{"memberUsername": "mfredson2@amazon.com", "memberPassword": "mynewpassword"}' \
+       | jq
+    */
+    @Override
+    @PatchMapping(value = "/manage-member-password",
+	    consumes = { _APPLICATION_YAML_VALUE,
+		    MediaType.APPLICATION_JSON_VALUE, 
+		    MediaType.APPLICATION_XML_VALUE}, 
+	    produces = { _APPLICATION_YAML_VALUE, 
+		    MediaType.APPLICATION_JSON_VALUE, 
+		    MediaType.APPLICATION_XML_VALUE })
+    public @ResponseBody ResponseEntity<MemberResponse> manageMemberPassword(@RequestBody MemberManagePasswordRequest request) {
+
+        log.info("MemberController - updating member {} password", request.getMemberUsername());
+
+	MemberResponse member = memberService.manageMemberPassword(request);
+	member.add(linkTo(methodOn(MemberControllerImpl.class)
+		.getMemberByUsername(member.getMemberEmail())).withSelfRel());
+
+	return ResponseEntity.ok(member);
+    }
+
+    /* ============= cURL ==============
+      
+       ------------- JSON --------------
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
        -L -X GET 'http://localhost:8080/api/member/v1/member-disable/3' | jq
     
      * Base64: 
@@ -254,7 +356,7 @@ public class MemberControllerImpl implements MemberController {
     /* ============= cURL ==============
       
        ------------- JSON --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' 
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
        -L -X GET 'http://localhost:8080/api/member/v1/member-enable/3' | jq
 
      * Base64: 
