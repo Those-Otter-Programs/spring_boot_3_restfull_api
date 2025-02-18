@@ -12,6 +12,8 @@ import com.thoseop.api.members.entity.AuthorityEntity;
 import com.thoseop.api.members.entity.MemberEntity;
 import com.thoseop.api.members.entity.enums.MemberStatus;
 import com.thoseop.api.members.http.request.MemberCreateRequest;
+import com.thoseop.api.members.http.request.MemberManagePasswordRequest;
+import com.thoseop.api.members.http.request.MemberUpdatePasswordRequest;
 import com.thoseop.api.members.http.request.MemberUpdateRequest;
 import com.thoseop.api.members.http.response.MemberResponse;
 import com.thoseop.api.members.mapper.MemberMapper;
@@ -39,7 +41,7 @@ public class MemberService {
 
         MemberEntity entity = this.memberMapper.mapRequestToEntity(request);
 
-        String hashPwd = passwordEncoder.encode(request.getMemberPassword());
+        String hashPwd = this.passwordEncoder.encode(request.getMemberPassword());
         entity.setPassword(hashPwd);
         entity.setEnabled(false)
         	.setCreatedAt(new Date())
@@ -95,6 +97,45 @@ public class MemberService {
 	return (result.isPresent())? 
 		this.memberMapper.mapToResponse(result.get())
 		: new MemberResponse();
+    }
+    
+    /**
+     * 
+     * @param id
+     * @param request
+     * @return
+     */
+    public MemberResponse changeMemberPassword(String username, MemberUpdatePasswordRequest request) {
+	log.info("Updating member {} password", username);
+
+        String hashPwd = this.passwordEncoder.encode(request.getNewPassword());
+	int res = this.memberRepository.setMemberPassword(username, hashPwd);
+
+	MemberEntity entity = null;
+	if (res == 1) {
+	    entity = this.memberRepository.findByEmail(username).get();
+	}
+	
+	return this.memberMapper.mapToResponse(entity);
+    }
+    
+    /**
+     * 
+     * @param request
+     * @return
+     */
+    public MemberResponse manageMemberPassword(MemberManagePasswordRequest request) {
+	log.info("Managing member {} password", request.getMemberUsername());
+
+        String hashPwd = this.passwordEncoder.encode(request.getMemberNewPassword());
+	int res = this.memberRepository.setMemberPassword(request.getMemberUsername(), hashPwd);
+
+	MemberEntity entity = null;
+	if (res == 1) {
+	    entity = this.memberRepository.findByEmail(request.getMemberUsername()).get();
+	}
+	
+	return this.memberMapper.mapToResponse(entity);
     }
     
     /**
