@@ -2,6 +2,8 @@ package com.thoseop.api.corporation.http;
 
 import java.util.Date;
 
+import static com.thoseop.config.OtterWebMvcConfig._APPLICATION_YAML_VALUE;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.MediaType;
@@ -20,8 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api/corporation/v1")
 public class InfoControllerImpl implements InfoController {
-
-    static final String _APPLICATION_YAML_VALUE = "application/x-yaml";
 
     @Value("${spring.application.name}")
     private String appName;
@@ -43,9 +43,9 @@ public class InfoControllerImpl implements InfoController {
      */
     @Override
     @GetMapping(value = {"", "/", "/info", "/info/"},
-    		produces = { MediaType.APPLICATION_JSON_VALUE, 
-    			MediaType.APPLICATION_XML_VALUE, 
-    			_APPLICATION_YAML_VALUE })
+    		produces = { _APPLICATION_YAML_VALUE,
+    			MediaType.APPLICATION_JSON_VALUE, 
+    			MediaType.APPLICATION_XML_VALUE })
     public @ResponseBody ResponseEntity<Model> info(Model model) {
 	
 	model.addAttribute("Application", appName);
@@ -80,9 +80,9 @@ public class InfoControllerImpl implements InfoController {
      */
     @Override
     @GetMapping(value = {"/info-corp", "/info-corp/"},
-    		produces = { MediaType.APPLICATION_JSON_VALUE, 
-    			MediaType.APPLICATION_XML_VALUE, 
-    			_APPLICATION_YAML_VALUE })
+    		produces = { _APPLICATION_YAML_VALUE,
+    			MediaType.APPLICATION_JSON_VALUE, 
+    			MediaType.APPLICATION_XML_VALUE })
     public @ResponseBody ResponseEntity<InfoCorpResponse> infoCorp() {
 
 	InfoCorpResponse response = new InfoCorpResponse(
