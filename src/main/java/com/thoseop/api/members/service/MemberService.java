@@ -47,9 +47,8 @@ public class MemberService {
         	.setCreatedAt(new Date())
         	.setUpdatedAt(new Date());
 
-	for (String rawAuthority : request.getMemberAuthorities()) { 
+	for (String rawAuthority : request.getMemberAuthorities()) 
 	    entity.addAuthority(new AuthorityEntity().setName(rawAuthority));
-	}
 	
         MemberEntity savedEntity = memberRepository.save(entity);
 
@@ -66,9 +65,12 @@ public class MemberService {
 
         MemberEntity entity = this.memberMapper.mapRequestToEntity(request);
 
-        MemberEntity savedEntity = memberRepository.save(entity);
+        for (String rawAuthority : request.getMemberAuthorities()) 
+	    entity.addAuthority(new AuthorityEntity().setName(rawAuthority));
 
-        return memberMapper.mapToResponse(savedEntity);
+        MemberEntity updatedEntity = memberRepository.save(entity);
+
+        return memberMapper.mapToResponse(updatedEntity);
     }
 
     /**
