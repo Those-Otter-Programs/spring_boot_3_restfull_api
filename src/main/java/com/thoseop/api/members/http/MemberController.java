@@ -52,7 +52,7 @@ public interface MemberController {
 		    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
 		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))) 
     		})
-    public ResponseEntity<MemberResponse> updateMember(MemberUpdateRequest memberRequest);
+    public ResponseEntity<MemberResponse> updateMember(MemberUpdateRequest memberRequest) throws Exception;
 
     /**
      * 
@@ -133,7 +133,7 @@ public interface MemberController {
      * @return
      */
     @Operation(summary = "Activates a member", 
-	    description = "Activates a member", 
+	    description = "Activates a member - it has to be run after member creation", 
 	    tags = { "MemberController" }, 
 	    responses = {
 		    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = MemberResponse.class))),
