@@ -2,6 +2,7 @@ package com.thoseop.api.members.http;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+import static com.thoseop.config.OtterWebMvcConfig._APPLICATION_YAML_VALUE;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -45,7 +46,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class MemberControllerImpl implements MemberController {
 
-    static final String _APPLICATION_YAML_VALUE = "application/x-yaml";
     private final MemberService memberService;
     private final PagedResourcesAssembler<MemberResponse> membersPage_Assembler;
 
@@ -83,7 +83,7 @@ public class MemberControllerImpl implements MemberController {
     public @ResponseBody ResponseEntity<MemberResponse> createMember(@RequestBody @Valid MemberCreateRequest request) 
 	    throws Exception {
 
-        log.info("MemberController - creating user");
+        log.info("MemberController - creating member");
 
 	MemberResponse savedMember;
         try {
@@ -94,45 +94,6 @@ public class MemberControllerImpl implements MemberController {
             throw new Exception(ex);
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(savedMember);
-    }
-
-    /* ============= cURL ==============
-     
-       ------------- JSON --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Content-Type: application/json' \ 
-       -L -X POST 'http://localhost:8080/api/member/v1/member-update' \
-       -d '{"memberName":"Ayrton Senna","memberEmail":"ayrton.senna@bravo.com","memberMobileNumber":"(11) 98765-4321","memberAuthorities":null}' | jq
-
-       -------------- XML --------------
-       curl -s -u 'ayrton.senna@bravo.com' -H 'Accept: application/xml' -H 'Content-Type: application/xml' \
-       -L -X POST 'http://localhost:8080/api/member/v1/member-update' \
-       -d '<MemberResponse><memberId>1</memberId><memberName>Ayrton Senna</memberName><memberEmail>ayrton.senna@bravo.com</memberEmail><memberMobileNumber>(11) 98765-4321</memberMobileNumber></MemberResponse>' | xmllint --format -       
-       
-       ------------- YAML --------------
-       to be continued...
-
-       ------------- CORS --------------
-       curl -s -u 'ayrton.senna@bravo.com' -H 'Origin: http://localhost:3000' -H 'Content-Type: application/json' \
-       -L -X POST 'http://localhost:8080/api/member/v1/member-update' \
-       -d '{"memberName":"Ayrton Senna","memberEmail":"ayrton.senna@bravo.com","memberMobileNumber":"(11) 98765-4321","memberAuthorities":null}' | jq
-     */
-    @Override
-    @PutMapping(value = "/member-update", 
-	    consumes = { _APPLICATION_YAML_VALUE,
-		    MediaType.APPLICATION_JSON_VALUE, 
-		    MediaType.APPLICATION_XML_VALUE}, 
-	    produces = { _APPLICATION_YAML_VALUE, 
-		    MediaType.APPLICATION_JSON_VALUE, 
-		    MediaType.APPLICATION_XML_VALUE })
-    public @ResponseBody ResponseEntity<MemberResponse> updateMember(@RequestBody @Valid MemberUpdateRequest memberRequest) {
-
-        log.info("Updating user");
-
-	MemberResponse user = memberService.modifyMember(memberRequest);
-	user.add(linkTo(methodOn(MemberControllerImpl.class)
-		.getMemberByUsername(memberRequest.getMemberEmail())).withSelfRel());
-	
-	return ResponseEntity.ok(user);
     }
 
     /* ============= cURL ==============
@@ -169,7 +130,7 @@ public class MemberControllerImpl implements MemberController {
 	    @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "8") Integer size,
 	    @RequestParam(defaultValue = "asc") String sort) { 
 	
-        log.info("MemberController - reading all users");
+        log.info("MemberController - reading all members");
 
 	var sortDirection = "desc".equalsIgnoreCase(sort) ? Direction.DESC : Direction.ASC;
 	Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "email"));
@@ -208,15 +169,60 @@ public class MemberControllerImpl implements MemberController {
 		    MediaType.APPLICATION_XML_VALUE })
     public @ResponseBody ResponseEntity<MemberResponse> getMemberByUsername(@PathVariable String username) {
 
-        log.info("MemberController - reading user by username: {}", username);
+        log.info("MemberController - reading member by username: {}", username);
 
 	MemberResponse member = memberService.readMemberByEmail(username);
 	member.add(linkTo(methodOn(MemberControllerImpl.class)
 		.getMemberByUsername(member.getMemberEmail())).withSelfRel());
 
 //	return new ResponseEntity<MemberResponse>(member, HttpStatus.OK);
-//	return ResponseEntity.ok(member);
-	return ResponseEntity.status(HttpStatus.FOUND).body(member);
+	return ResponseEntity.ok(member);
+    }
+
+    /* ============= cURL ==============
+     
+       ------------- JSON --------------
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Content-Type: application/json' \ 
+       -L -X POST 'http://localhost:8080/api/member/v1/member-update' \
+       -d '{"memberId":3,"memberName":"Cody Johnson","memberEmail":"cody.johnson@bravo.com","memberMobileNumber":"+1 (865) 765-4321", "memberAuthorities": ["ROLE_MANAGER"]}' \
+       | jq
+
+       -------------- XML --------------
+       curl -s -u 'ayrton.senna@bravo.com' -H 'Accept: application/xml' -H 'Content-Type: application/xml' \
+       -L -X POST 'http://localhost:8080/api/member/v1/member-update' \
+       -d '<MemberResponse><memberId>3</memberId><memberName>Toby Keith</memberName><memberEmail>toby.keith@bravo.com</memberEmail><memberMobileNumber>+1 (865) 765-4321</memberMobileNumber></MemberResponse>' \
+       | xmllint --format -       
+       
+       ------------- YAML --------------
+       to be continued...
+
+       ------------- CORS --------------
+       curl -s -u 'ayrton.senna@bravo.com' -H 'Origin: http://localhost:3000' -H 'Content-Type: application/json' \
+       -L -X POST 'http://localhost:8080/api/member/v1/member-update' \
+       -d '{"memberId":3,"memberName":"Jo Dee Messina","memberEmail":"jo.dee@bravo.com","memberMobileNumber":"+1 (865) 765-4321", "memberAuthorities": ["ROLE_MANAGER"]}' \
+       | jq
+     */
+    @Override
+    @PutMapping(value = "/member-update", 
+	    consumes = { _APPLICATION_YAML_VALUE,
+		    MediaType.APPLICATION_JSON_VALUE, 
+		    MediaType.APPLICATION_XML_VALUE}, 
+	    produces = { _APPLICATION_YAML_VALUE, 
+		    MediaType.APPLICATION_JSON_VALUE, 
+		    MediaType.APPLICATION_XML_VALUE })
+    public @ResponseBody ResponseEntity<MemberResponse> updateMember(@RequestBody @Valid MemberUpdateRequest memberRequest) throws Exception {
+
+        log.info("MemberController - updating member");
+        
+        MemberResponse updatedMember = null;
+        try { 
+            updatedMember = memberService.modifyMember(memberRequest);
+            updatedMember.add(linkTo(methodOn(MemberControllerImpl.class)
+                    .getMemberByUsername(memberRequest.getMemberEmail())).withSelfRel());
+        } catch (Exception ex) {
+	    throw new Exception(ex);
+	}
+	return ResponseEntity.ok(updatedMember);
     }
 
     /* ============= cURL ==============
@@ -256,7 +262,7 @@ public class MemberControllerImpl implements MemberController {
 	    produces = { _APPLICATION_YAML_VALUE, 
 		    MediaType.APPLICATION_JSON_VALUE, 
 		    MediaType.APPLICATION_XML_VALUE })
-    public @ResponseBody ResponseEntity<MemberResponse> updateMemberPassword(@RequestBody MemberUpdatePasswordRequest request, Authentication userAuth) {
+    public @ResponseBody ResponseEntity<MemberResponse> updateMemberPassword(@RequestBody @Valid MemberUpdatePasswordRequest request, Authentication userAuth) {
 
         log.info("MemberController - updating member {} password", userAuth.getName());
 
@@ -304,7 +310,7 @@ public class MemberControllerImpl implements MemberController {
 	    produces = { _APPLICATION_YAML_VALUE, 
 		    MediaType.APPLICATION_JSON_VALUE, 
 		    MediaType.APPLICATION_XML_VALUE })
-    public @ResponseBody ResponseEntity<MemberResponse> manageMemberPassword(@RequestBody MemberManagePasswordRequest request) {
+    public @ResponseBody ResponseEntity<MemberResponse> manageMemberPassword(@RequestBody @Valid MemberManagePasswordRequest request) {
 
         log.info("MemberController - updating member {} password", request.getMemberUsername());
 
