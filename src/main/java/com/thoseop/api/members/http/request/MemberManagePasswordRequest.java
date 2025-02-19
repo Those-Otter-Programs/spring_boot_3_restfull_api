@@ -25,6 +25,8 @@ public class MemberManagePasswordRequest implements Serializable {
     private static final long serialVersionUID = -6153353822460684876L;
 
     @Schema( description = "The member's username", example = "johnwart@corp.com")
+    @NotNull
+    @Size(min = 2, max = 200)
     private String memberUsername;
     
     @Schema(description = "The member's new password", example = "mynewpassword")
