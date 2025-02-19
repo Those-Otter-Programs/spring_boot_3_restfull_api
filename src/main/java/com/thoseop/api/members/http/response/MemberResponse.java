@@ -39,7 +39,7 @@ public class MemberResponse extends RepresentationModel<MemberResponse> implemen
     private String memberMobileNumber;
     
     @Schema(description = "The member's status", example = "false")
-    private boolean memberEnabled;
+    private Boolean memberEnabled;
     
     @Schema(description = "The member's creation date", example = "1945-09-02")
     private Date memberCreatedAt;
