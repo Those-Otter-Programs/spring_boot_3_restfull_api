@@ -1,9 +1,6 @@
 HELP.md
 target/
-data/test_dev_db.mv.db
-data/test_dev_db.trace.db
-data/test_prod_db.mv.db
-data/test_prod_db.trace.db
+data/*.db
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -15,6 +12,7 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
+*.bkp
 
 # Eclipse m2e generated files
 # Eclipse Core
