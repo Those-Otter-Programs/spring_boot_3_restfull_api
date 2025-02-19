@@ -15,7 +15,7 @@ import com.thoseop.serialization.converter.OtterYamlJackson2HttpMessageConverter
 @Configuration
 public class OtterWebMvcConfig implements WebMvcConfigurer {
 
-    private static final MediaType MEDIA_TYPE_APPLICATION_YAML = MediaType.valueOf("application/x-yaml");
+    public static final String _APPLICATION_YAML_VALUE = "application/x-yaml";
 
     @Value("${corsAllowedOrigins:http://localhost:8080}")
     private String corsAllowedOrigins;
@@ -43,7 +43,7 @@ public class OtterWebMvcConfig implements WebMvcConfigurer {
 		.useRegisteredExtensionsOnly(false)
 		.defaultContentType(MediaType.APPLICATION_JSON) // default responses format is JSON
 		.mediaType("json", MediaType.APPLICATION_JSON)
-		.mediaType("x-yaml", MEDIA_TYPE_APPLICATION_YAML)
-		.mediaType("xml", MediaType.APPLICATION_XML); // additional supported media types
+		.mediaType("xml", MediaType.APPLICATION_XML) // additional supported media types
+		.mediaType("x-yaml", MediaType.valueOf(_APPLICATION_YAML_VALUE));
     }
 }
