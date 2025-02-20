@@ -2,6 +2,7 @@ package com.thoseop.api.members.http;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -10,6 +11,9 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -56,16 +60,27 @@ class MemberControllerIntegrationTest {
 	jdbcTemplate.execute("DELETE FROM members WHERE id > 50");
     }
 
+    static Stream<Arguments> memberSeed() {
+	return Stream.of(
+		Arguments.of(new MemberCreateRequest("Oscar Niemeyer", "oscar.niemeyer@test.com",
+			"(11) 91234-5678", "niemeyer_pass", Set.of("ROLE_ASSOCIATE"))),
+		Arguments.of(new MemberCreateRequest("Pele", "pele@test.com",
+			"(11) 92345-6789", "pele_pass", Set.of("ROLE_ASSOCIATE"))),
+		Arguments.of(new MemberCreateRequest("Gisele Bündchen", "bisele.bundchen@test.com",
+			"(11) 93456-7890", "bundchen_pass", Set.of("ROLE_ASSOCIATE"))),
+		Arguments.of(new MemberCreateRequest("Santos Dumont", "santos.dumont@test.com",
+			"(11) 94567-8901", "dumont_pass", Set.of("ROLE_ASSOCIATE"))),
+		Arguments.of(new MemberCreateRequest("Tom Jobim", "tom.jobim@test.com",
+			"(11) 95678-9012", "jobim_pass", Set.of("ROLE_ASSOCIATE"))));
+    }
+
     @DisplayName("test Create Member_when Member Authorized_then Returns HTTP 201")
-    @Test
+    @ParameterizedTest
+    @MethodSource("memberSeed")
     @Order(1)
-    void testCreateMember_whenMemberAuthorized_thenReturnsHTTP201() {
+    void testCreateMember_whenMemberAuthorized_thenReturnsHTTP201(MemberCreateRequest memberCreateRequest) {
 	// g
 	String route = "%s/member-create".formatted(this.baseRoute);
-	
-	MemberCreateRequest memberCreateRequest = 
-		new MemberCreateRequest("Rocco Lampone", "rocco.lamponne@test.com",
-			"(865) 1234-5678", "roccos_pass", Set.of("ROLE_ASSOCIATE"));
 
 	// creating the headers for the request
 	HttpHeaders headers = new HttpHeaders();
@@ -76,19 +91,22 @@ class MemberControllerIntegrationTest {
 		memberCreateRequest, headers);
 	// w
 	ResponseEntity<MemberResponse> response = testRestTemplate
-		.withBasicAuth("ayrton.senna@bravo.com", 
-				"ayrton_pass")
+		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.POST, request, MemberResponse.class);
 	
 	// t
 	Assertions.assertEquals(HttpStatus.CREATED, 
-		response.getStatusCode());
+		response.getStatusCode(), 
+		() -> "The returned http status code was not the expected.");
 	Assertions.assertEquals(memberCreateRequest.getMemberName(), 
-		response.getBody().getMemberName());
+		response.getBody().getMemberName(), 
+		() -> "The returned member name was not the expected.");
 	Assertions.assertEquals(memberCreateRequest.getMemberEmail(), 
-		response.getBody().getMemberEmail());
+		response.getBody().getMemberEmail(), 
+		() -> "The returned member email was not the expected.");
 	Assertions.assertEquals(memberCreateRequest.getMemberMobileNumber(), 
-		response.getBody().getMemberMobileNumber());
+		response.getBody().getMemberMobileNumber(), 
+		() -> "The retruned member mobile number was not the expected");
     }
 
     @DisplayName("test Get Members_when Member Authorized_then Returns HTTP 200")
@@ -113,7 +131,8 @@ class MemberControllerIntegrationTest {
 
 //	Collection<EntityModel<MemberResponse>> members = response.getBody().getContent();
 	// t
-	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(), 
+		() -> "The returned http status code returned was not the expected.");
     }
 
     @DisplayName("test Get Member By Username_when Member Authorized_then Returns HTTP 200")
@@ -132,17 +151,17 @@ class MemberControllerIntegrationTest {
 		null, headers);
 	// w
 	ResponseEntity<MemberResponse> response = testRestTemplate
-		.withBasicAuth("ayrton.senna@bravo.com", 
-				"ayrton_pass")
+		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.GET, request, MemberResponse.class);
 	// t
-	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-	Assertions.assertEquals("Ayrton Senna", 
-		response.getBody().getMemberName());
-	Assertions.assertEquals("ayrton.senna@bravo.com", 
-		response.getBody().getMemberEmail());
-	Assertions.assertEquals("(11) 98765-4321", 
-		response.getBody().getMemberMobileNumber());
+	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
+		() -> "The returned http status code was not the expected.");
+	Assertions.assertEquals("Ayrton Senna", response.getBody().getMemberName(), 
+		() -> "The returned member name was not the expected.");
+	Assertions.assertEquals("ayrton.senna@bravo.com", response.getBody().getMemberEmail(), 
+		() -> "The returned member email was not the expected.");
+	Assertions.assertEquals("(11) 98765-4321", response.getBody().getMemberMobileNumber(),
+		() -> "The returned member mobile number was not expected.");
     }
     
     @DisplayName("test Update Member Password_when Authenticated_then Returns HTTP 200")
@@ -168,8 +187,8 @@ class MemberControllerIntegrationTest {
 		.withBasicAuth("mfredson2@amazon.com", "lQEXBPL")
 		.exchange(route, HttpMethod.PATCH, updPassHTTPrequest, MemberResponse.class);
 	// t
-	Assertions.assertEquals(HttpStatus.OK, 
-		responsePassChange.getStatusCode());
+	Assertions.assertEquals(HttpStatus.OK, responsePassChange.getStatusCode(),
+		() -> "The returned http status code was not the expected.");
 
 	// ------------------ REVERTING PASSWORD CHANGE ------------------
 	// g
@@ -181,8 +200,8 @@ class MemberControllerIntegrationTest {
 		.withBasicAuth("mfredson2@amazon.com", "new_mick_pass")
 		.exchange(route, HttpMethod.PATCH, updPassHTTPrequest, MemberResponse.class);
 	// t
-	Assertions.assertEquals(HttpStatus.OK, 
-		responsePassChange.getStatusCode());
+	Assertions.assertEquals(HttpStatus.OK, responsePassChange.getStatusCode(),
+		() -> "The returned http status code was not the expected.");
     }
     
     @DisplayName("test Manage Member Password_when Authenticated_then Returns HTTP 200")
@@ -209,8 +228,8 @@ class MemberControllerIntegrationTest {
 		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.PATCH, updPassHTTPrequest, MemberResponse.class);
 	// t
-	Assertions.assertEquals(HttpStatus.OK, 
-		responsePassChange.getStatusCode());
+	Assertions.assertEquals(HttpStatus.OK, responsePassChange.getStatusCode(),
+		() -> "The returned http status code was not the expected.");
 
 	// ------------------ REVERTING PASSWORD CHANGE ------------------
 	// g
@@ -222,8 +241,8 @@ class MemberControllerIntegrationTest {
 		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.PATCH, updPassHTTPrequest, MemberResponse.class);
 	// t
-	Assertions.assertEquals(HttpStatus.OK, 
-		responsePassChange.getStatusCode());
+	Assertions.assertEquals(HttpStatus.OK, responsePassChange.getStatusCode(),
+		() -> "The returned http status code was not the expected.");
     }
 
     @DisplayName("test Inactivate Member_when Right Privileges_then Returns HTTP 200")
@@ -242,13 +261,13 @@ class MemberControllerIntegrationTest {
 		null, headers);
 	// w
 	ResponseEntity<MemberResponse> response = testRestTemplate
-		.withBasicAuth("ayrton.senna@bravo.com", 
-				"ayrton_pass")
+		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.PATCH, request, MemberResponse.class);
 	// t
-	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-	Assertions.assertEquals(false, 
-		response.getBody().getMemberEnabled());
+	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
+		() -> "The returned http status code was not the expected.");
+	Assertions.assertEquals(false, response.getBody().getMemberEnabled(),
+		() -> "The returned member status was not the expected.");
     }
 
     @DisplayName("test Activate Member_when Right Privileges_then Returns HTTP 200")
@@ -267,12 +286,12 @@ class MemberControllerIntegrationTest {
 		null, headers);
 	// w
 	ResponseEntity<MemberResponse> response = testRestTemplate
-		.withBasicAuth("ayrton.senna@bravo.com", 
-				"ayrton_pass")
+		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.PATCH, request, MemberResponse.class);
 	// t
-	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
-	Assertions.assertEquals(true, 
-		response.getBody().getMemberEnabled());
+	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
+		() -> "The returned http status code was not the expected.");
+	Assertions.assertEquals(true, response.getBody().getMemberEnabled(),
+		() -> "The returned member status was not the expected.");
     }
 }
