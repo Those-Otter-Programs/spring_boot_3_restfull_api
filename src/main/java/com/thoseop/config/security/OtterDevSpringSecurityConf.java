@@ -14,7 +14,6 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import com.thoseop.exception.OtterAccessDeniedHandler;
 import com.thoseop.exception.OtterBasicAuthenticationEntryPoint;
 import com.thoseop.filter.AuthenticationLoggingAfterFilter;
-import com.thoseop.filter.AuthenticationLoggingAtFilter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,8 +40,7 @@ public class OtterDevSpringSecurityConf {
 	});  
 	
 	// FILTER 
-        http.addFilterAfter(new AuthenticationLoggingAfterFilter(), BasicAuthenticationFilter.class)
-            .addFilterAt(new AuthenticationLoggingAtFilter(), BasicAuthenticationFilter.class);
+        http.addFilterAfter(new AuthenticationLoggingAfterFilter(), BasicAuthenticationFilter.class);
 
 	http.authorizeHttpRequests((requestFilter) -> requestFilter
 		// AUTHENTICATED ROUTES
