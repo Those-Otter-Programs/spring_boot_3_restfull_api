@@ -10,9 +10,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import com.thoseop.exception.OtterAccessDeniedHandler;
 import com.thoseop.exception.OtterBasicAuthenticationEntryPoint;
+import com.thoseop.filter.AuthenticationLoggingAfterFilter;
+import com.thoseop.filter.AuthenticationLoggingAtFilter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,6 +40,10 @@ public class OtterSpringSecurityConf {
 		.maxSessionsPreventsLogin(false); // If true, prevents a user from authenticating when the {@link #maximumSessions(int)} has been reached.
 	    smc.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 	});  
+	
+	// FILTER 
+        http.addFilterAfter(new AuthenticationLoggingAfterFilter(), BasicAuthenticationFilter.class)
+            .addFilterAt(new AuthenticationLoggingAtFilter(), BasicAuthenticationFilter.class);
 
 	http.authorizeHttpRequests((requestFilter) -> requestFilter
 		// AUTHENTICATED ROUTES
@@ -44,6 +51,7 @@ public class OtterSpringSecurityConf {
 			"/api/corporation/v1/info-corp", "/api/corporation/v1/info-corp/"
 			).authenticated()
 		.requestMatchers(HttpMethod.PATCH, "/api/member/v1/member-password/**").authenticated()
+		.requestMatchers(HttpMethod.GET, "/api/member/v1/me").authenticated()
 
 		// ROLE BASED AUTHENTICATED ROUTES
 		.requestMatchers(HttpMethod.POST, "/api/member/v1/member-create/**").hasRole("ADMIN")
