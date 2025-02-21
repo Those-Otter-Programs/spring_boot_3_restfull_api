@@ -1,8 +1,8 @@
 package com.thoseop.api.members.http;
 
+import static com.thoseop.config.OtterWebMvcConfig._APPLICATION_YAML_VALUE;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-import static com.thoseop.config.OtterWebMvcConfig._APPLICATION_YAML_VALUE;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -180,6 +181,42 @@ public class MemberControllerImpl implements MemberController {
     }
 
     /* ============= cURL ==============
+      
+       ------------- JSON --------------
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/me' | jq
+
+       -------------- XML --------------
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/xml' \
+       -L -X GET 'http://localhost:8080/api/member/v1/me' | xmllint --format -
+       
+       ------------- YAML --------------
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/x-yaml' \
+       -L -X GET 'http://localhost:8080/api/member/v1/me' | yq
+
+       ------------- CORS --------------
+       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Origin: http://localhost:3000' \
+       -L -X GET 'http://localhost:8080/api/member/v1/me' | jq
+     */
+    @Override
+    @GetMapping(value = "/me", 
+	    produces = { _APPLICATION_YAML_VALUE, 
+		    MediaType.APPLICATION_JSON_VALUE, 
+		    MediaType.APPLICATION_XML_VALUE })
+    public @ResponseBody ResponseEntity<MemberResponse> getMineDetails() {
+	
+	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	MemberResponse member = new MemberResponse();
+
+	if (authentication != null) {
+            member = memberService.readMemberByEmail(authentication.getName());
+            member.add(linkTo(methodOn(MemberControllerImpl.class)
+                    .getMemberByUsername(member.getMemberEmail())).withSelfRel());
+	}
+
+	return ResponseEntity.ok(member);
+    }
+
+    /* ============= cURL ==============
      
        ------------- JSON --------------
        curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Content-Type: application/json' \ 
@@ -262,14 +299,18 @@ public class MemberControllerImpl implements MemberController {
 	    produces = { _APPLICATION_YAML_VALUE, 
 		    MediaType.APPLICATION_JSON_VALUE, 
 		    MediaType.APPLICATION_XML_VALUE })
-    public @ResponseBody ResponseEntity<MemberResponse> updateMemberPassword(@RequestBody @Valid MemberUpdatePasswordRequest request, Authentication userAuth) {
+    public @ResponseBody ResponseEntity<MemberResponse> updateMemberPassword(@RequestBody @Valid MemberUpdatePasswordRequest request, 
+	    Authentication userAuth) {
 
         log.info("MemberController - updating member {} password", userAuth.getName());
 
-	MemberResponse member = memberService.changeMemberPassword(userAuth.getName(), request);
-	member.add(linkTo(methodOn(MemberControllerImpl.class)
-		.getMemberByUsername(member.getMemberEmail())).withSelfRel());
-
+        MemberResponse member = new MemberResponse();
+        if (userAuth != null) {
+            member = memberService.changeMemberPassword(userAuth.getName(), request);
+            member.add(linkTo(methodOn(MemberControllerImpl.class)
+                    .getMemberByUsername(member.getMemberEmail())).withSelfRel());
+        }
+        
 	return ResponseEntity.ok(member);
     }
 
