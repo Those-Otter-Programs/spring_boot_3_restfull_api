@@ -94,6 +94,24 @@ public interface MemberController {
 
     /**
      * 
+     * @param memberUsername
+     * @return
+     */
+    @Operation(summary = "Shows the authenticated member details", 
+	    description = "Shows the authenticated member details", 
+	    tags = { "MemberController" }, 
+	    responses = {
+		    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = MemberResponse.class))),
+		    @ApiResponse(description = "No Content", responseCode = "204", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))), 
+    		})
+    public ResponseEntity<MemberResponse> getMineDetails();
+
+    /**
+     * 
      * @param request
      * @return
      */
