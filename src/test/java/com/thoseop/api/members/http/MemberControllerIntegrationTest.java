@@ -62,16 +62,17 @@ class MemberControllerIntegrationTest {
 
     static Stream<Arguments> memberSeed() {
 	return Stream.of(
-		Arguments.of(new MemberCreateRequest("Oscar Niemeyer", "oscar.niemeyer@test.com",
-			"(11) 91234-5678", "niemeyer_pass", Set.of("ROLE_ASSOCIATE"))),
-		Arguments.of(new MemberCreateRequest("Pele", "pele@test.com",
-			"(11) 92345-6789", "pele_pass", Set.of("ROLE_ASSOCIATE"))),
-		Arguments.of(new MemberCreateRequest("Gisele Bündchen", "bisele.bundchen@test.com",
-			"(11) 93456-7890", "bundchen_pass", Set.of("ROLE_ASSOCIATE"))),
 		Arguments.of(new MemberCreateRequest("Santos Dumont", "santos.dumont@test.com",
-			"(11) 94567-8901", "dumont_pass", Set.of("ROLE_ASSOCIATE"))),
+			"(11) 94567-8901", "dumont_pass", Set.of("ROLE_ADMIN", "ROLE_INVENTOR"))),
 		Arguments.of(new MemberCreateRequest("Tom Jobim", "tom.jobim@test.com",
-			"(11) 95678-9012", "jobim_pass", Set.of("ROLE_ASSOCIATE"))));
+			"(11) 95678-9012", "jobim_pass", Set.of("ROLE_ADMIN", "ROLE_MUSICIAN"))),
+		Arguments.of(new MemberCreateRequest("Pele", "pele@test.com",
+			"(11) 92345-6789", "pele_pass", Set.of("ROLE_ADMIN", "ROLE_ATHLETE"))),
+		Arguments.of(new MemberCreateRequest("Vitor Belfort", "vitor.belfort@test.com",
+			"(11) 91234-5678", "belfort_pass", Set.of("ROLE_MANAGER", "ROLE_WARRIOR"))),
+		Arguments.of(new MemberCreateRequest("Cláudia Abreu", "claudia.abreu@test.com",
+			"(11) 93456-7890", "abreu_pass", Set.of("ROLE_MANAGER", "ROLE_HOTEST")))
+		);
     }
 
     @DisplayName("test Create Member_when Member Authorized_then Returns HTTP 201")
@@ -93,7 +94,6 @@ class MemberControllerIntegrationTest {
 	ResponseEntity<MemberResponse> response = testRestTemplate
 		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.POST, request, MemberResponse.class);
-	
 	// t
 	Assertions.assertEquals(HttpStatus.CREATED, 
 		response.getStatusCode(), 
@@ -141,6 +141,35 @@ class MemberControllerIntegrationTest {
     void testGetMemberByUsername_whenMemberAuthorized_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-details/ayrton.senna@bravo.com".formatted(this.baseRoute);
+
+	// creating the headers for the requestString
+	HttpHeaders headers = new HttpHeaders();
+	headers.setContentType(MediaType.APPLICATION_JSON);
+	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+
+	HttpEntity<?> request = new HttpEntity<>(
+		null, headers);
+	// w
+	ResponseEntity<MemberResponse> response = testRestTemplate
+		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
+		.exchange(route, HttpMethod.GET, request, MemberResponse.class);
+	// t
+	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
+		() -> "The returned http status code was not the expected.");
+	Assertions.assertEquals("Ayrton Senna", response.getBody().getMemberName(), 
+		() -> "The returned member name was not the expected.");
+	Assertions.assertEquals("ayrton.senna@bravo.com", response.getBody().getMemberEmail(), 
+		() -> "The returned member email was not the expected.");
+	Assertions.assertEquals("(11) 98765-4321", response.getBody().getMemberMobileNumber(),
+		() -> "The returned member mobile number was not expected.");
+    }
+
+    @DisplayName("test Get Me_when Member Authenticated_then Returns HTTP 200")
+    @Test
+    @Order(3)
+    void testMe_whenMemberAuthenticated_thenReturnsHTTP200() {
+	// g
+	String route = "%s/me".formatted(this.baseRoute);
 
 	// creating the headers for the requestString
 	HttpHeaders headers = new HttpHeaders();
