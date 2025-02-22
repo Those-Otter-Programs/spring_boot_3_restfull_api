@@ -62,6 +62,7 @@ class MemberControllerIntegrationTest {
 	jdbcTemplate.execute("DELETE FROM members WHERE id > 50");
     }
     
+    @DisplayName("test Member Token_when Member Authorized_then Return Token")
     @Test
     @Order(1)
     void testMemberToken_whenMemberAuthorized_thenReturnToken() {
@@ -82,12 +83,13 @@ class MemberControllerIntegrationTest {
 	// getting the JWT token and setting it to a property to use on the other
 	// authenticated tests.
 	this.jwtAuthToken = response.getHeaders().getValuesAsList("Authorization").get(0);
+
 	// t
 	Assertions.assertEquals(HttpStatus.OK, 
 		response.getStatusCode(), 
 		() -> "The returned http status code was not the expected.");
 	Assertions.assertNotNull(this.jwtAuthToken, 
-		() -> "Response should contain Authorization header with JWT");
+		() -> "Response should contain the JWT token in the Authorization header field");
     }
 
     static Stream<Arguments> memberSeed() {
@@ -158,8 +160,7 @@ class MemberControllerIntegrationTest {
 	// w
 	ResponseEntity<PagedModel<EntityModel<MemberResponse>>> response = testRestTemplate
 //		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
-		.exchange(route, HttpMethod.GET, request, 
-			new ParameterizedTypeReference<PagedModel<EntityModel<MemberResponse>>>() {
+		.exchange(route, HttpMethod.GET, request, new ParameterizedTypeReference<PagedModel<EntityModel<MemberResponse>>>() {
 		});
 
 //	Collection<EntityModel<MemberResponse>> members = response.getBody().getContent();
@@ -200,7 +201,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Get Me_when Member Authenticated_then Returns HTTP 200")
     @Test
-    @Order(4)
+    @Order(5)
     void testMe_whenMemberAuthenticated_thenReturnsHTTP200() {
 	// g
 	String route = "%s/me".formatted(this.baseRoute);
@@ -230,13 +231,13 @@ class MemberControllerIntegrationTest {
     
     @DisplayName("test Update Member Password_when Authenticated_then Returns HTTP 200")
     @Test
-    @Order(5)
+    @Order(6)
     void testUpdateMemberPassword_whenAuthenticated_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-password".formatted(this.baseRoute);
 	
 	MemberUpdatePasswordRequest memberUpdPassRequest = 
-		new MemberUpdatePasswordRequest("new_mick_pass"); 
+		new MemberUpdatePasswordRequest("new_ayrton_pass"); 
 
 	// creating the headers for the requestString
 	HttpHeaders headers = new HttpHeaders();
@@ -249,7 +250,6 @@ class MemberControllerIntegrationTest {
 	// w
 	// ...changing the members password...
 	ResponseEntity<MemberResponse> responsePassChange = testRestTemplate
-//		.withBasicAuth("mfredson2@amazon.com", "lQEXBPL")
 		.exchange(route, HttpMethod.PATCH, updPassHTTPrequest, MemberResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, responsePassChange.getStatusCode(),
@@ -258,11 +258,11 @@ class MemberControllerIntegrationTest {
 	// ------------------ REVERTING PASSWORD CHANGE ------------------
 	// g
 	memberUpdPassRequest = 
-		new MemberUpdatePasswordRequest("lQEXBPL"); 
+		new MemberUpdatePasswordRequest("ayrton_pass"); 
 	updPassHTTPrequest = new HttpEntity<>(memberUpdPassRequest, headers);
 	// w
 	responsePassChange = testRestTemplate
-		.withBasicAuth("mfredson2@amazon.com", "new_mick_pass")
+//		.withBasicAuth("mfredson2@amazon.com", "new_mick_pass")
 		.exchange(route, HttpMethod.PATCH, updPassHTTPrequest, MemberResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, responsePassChange.getStatusCode(),
@@ -271,7 +271,7 @@ class MemberControllerIntegrationTest {
     
     @DisplayName("test Manage Member Password_when Authenticated_then Returns HTTP 200")
     @Test
-    @Order(6)
+    @Order(7)
     void testManageMemberPassword_whenAuthenticated_thenReturnsHTTP200() {
 	// g
 	String route = "%s/manage-member-password".formatted(this.baseRoute);
@@ -304,7 +304,7 @@ class MemberControllerIntegrationTest {
 	updPassHTTPrequest = new HttpEntity<>(memberMngPassRequest, headers);
 	// w
 	responsePassChange = testRestTemplate
-		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
+//		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.PATCH, updPassHTTPrequest, MemberResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, responsePassChange.getStatusCode(),
@@ -313,7 +313,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Inactivate Member_when Right Privileges_then Returns HTTP 200")
     @Test
-    @Order(7)
+    @Order(8)
     void testInactivateMember_whenRightPrivileges_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-disable/3".formatted(this.baseRoute);
@@ -339,7 +339,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Activate Member_when Right Privileges_then Returns HTTP 200")
     @Test
-    @Order(8)
+    @Order(9)
     void testActivateMember_whenRightPrivileges_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-enable/3".formatted(this.baseRoute);
