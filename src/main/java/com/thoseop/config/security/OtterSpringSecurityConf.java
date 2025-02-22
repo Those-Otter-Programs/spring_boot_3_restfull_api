@@ -4,17 +4,26 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import com.thoseop.exception.OtterAccessDeniedHandler;
 import com.thoseop.exception.OtterBasicAuthenticationEntryPoint;
 import com.thoseop.filter.AuthenticationLoggingAfterFilter;
+import com.thoseop.filter.AuthenticationLoggingAtFilter;
+import com.thoseop.filter.AuthenticationLoggingBeforeFilter;
+import com.thoseop.filter.OtterJWTTokenGeneratorFilter;
+import com.thoseop.filter.OtterJWTTokenValidatorFilter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,10 +50,18 @@ public class OtterSpringSecurityConf {
 	});  
 	
 	// FILTER 
-        http.addFilterAfter(new AuthenticationLoggingAfterFilter(), BasicAuthenticationFilter.class);
+        http.addFilterBefore(new AuthenticationLoggingBeforeFilter(), BasicAuthenticationFilter.class)
+            .addFilterAt(new AuthenticationLoggingAtFilter(), BasicAuthenticationFilter.class)
+            .addFilterAfter(new AuthenticationLoggingAfterFilter(), BasicAuthenticationFilter.class)
+            // JWT FILTERS
+            .addFilterAfter(new OtterJWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
+            .addFilterBefore(new OtterJWTTokenValidatorFilter(), BasicAuthenticationFilter.class);
+
+//        http.requiresChannel(rcc -> rcc.anyRequest().requiresSecure()); // HTTPS only
 
 	http.authorizeHttpRequests((requestFilter) -> requestFilter
 		// AUTHENTICATED ROUTES
+		.requestMatchers(HttpMethod.GET, "/api/member/v1/token").authenticated() 
 		.requestMatchers(HttpMethod.GET, 
 			"/api/corporation/v1/info-corp", "/api/corporation/v1/info-corp/"
 			).authenticated()
@@ -86,5 +103,25 @@ public class OtterSpringSecurityConf {
     @Bean
     PasswordEncoder passwordEncoder() {
 	return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    /**
+     * Spring Security 6.3+
+     *
+     * @return
+     */
+    @Bean
+    CompromisedPasswordChecker compromisedPasswordChecker() {
+        return new HaveIBeenPwnedRestApiPasswordChecker();
+    }
+
+    @Bean
+    AuthenticationManager authenticationManager(UserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder) {
+	OtterEmailPwdAuthenticationProvider authenticationProvider =
+                new OtterEmailPwdAuthenticationProvider(userDetailsService, passwordEncoder);
+        ProviderManager providerManager = new ProviderManager(authenticationProvider);
+        providerManager.setEraseCredentialsAfterAuthentication(false);
+        return  providerManager;
     }
 }
