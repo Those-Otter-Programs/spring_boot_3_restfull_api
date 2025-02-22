@@ -54,7 +54,7 @@ public class OtterJWTTokenGeneratorFilter extends OncePerRequestFilter {
                         	.stream().map(GrantedAuthority::getAuthority)
                         	         .collect(Collectors.joining(",")))
                         .issuedAt(new Date())
-                        .expiration(new Date((new Date()).getTime() + 30000000)) // token valid for 120 seconds 120000 ms
+                        .expiration(new Date((new Date()).getTime() + 60000)) // token valid for 60 seconds 60000 ms
             		.signWith(secretKey).compact();
                 
                 response.setHeader("Authorization", jwt);
