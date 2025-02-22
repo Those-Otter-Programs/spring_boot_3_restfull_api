@@ -1,8 +1,7 @@
 package com.thoseop.api.corporation.http;
 
-import java.util.Date;
-
 import static com.thoseop.config.OtterWebMvcConfig._APPLICATION_YAML_VALUE;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
