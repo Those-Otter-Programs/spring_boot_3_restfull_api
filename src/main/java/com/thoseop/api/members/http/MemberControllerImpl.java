@@ -1,8 +1,10 @@
 package com.thoseop.api.members.http;
 
-import static com.thoseop.config.OtterWebMvcConfig._APPLICATION_YAML_VALUE;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+
+import static com.thoseop.config.OtterWebMvcConfig._APPLICATION_YAML_VALUE;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +40,7 @@ import com.thoseop.api.members.http.request.MemberUpdateRequest;
 import com.thoseop.api.members.http.response.MemberResponse;
 import com.thoseop.api.members.service.MemberService;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +53,18 @@ public class MemberControllerImpl implements MemberController {
 
     private final MemberService memberService;
     private final PagedResourcesAssembler<MemberResponse> membersPage_Assembler;
+
+    @Override
+    @GetMapping(value = "/token",
+	    produces = { _APPLICATION_YAML_VALUE,
+		    MediaType.APPLICATION_JSON_VALUE, 
+		    MediaType.APPLICATION_XML_VALUE })
+    public @ResponseBody ResponseEntity<Model> memberToken(HttpServletResponse response, Model model) {
+	
+	model.addAttribute("token", response.getHeader("Authorization"));
+	
+	return ResponseEntity.ok(model);
+    }
 
     /* ============= cURL ==============
      

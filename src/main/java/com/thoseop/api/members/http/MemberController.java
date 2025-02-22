@@ -4,6 +4,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.ui.Model;
 
 import com.thoseop.api.members.http.request.MemberCreateRequest;
 import com.thoseop.api.members.http.request.MemberManagePasswordRequest;
@@ -17,9 +18,26 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Tag(name = "MemberController", description = "Endpoints for InfoController actions requests")
 public interface MemberController {
+
+    /**
+     * 
+     * @param request
+     * @return
+     */
+    @Operation(summary = "Returns a member's JWT Token", 
+	    description = "Returns a member's JWT Token", 
+	    tags = { "MemberController" }, 
+	    responses = { 
+		    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = MemberResponse.class))),
+		    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
+		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))) 
+    		})
+    public ResponseEntity<Model> memberToken(HttpServletResponse response, Model model);
 
     /**
      * 
