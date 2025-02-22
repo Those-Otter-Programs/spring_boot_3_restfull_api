@@ -18,8 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
-public class OtterUserDetailsService implements UserDetailsService
-{
+public class OtterUserDetailsService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
 
@@ -30,14 +29,13 @@ public class OtterUserDetailsService implements UserDetailsService
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        MemberEntity member = memberRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User details not found for the user: " + username));
-        //	Filter
-        List<GrantedAuthority> authorities = member.getAuthorities().stream().map(
-                authority -> new SimpleGrantedAuthority(authority.getName())).collect(Collectors.toList()); 
-        
-        return new User(member.getEmail(), member.getPassword(), 
-        	member.getEnabled(), member.getEnabled(), member.getEnabled(), member.getEnabled(),
-		authorities);
+	MemberEntity member = memberRepository.findByEmail(username)
+		.orElseThrow(() -> new UsernameNotFoundException("User details not found for the user: " + username));
+	//	Filter
+	List<GrantedAuthority> authorities = member.getAuthorities().stream()
+		.map(authority -> new SimpleGrantedAuthority(authority.getName())).collect(Collectors.toList());
+
+	return new User(member.getEmail(), member.getPassword(), member.getEnabled(), member.getEnabled(),
+		member.getEnabled(), member.getEnabled(), authorities);
     }
 }
