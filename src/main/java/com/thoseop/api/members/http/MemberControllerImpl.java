@@ -54,6 +54,18 @@ public class MemberControllerImpl implements MemberController {
     private final MemberService memberService;
     private final PagedResourcesAssembler<MemberResponse> membersPage_Assembler;
 
+    /*  ============= cURL ==============
+     
+        ------------- JSON --------------
+      	Bash: 
+      	
+      	# get the JWT token and stores it in a bash variable:
+       	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
+       	
+	# run cURL using the variable as the authorization token:
+	curl -L -X GET 'http://localhost:8080/api/member/v1/member-details/ayrton.senna@bravo.com' -H "Authorization: $myJWTToken"
+
+    */
     @Override
     @GetMapping(value = "/token",
 	    produces = { _APPLICATION_YAML_VALUE,
