@@ -50,6 +50,8 @@ class MemberControllerIntegrationTest {
     
     @Autowired
     private TestRestTemplate testRestTemplate;
+    
+    private String jwtAuthToken;
 
     // base route for the tested controller
     private final String baseRoute = "/api/member/v1"; 
@@ -58,6 +60,34 @@ class MemberControllerIntegrationTest {
     public MemberControllerIntegrationTest(JdbcTemplate jdbcTemplate) {
 	jdbcTemplate.execute("DELETE FROM authorities WHERE member_id > 50");
 	jdbcTemplate.execute("DELETE FROM members WHERE id > 50");
+    }
+    
+    @Test
+    @Order(1)
+    void testMemberToken_whenMemberAuthorized_thenReturnToken() {
+	// g
+	String route = "%s/token".formatted(this.baseRoute);
+
+	// creating the headers for the request
+	HttpHeaders headers = new HttpHeaders();
+	headers.setContentType(MediaType.APPLICATION_JSON);
+	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+
+	HttpEntity<String> request = new HttpEntity<>(null, headers);
+	// w
+	ResponseEntity<String> response = testRestTemplate
+		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
+		.exchange(route, HttpMethod.GET, request, String.class);
+
+	// getting the JWT token and setting it to a property to use on the other
+	// authenticated tests.
+	this.jwtAuthToken = response.getHeaders().getValuesAsList("Authorization").get(0);
+	// t
+	Assertions.assertEquals(HttpStatus.OK, 
+		response.getStatusCode(), 
+		() -> "The returned http status code was not the expected.");
+	Assertions.assertNotNull(this.jwtAuthToken, 
+		() -> "Response should contain Authorization header with JWT");
     }
 
     static Stream<Arguments> memberSeed() {
@@ -78,7 +108,7 @@ class MemberControllerIntegrationTest {
     @DisplayName("test Create Member_when Member Authorized_then Returns HTTP 201")
     @ParameterizedTest
     @MethodSource("memberSeed")
-    @Order(1)
+    @Order(2)
     void testCreateMember_whenMemberAuthorized_thenReturnsHTTP201(MemberCreateRequest memberCreateRequest) {
 	// g
 	String route = "%s/member-create".formatted(this.baseRoute);
@@ -87,12 +117,13 @@ class MemberControllerIntegrationTest {
 	HttpHeaders headers = new HttpHeaders();
 	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
 
 	HttpEntity<MemberCreateRequest> request = new HttpEntity<>(
 		memberCreateRequest, headers);
 	// w
 	ResponseEntity<MemberResponse> response = testRestTemplate
-		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
+//		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.POST, request, MemberResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.CREATED, 
@@ -111,7 +142,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Get Members_when Member Authorized_then Returns HTTP 200")
     @Test
-    @Order(2)
+    @Order(3)
     void testGetMembers_whenMemberAuthorized_thenReturnsHTTP200() {
 	// g
 	String route = "%s/list".formatted(this.baseRoute);
@@ -120,13 +151,15 @@ class MemberControllerIntegrationTest {
 	HttpHeaders headers = new HttpHeaders();
 	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
 
 	HttpEntity<?> request = new HttpEntity<>(
 		null, headers);
 	// w
 	ResponseEntity<PagedModel<EntityModel<MemberResponse>>> response = testRestTemplate
-		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
-		.exchange(route, HttpMethod.GET, request, new ParameterizedTypeReference<PagedModel<EntityModel<MemberResponse>>>() {
+//		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
+		.exchange(route, HttpMethod.GET, request, 
+			new ParameterizedTypeReference<PagedModel<EntityModel<MemberResponse>>>() {
 		});
 
 //	Collection<EntityModel<MemberResponse>> members = response.getBody().getContent();
@@ -137,7 +170,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Get Member By Username_when Member Authorized_then Returns HTTP 200")
     @Test
-    @Order(3)
+    @Order(4)
     void testGetMemberByUsername_whenMemberAuthorized_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-details/ayrton.senna@bravo.com".formatted(this.baseRoute);
@@ -146,12 +179,13 @@ class MemberControllerIntegrationTest {
 	HttpHeaders headers = new HttpHeaders();
 	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
 
 	HttpEntity<?> request = new HttpEntity<>(
 		null, headers);
 	// w
 	ResponseEntity<MemberResponse> response = testRestTemplate
-		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
+//		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.GET, request, MemberResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
@@ -166,7 +200,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Get Me_when Member Authenticated_then Returns HTTP 200")
     @Test
-    @Order(3)
+    @Order(4)
     void testMe_whenMemberAuthenticated_thenReturnsHTTP200() {
 	// g
 	String route = "%s/me".formatted(this.baseRoute);
@@ -175,12 +209,13 @@ class MemberControllerIntegrationTest {
 	HttpHeaders headers = new HttpHeaders();
 	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
 
 	HttpEntity<?> request = new HttpEntity<>(
 		null, headers);
 	// w
 	ResponseEntity<MemberResponse> response = testRestTemplate
-		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
+//		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.GET, request, MemberResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
@@ -195,7 +230,7 @@ class MemberControllerIntegrationTest {
     
     @DisplayName("test Update Member Password_when Authenticated_then Returns HTTP 200")
     @Test
-    @Order(4)
+    @Order(5)
     void testUpdateMemberPassword_whenAuthenticated_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-password".formatted(this.baseRoute);
@@ -207,13 +242,14 @@ class MemberControllerIntegrationTest {
 	HttpHeaders headers = new HttpHeaders();
 	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
 
 	HttpEntity<MemberUpdatePasswordRequest> updPassHTTPrequest = new HttpEntity<>(
 		memberUpdPassRequest, headers);
 	// w
 	// ...changing the members password...
 	ResponseEntity<MemberResponse> responsePassChange = testRestTemplate
-		.withBasicAuth("mfredson2@amazon.com", "lQEXBPL")
+//		.withBasicAuth("mfredson2@amazon.com", "lQEXBPL")
 		.exchange(route, HttpMethod.PATCH, updPassHTTPrequest, MemberResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, responsePassChange.getStatusCode(),
@@ -235,7 +271,7 @@ class MemberControllerIntegrationTest {
     
     @DisplayName("test Manage Member Password_when Authenticated_then Returns HTTP 200")
     @Test
-    @Order(5)
+    @Order(6)
     void testManageMemberPassword_whenAuthenticated_thenReturnsHTTP200() {
 	// g
 	String route = "%s/manage-member-password".formatted(this.baseRoute);
@@ -248,13 +284,14 @@ class MemberControllerIntegrationTest {
 	HttpHeaders headers = new HttpHeaders();
 	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
 
 	HttpEntity<MemberManagePasswordRequest> updPassHTTPrequest = new HttpEntity<>(
 		memberMngPassRequest, headers);
 	// w
 	// ...changing the members password...
 	ResponseEntity<MemberResponse> responsePassChange = testRestTemplate
-		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
+//		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.PATCH, updPassHTTPrequest, MemberResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, responsePassChange.getStatusCode(),
@@ -276,7 +313,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Inactivate Member_when Right Privileges_then Returns HTTP 200")
     @Test
-    @Order(6)
+    @Order(7)
     void testInactivateMember_whenRightPrivileges_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-disable/3".formatted(this.baseRoute);
@@ -285,12 +322,13 @@ class MemberControllerIntegrationTest {
 	HttpHeaders headers = new HttpHeaders();
 	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
 
 	HttpEntity<?> request = new HttpEntity<>(
 		null, headers);
 	// w
 	ResponseEntity<MemberResponse> response = testRestTemplate
-		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
+//		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.PATCH, request, MemberResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
@@ -301,7 +339,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Activate Member_when Right Privileges_then Returns HTTP 200")
     @Test
-    @Order(7)
+    @Order(8)
     void testActivateMember_whenRightPrivileges_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-enable/3".formatted(this.baseRoute);
@@ -310,12 +348,13 @@ class MemberControllerIntegrationTest {
 	HttpHeaders headers = new HttpHeaders();
 	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
 
 	HttpEntity<?> request = new HttpEntity<>(
 		null, headers);
 	// w
 	ResponseEntity<MemberResponse> response = testRestTemplate
-		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
+//		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.PATCH, request, MemberResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
