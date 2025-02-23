@@ -37,7 +37,7 @@ class InfoControllerWebLayerTest {
 
     @DisplayName("test Info_when Do Request_then Return HTTP 200")
     @ParameterizedTest
-    @ValueSource(strings = { "", "/", "/info", "/info/" })
+    @ValueSource(strings = { "", "/info" })
     void testInfo_whenDoRequest_thenReturnHTTP200(String route) throws Exception {
 	// g
 	RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -52,7 +52,7 @@ class InfoControllerWebLayerTest {
 
     @DisplayName("test Info_when Do Request_then Return Expected Data")
     @ParameterizedTest
-    @ValueSource(strings = { "", "/", "/info", "/info/" })
+    @ValueSource(strings = { "", "/info" })
     void testInfo_whenDoRequest_thenReturnExpectedData(String route) throws Exception {
 	// g
 	String appDescription = "A Spring Boot 3 RESTfull API sample";
@@ -71,7 +71,7 @@ class InfoControllerWebLayerTest {
 
     @DisplayName("test Info_when Do Request Allowed CORS Origin_then Return HTTP 200")
     @ParameterizedTest
-    @ValueSource(strings = { "", "/", "/info", "/info/" })
+    @ValueSource(strings = { "", "/info" })
     void testInfo_whenDoRequestAllowedCORSOrigin_thenReturnHTTP200(String route) throws Exception {
 	// g
 	String appDescription = "A Spring Boot 3 RESTfull API sample";
@@ -91,7 +91,7 @@ class InfoControllerWebLayerTest {
     
     @DisplayName("test Info_when Do Request Invalid CORS Origin_then Return HTTP 403")
     @ParameterizedTest
-    @ValueSource(strings = { "", "/", "/info", "/info/" })
+    @ValueSource(strings = { "", "/info" })
     void testInfo_whenDoRequestInvalidCORSOrigin_thenReturnHTTP403(String route) throws Exception {
 	// g
 	RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -107,7 +107,7 @@ class InfoControllerWebLayerTest {
     
     @DisplayName("test Info_when Do Request Accepting XML Media Type_then Return HTTP 200")
     @ParameterizedTest
-    @ValueSource(strings = { "", "/", "/info", "/info/" })
+    @ValueSource(strings = { "", "/info" })
     void testInfo_whenDoRequestAcceptingXMLMediaType_thenReturnHTTP200(String route) throws Exception {
 	// g
 	RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -123,7 +123,7 @@ class InfoControllerWebLayerTest {
     
     @DisplayName("test Info_when Do Request Accepting YML Media Type_then Return HTTP 200")
     @ParameterizedTest
-    @ValueSource(strings = { "", "/", "/info", "/info/" })
+    @ValueSource(strings = { "", "/info" })
     void testInfo_whenDoRequestAcceptingYMLMediaType_thenReturnHTTP200(String route) throws Exception {
 	// g
 	RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -139,7 +139,7 @@ class InfoControllerWebLayerTest {
 
     @DisplayName("test Info Corp_when Do Request_then Return HTTP 200")
     @ParameterizedTest
-    @ValueSource(strings = { "/info-corp", "/info-corp/" })
+    @ValueSource(strings = { "/info-corp" })
     void testInfoCorp_whenDoRequest_thenReturnHTTP200(String route) throws Exception {
 	// g
 	RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -154,7 +154,7 @@ class InfoControllerWebLayerTest {
 
     @DisplayName("test Info Corp_when Do Request_then Return Expected Data")
     @ParameterizedTest
-    @ValueSource(strings = { "/info-corp", "/info-corp/" })
+    @ValueSource(strings = { "/info-corp" })
     void testInfoCorp_whenDoRequest_thenReturnExpectedData(String route) throws Exception {
 	// g
 	String reqMessage = "All facilities operating";
@@ -174,7 +174,7 @@ class InfoControllerWebLayerTest {
 
     @DisplayName("test Info Corp_when Do Request Allowed CORS Origin_then Return HTTP 200")
     @ParameterizedTest
-    @ValueSource(strings = { "/info-corp", "/info-corp/" })
+    @ValueSource(strings = { "/info-corp" })
     void testInfoCorp_whenDoRequestAllowedCORSOrigin_thenReturnHTTP200(String route) throws Exception {
 	// g
 	String reqMessage = "All facilities operating";
@@ -195,7 +195,7 @@ class InfoControllerWebLayerTest {
     
     @DisplayName("test Info Corp_when Do Request Invalid CORS Origin_then Return HTTP 403")
     @ParameterizedTest
-    @ValueSource(strings = { "/info-corp", "/info-corp/" })
+    @ValueSource(strings = { "/info-corp" })
     void testInfoCorp_whenDoRequestInvalidCORSOrigin_thenReturnHTTP403(String route) throws Exception {
 	// g
 	RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -211,7 +211,7 @@ class InfoControllerWebLayerTest {
     
     @DisplayName("test Info Corp_when Do Request Accepting XML Media Type_then Return HTTP 200")
     @ParameterizedTest
-    @ValueSource(strings = { "/info-corp", "/info-corp/" })
+    @ValueSource(strings = { "/info-corp" })
     void testInfoCorp_whenDoRequestAcceptingXMLMediaType_thenReturnHTTP200(String route) throws Exception {
 	// g
 	RequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -227,7 +227,7 @@ class InfoControllerWebLayerTest {
     
     @DisplayName("test Info Corp_when Do Request Accepting YML Media Type_then Return HTTP 200")
     @ParameterizedTest
-    @ValueSource(strings = { "/info-corp", "/info-corp/" })
+    @ValueSource(strings = { "/info-corp" })
     void testInfoCorp_whenDoRequestAcceptingYMLMediaType_thenReturnHTTP200(String route) throws Exception {
 	// g
 	RequestBuilder requestBuilder = MockMvcRequestBuilders

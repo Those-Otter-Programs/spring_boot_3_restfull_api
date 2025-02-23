@@ -54,7 +54,7 @@ class InfoControllerAuthWebLayerTest {
 
     @DisplayName("test Info Corp_when Do Request With Auth_then Return HTTP 200")
     @ParameterizedTest
-    @ValueSource(strings = { "/info-corp", "/info-corp/" })
+    @ValueSource(strings = { "/info-corp" })
     void testInfoCorp_whenDoRequestWithAuth_thenReturnHTTP200(String route) throws Exception {
 	// g
 	HttpHeaders headers = new HttpHeaders();
@@ -73,7 +73,7 @@ class InfoControllerAuthWebLayerTest {
 
     @DisplayName("test Info Corp_when Do Request With Auth_then Return Expected Data")
     @ParameterizedTest
-    @ValueSource(strings = { "/info-corp", "/info-corp/" })
+    @ValueSource(strings = { "/info-corp" })
     void testInfoCorp_whenDoRequestWithAuth_thenReturnExpectedData(String route) throws Exception {
 	// g
 	String reqMessage = "All facilities operating";
@@ -97,7 +97,7 @@ class InfoControllerAuthWebLayerTest {
 
     @DisplayName("test Info Corp_when Do Request Allowed CORS Origin_then Return HTTP 200")
     @ParameterizedTest
-    @ValueSource(strings = { "/info-corp", "/info-corp/" })
+    @ValueSource(strings = { "/info-corp" })
     void testInfoCorp_whenDoRequestWithAuthAllowedCORSOrigin_thenReturnHTTP200(String route) throws Exception {
 	// g
 	String reqMessage = "All facilities operating";
@@ -121,7 +121,7 @@ class InfoControllerAuthWebLayerTest {
     
     @DisplayName("test Info Corp_when Do Request Invalid CORS Origin_then Return HTTP 403")
     @ParameterizedTest
-    @ValueSource(strings = { "/info-corp", "/info-corp/" })
+    @ValueSource(strings = { "/info-corp" })
     void testInfoCorp_whenDoRequestWithAuthInvalidCORSOrigin_thenReturnHTTP403(String route) throws Exception {
 	// g
 	HttpHeaders headers = new HttpHeaders();
@@ -141,7 +141,7 @@ class InfoControllerAuthWebLayerTest {
     
     @DisplayName("test Info Corp_when Do Request Accepting XML Media Type_then Return HTTP 200")
     @ParameterizedTest
-    @ValueSource(strings = { "/info-corp", "/info-corp/" })
+    @ValueSource(strings = { "/info-corp" })
     void testInfoCorp_whenDoRequestWithAuthAcceptingXMLMediaType_thenReturnHTTP200(String route) throws Exception {
 	// g
 	HttpHeaders headers = new HttpHeaders();
@@ -161,7 +161,7 @@ class InfoControllerAuthWebLayerTest {
     
     @DisplayName("test Info Corp_when Do Request Accepting YML Media Type_then Return HTTP 200")
     @ParameterizedTest
-    @ValueSource(strings = { "/info-corp", "/info-corp/" })
+    @ValueSource(strings = { "/info-corp" })
     void testInfoCorp_whenDoRequestWithAuthAcceptingYMLMediaType_thenReturnHTTP200(String route) throws Exception {
 	// g
 	HttpHeaders headers = new HttpHeaders();

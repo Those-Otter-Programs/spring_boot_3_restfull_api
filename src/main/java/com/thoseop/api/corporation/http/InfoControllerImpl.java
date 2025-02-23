@@ -41,7 +41,7 @@ public class InfoControllerImpl implements InfoController {
        	-L -X GET 'http://localhost:8080/api/corporation/v1/info' | jq
      */
     @Override
-    @GetMapping(value = {"", "/", "/info", "/info/"},
+    @GetMapping(value = {"", "/", "/info"},
     		produces = { _APPLICATION_YAML_VALUE,
     			MediaType.APPLICATION_JSON_VALUE, 
     			MediaType.APPLICATION_XML_VALUE })
@@ -78,7 +78,7 @@ public class InfoControllerImpl implements InfoController {
        	-L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | jq
      */
     @Override
-    @GetMapping(value = {"/info-corp", "/info-corp/"},
+    @GetMapping(value = {"/info-corp"},
     		produces = { _APPLICATION_YAML_VALUE,
     			MediaType.APPLICATION_JSON_VALUE, 
     			MediaType.APPLICATION_XML_VALUE })
