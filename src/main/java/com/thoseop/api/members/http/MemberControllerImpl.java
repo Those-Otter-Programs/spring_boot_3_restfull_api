@@ -55,16 +55,31 @@ public class MemberControllerImpl implements MemberController {
     private final PagedResourcesAssembler<MemberResponse> membersPage_Assembler;
 
     /*  ============= cURL ==============
-     
-        ------------- JSON --------------
-      	Bash: 
-      	
-      	# get the JWT token and stores it in a bash variable:
-       	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
-       	
-	# run cURL using the variable as the authorization token:
-	curl -L -X GET 'http://localhost:8080/api/member/v1/member-details/ayrton.senna@bravo.com' -H "Authorization: $myJWTToken"
+      	# BASH:
 
+        # get the JWT token and stores it in a bash variable:
+        myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
+        
+        # run cURL using the variable as the authorization token:
+        
+        # ------------- JSON --------------
+        curl -s -u 'ayrton.senna@bravo.com:ayrton_pass'
+        	-L -X GET 'http://localhost:8080/api/member/v1/token' | jq
+        # Base64 encoded credentials:
+        curl -s -u 'YXlydG9uLnNlbm5hQGJyYXZvLmNvbTpheXJ0b25fcGFzcw=='
+        	-L -X GET 'http://localhost:8080/api/member/v1/token' | jq
+
+        # ------------- XML --------------
+        curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/xml'
+        	-L -X GET 'http://localhost:8080/api/member/v1/token' | xmllint --format -
+        
+        # ------------- YAML --------------
+        curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/x-yaml'\
+		-L -X GET 'http://localhost:8080/api/member/v1/token' | yq
+        
+        # ------------- CORS --------------
+        curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Origin: http://localhost:3000'
+        	-L -X GET 'http://localhost:8080/api/member/v1/token' | jq
     */
     @Override
     @GetMapping(value = "/token",
@@ -78,28 +93,60 @@ public class MemberControllerImpl implements MemberController {
 	return ResponseEntity.ok(model);
     }
 
-    /* ============= cURL ==============
-     
-       ------------- JSON --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Content-Type: application/json' \ 
-       -L -X POST 'http://localhost:8080/api/member/v1/member-create' \
-       -d '{"memberName":"Ayrton Senna","memberEmail":"ayrton.senna@bravo.com","memberMobileNumber":"(11) 98765-4321","memberAuthorities":null}' \
-       | jq
+    /*  ============= cURL ==============
+	# BASH:
+	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
 
-       -------------- XML --------------
-       curl -s -u 'ayrton.senna@bravo.com' -H 'Accept: application/xml' -H 'Content-Type: application/xml' \
-       -L -X POST 'http://localhost:8080/api/member/v1/member-create' \
-       -d '<MemberCreateRequest><memberId>1</memberId><memberName>Ayrton Senna</memberName><memberEmail>ayrton.senna@bravo.com</memberEmail><memberMobileNumber>(11) 98765-4321</memberMobileNumber></MemberCreateRequest>' \
-       | xmllint --format - 
+	# ------------- JSON (request and response) --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Content-Type: application/json' \
+		-L -X POST 'http://localhost:8080/api/member/v1/member-create' \
+		-d '{
+			"memberName":"Rubens Barrichello", 
+			"memberEmail":"rubens.barrichello@bravo.com",
+		     	"memberMobileNumber":"(11) 98765-4321", 
+		     	"memberPassword": "barrichello_pass",
+		     	"memberAuthorities": [
+		     		"ROLE_ADMIN"
+		     	]
+		     }' | jq
+
+       	# -------------- XML (request and response) --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' -H 'Content-Type: application/xml' \
+       		-L -X POST 'http://localhost:8080/api/member/v1/member-create' \
+       		-d '<MemberCreateRequest>
+                        <memberName>Emerson Fittipaldi</memberName>
+                        <memberEmail>emerson.fittipaldi@bravo.com</memberEmail>
+                        <memberMobileNumber>(11) 98765-4321</memberMobileNumber>
+                        <memberPassword>fittipaldi_pass</memberPassword>
+                        <memberAuthorities>
+                                <memberAuthorities>ROLE_ADMIN</memberAuthorities>
+                        </memberAuthorities>
+                   </MemberCreateRequest>' | xmllint --format - 
        
-       ------------- YAML --------------
-       to be continued...
+        # ------------- YAML (request and response) --------------
+	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' -H 'Content-Type: application/x-yaml' \
+       		-L -X POST 'http://localhost:8080/api/member/v1/member-create' \
+       		-d '---
+                    memberName: "Nelson Piquet"
+                    memberEmail: "nelson.piquet@bravo.com"
+                    memberMobileNumber: "(11) 98765-4321"
+                    memberPassword: "piquet_pass"
+                    memberAuthorities:
+                        - "ROLE_ADMIN"' | yq
 
-       ------------- CORS --------------
-       curl -s -u 'ayrton.senna@bravo.com' -H 'Origin: http://localhost:3000' -H 'Content-Type: application/json' \
-       -L -X POST 'http://localhost:8080/api/member/v1/member-create' \
-       -d '{"memberName":"Ayrton Senna","memberEmail":"ayrton.senna@bravo.com","memberMobileNumber":"(11) 98765-4321","memberAuthorities":null}' \
-       | jq
+        # ------------- CORS - origin filter and JSON request / response -------------
+        curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
+        	-H 'Content-Type: application/json' \
+        	-L -X POST 'http://localhost:8080/api/member/v1/member-create' \
+        	-d '{
+        		"memberName":"Felipe Massa", 
+        		"memberEmail":"felipe.massa@bravo.com",
+	     		"memberMobileNumber":"(11) 98765-4321", 
+	     		"memberPassword": "massa_pass",
+	     		"memberAuthorities": [
+	     			"ROLE_ADMIN"
+	     		]
+	     	    }' | jq
      */
     @Override
     @PostMapping(value = "/member-create",
@@ -125,30 +172,29 @@ public class MemberControllerImpl implements MemberController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedMember);
     }
 
-    /* ============= cURL ==============
-      
-       ------------- JSON - PAGINATED --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | jq
-       curl -s -u 'ayrton.senna@bravo.com' -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | jq
-       
-     * Base64: 
-       curl -s -u 'YXlydG9uLnNlbm5hQGJlc3QuY29tOmF5cnRvbl9wYXNz' -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | jq
-       
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8' | jq
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/list?page=1' | jq
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/list' | jq
+    /*  ============= cURL ==============
+      	# BASH:
+	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
 
-       -------------- XML - PAGINATED --------------
-       curl -s -u 'ayrton.senna@bravo.com' -H 'Accept: application/xml' \
-       -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | xmllint --format -
+       	------------- JSON - PAGINATED --------------
+       	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | jq
+       	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | jq
        
-       ------------- YAML - PAGINATED --------------
-       curl -s -u 'ayrton.senna@bravo.com' -H 'Accept: application/x-yaml' \
-       -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | yq
+       	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8' | jq
+       	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list?page=1' | jq
+       	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list' | jq
 
-       ------------- CORS - PAGINATED --------------
-       curl -s -u 'ayrton.senna@bravo.com' -H 'Origin: http://localhost:3000' \
-       -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | jq
+       	-------------- XML - PAGINATED --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
+       		-L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | xmllint --format -
+       
+       	------------- YAML - PAGINATED --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
+       		-L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | yq
+
+       	------------- CORS - PAGINATED --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
+       		-L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | jq
      */
     @Override
     @GetMapping(value = "/list", 
@@ -173,23 +219,25 @@ public class MemberControllerImpl implements MemberController {
 	return ResponseEntity.ok(membersPage_Assembler.toModel(members, link));
     }
 
-    /* ============= cURL ==============
+    /*  ============= cURL ==============
+      	# BASH:
+	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
       
-       ------------- JSON --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
-       -L -X GET 'http://localhost:8080/api/member/v1/member-details/ayrton.senna@bravo.com' | jq
+       	------------- JSON --------------
+       	curl -s -H "Authorization: $myJWTToken" \
+       		-L -X GET 'http://localhost:8080/api/member/v1/member-details/ayrton.senna@bravo.com' | jq
 
-       -------------- XML --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/xml' \
-       -L -X GET 'http://localhost:8080/api/member/v1/member-details/ayrton.senna@bravo.com' | xmllint --format -
+       	-------------- XML --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
+       		-L -X GET 'http://localhost:8080/api/member/v1/member-details/ayrton.senna@bravo.com' | xmllint --format -
        
-       ------------- YAML --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/x-yaml' \
-       -L -X GET 'http://localhost:8080/api/member/v1/member-details/ayrton.senna@bravo.com' | yq
+       	------------- YAML --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
+       		-L -X GET 'http://localhost:8080/api/member/v1/member-details/ayrton.senna@bravo.com' | yq
 
-       ------------- CORS --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Origin: http://localhost:3000' \
-       -L -X GET 'http://localhost:8080/api/member/v1/member-details/ayrton.senna@bravo.com' | jq
+       	------------- CORS --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
+       		-L -X GET 'http://localhost:8080/api/member/v1/member-details/ayrton.senna@bravo.com' | jq
      */
     @Override
     @GetMapping(value = "/member-details/{username}", 
@@ -208,22 +256,24 @@ public class MemberControllerImpl implements MemberController {
 	return ResponseEntity.ok(member);
     }
 
-    /* ============= cURL ==============
+    /*  ============= cURL ==============
+      	# BASH:
+	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
       
-       ------------- JSON --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/me' | jq
+	------------- JSON --------------
+        curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/me' | jq
 
-       -------------- XML --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/xml' \
-       -L -X GET 'http://localhost:8080/api/member/v1/me' | xmllint --format -
-       
-       ------------- YAML --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/x-yaml' \
-       -L -X GET 'http://localhost:8080/api/member/v1/me' | yq
+        -------------- XML --------------
+        curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
+        	-L -X GET 'http://localhost:8080/api/member/v1/me' | xmllint --format -
+        
+        ------------- YAML --------------
+        curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
+        	-L -X GET 'http://localhost:8080/api/member/v1/me' | yq
 
-       ------------- CORS --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Origin: http://localhost:3000' \
-       -L -X GET 'http://localhost:8080/api/member/v1/me' | jq
+        ------------- CORS --------------
+        curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
+        	-L -X GET 'http://localhost:8080/api/member/v1/me' | jq
      */
     @Override
     @GetMapping(value = "/me", 
@@ -244,28 +294,18 @@ public class MemberControllerImpl implements MemberController {
 	return ResponseEntity.ok(member);
     }
 
-    /* ============= cURL ==============
+    /*  ============= cURL ==============
+      	# BASH:
+	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
      
-       ------------- JSON --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Content-Type: application/json' \ 
-       -L -X POST 'http://localhost:8080/api/member/v1/member-update' \
-       -d '{"memberId":3,"memberName":"Cody Johnson","memberEmail":"cody.johnson@bravo.com","memberMobileNumber":"+1 (865) 765-4321", "memberAuthorities": ["ROLE_MANAGER"]}' \
-       | jq
+       	------------- JSON --------------
 
-       -------------- XML --------------
-       curl -s -u 'ayrton.senna@bravo.com' -H 'Accept: application/xml' -H 'Content-Type: application/xml' \
-       -L -X POST 'http://localhost:8080/api/member/v1/member-update' \
-       -d '<MemberResponse><memberId>3</memberId><memberName>Toby Keith</memberName><memberEmail>toby.keith@bravo.com</memberEmail><memberMobileNumber>+1 (865) 765-4321</memberMobileNumber></MemberResponse>' \
-       | xmllint --format -       
+       	-------------- XML --------------
        
-       ------------- YAML --------------
-       to be continued...
+       	------------- YAML --------------
 
-       ------------- CORS --------------
-       curl -s -u 'ayrton.senna@bravo.com' -H 'Origin: http://localhost:3000' -H 'Content-Type: application/json' \
-       -L -X POST 'http://localhost:8080/api/member/v1/member-update' \
-       -d '{"memberId":3,"memberName":"Jo Dee Messina","memberEmail":"jo.dee@bravo.com","memberMobileNumber":"+1 (865) 765-4321", "memberAuthorities": ["ROLE_MANAGER"]}' \
-       | jq
+       	------------- CORS --------------
+       
      */
     @Override
     @PutMapping(value = "/member-update", 
@@ -290,34 +330,31 @@ public class MemberControllerImpl implements MemberController {
 	return ResponseEntity.ok(updatedMember);
     }
 
-    /* ============= cURL ==============
+    /*  ============= cURL ==============
+      	# BASH:
+	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
       
-       ------------- JSON --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
-       -L -X GET 'http://localhost:8080/api/member/v1/member-password' \
-       -d '{"newPassword": "mynewpassword"}' \
-       | jq
-    
-     * Base64: 
-       curl -s -u 'YXlydG9uLnNlbm5hQGJlc3QuY29tOmF5cnRvbl9wYXNz' \
-       -L -X GET 'http://localhost:8080/api/member/v1/member-password' \
-       -d '{"newPassword": "mynewpassword"}' \
-       | jq
-    
-       -------------- XML --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/xml' \
-       -L -X GET 'http://localhost:8080/api/member/v1/member-password' \
-       -d '<MemberUpdatePasswordRequest><newPassword>mynewpassword</newPassword></MemberUpdatePasswordRequest>' \
-       | xmllint --format -
+       	------------- JSON --------------
+       	curl -s -H "Authorization: $myJWTToken" \
+       		-L -X GET 'http://localhost:8080/api/member/v1/member-password' \
+       		-d '{"newPassword": "mynewpassword"}' | jq
        
-       ------------- YAML --------------
-       to be continued...
+       	-------------- XML --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' -H 'Content-Type: application/xml' \
+       		-L -X GET 'http://localhost:8080/api/member/v1/member-password' \
+       		-d '<MemberUpdatePasswordRequest>
+       			<newPassword>mynewpassword</newPassword>
+       		    </MemberUpdatePasswordRequest>' | xmllint --format -
+       
+       	------------- YAML --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' -H 'Content-Type: application/x-yaml' \
+       		-L -X GET 'http://localhost:8080/api/member/v1/member-password' \
+       		-d '--- newPassword: "mynewpassword"' | yq
     
-       ------------- CORS --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Origin: http://localhost:3000' \
-       -L -X GET 'http://localhost:8080/api/member/v1/member-password' \
-       -d '{"newPassword": "mynewpassword"}' \
-       | jq
+       	------------- CORS --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
+       		-L -X GET 'http://localhost:8080/api/member/v1/member-password' \
+       		-d '{"newPassword": "mynewpassword"}' | jq
     */
     @Override
     @PatchMapping(value = "/member-password",
@@ -342,34 +379,35 @@ public class MemberControllerImpl implements MemberController {
 	return ResponseEntity.ok(member);
     }
 
-    /* ============= cURL ==============
+    /*  ============= cURL ==============
+      	# BASH:
+	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
       
-       ------------- JSON --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
-       -L -X GET 'http://localhost:8080/api/member/v1/manage-member-password' \
-       -d '{"memberUsername": "mfredson2@amazon.com", "memberPassword": "mynewpassword"}' \
-       | jq
+       	------------- JSON --------------       	
+       	curl -s -H "Authorization: $myJWTToken" \
+       		-L -X GET 'http://localhost:8080/api/member/v1/manage-member-password' \
+            	-d '{"memberUsername": "mfredson2@amazon.com", "memberPassword": "newpassword"}' | jq
     
-     * Base64: 
-       curl -s -u 'YXlydG9uLnNlbm5hQGJlc3QuY29tOmF5cnRvbl9wYXNz' \
-       -L -X GET 'http://localhost:8080/api/member/v1/manage-member-password' \
-       -d '{"memberUsername": "mfredson2@amazon.com", "memberPassword": "mynewpassword"}' \
-       | jq
-    
-       -------------- XML --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/xml' \
-       -L -X GET 'http://localhost:8080/api/member/v1/manage-member-password' \
-       -d '<MemberUpdatePasswordRequest><memberUsername>mfredson2@amazon.com</memberUsername><memberPassword>mynewpassword</memberPassword></MemberUpdatePasswordRequest>' \
-       | xmllint --format -
+       	-------------- XML --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' -H 'Content-Type: application/xml' \
+       	    	-L -X GET 'http://localhost:8080/api/member/v1/manage-member-password' \
+       	    	-d '<MemberManagePasswordRequest>
+       		    	<memberUsername>mfredson2@amazon.com</memberUsername>
+       		    	<memberPassword>newpassword</memberPassword>
+       		    </MemberManagePasswordRequest>' | xmllint --format -
        
-       ------------- YAML --------------
-       to be continued...
+       	------------- YAML --------------
+	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' -H 'Content-Type: application/x-yaml' \
+		-L -X POST 'http://localhost:8080/api/member/v1/manage-member-password' \
+       		-d '---
+                    memberUsername: "Nelson Piquet"
+                    memberPassword: "newpassword"' | yq
     
-       ------------- CORS --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Origin: http://localhost:3000' \
-       -L -X GET 'http://localhost:8080/api/member/v1/manage-member-password' \
-       -d '{"memberUsername": "mfredson2@amazon.com", "memberPassword": "mynewpassword"}' \
-       | jq
+       	------------- CORS --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
+            -L -X GET 'http://localhost:8080/api/member/v1/manage-member-password' \
+            -d '{"memberUsername": "mfredson2@amazon.com", "memberPassword": "newpassword"}' \
+            | jq
     */
     @Override
     @PatchMapping(value = "/manage-member-password",
@@ -390,27 +428,25 @@ public class MemberControllerImpl implements MemberController {
 	return ResponseEntity.ok(member);
     }
 
-    /* ============= cURL ==============
+    /*  ============= cURL ==============
+      	# BASH:
+	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
       
-       ------------- JSON --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
-       -L -X GET 'http://localhost:8080/api/member/v1/member-disable/3' | jq
+       	------------- JSON --------------
+       	curl -s -H "Authorization: $myJWTToken" \
+       		-L -X GET 'http://localhost:8080/api/member/v1/member-disable/3' | jq
     
-     * Base64: 
-       curl -s -u 'YXlydG9uLnNlbm5hQGJlc3QuY29tOmF5cnRvbl9wYXNz' \
-       -L -X GET 'http://localhost:8080/api/member/v1/member-disable/3' | jq
-    
-       -------------- XML --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/xml' \
-       -L -X GET 'http://localhost:8080/api/member/v1/member-disable/3' | xmllint --format -
+       	-------------- XML --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
+       		-L -X GET 'http://localhost:8080/api/member/v1/member-disable/3' | xmllint --format -
        
-       ------------- YAML --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/x-yaml' \
-       -L -X GET 'http://localhost:8080/api/member/v1/member-disable/3' | yq
+       	------------- YAML --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
+       		-L -X GET 'http://localhost:8080/api/member/v1/member-disable/3' | yq
     
-       ------------- CORS --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Origin: http://localhost:3000' \
-       -L -X GET 'http://localhost:8080/api/member/v1/member-disable/3' | jq
+       	------------- CORS --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
+       		-L -X GET 'http://localhost:8080/api/member/v1/member-disable/3' | jq
     */
     @Override
     @PatchMapping(value = "/member-disable/{id}",
@@ -428,27 +464,25 @@ public class MemberControllerImpl implements MemberController {
 	return ResponseEntity.ok(member);
     }
 
-    /* ============= cURL ==============
+    /*  ============= cURL ==============
+      	# BASH:
+	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
       
-       ------------- JSON --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
-       -L -X GET 'http://localhost:8080/api/member/v1/member-enable/3' | jq
+       	------------- JSON --------------
+       	curl -s -u -H "Authorization: $myJWTToken" \
+       		-L -X GET 'http://localhost:8080/api/member/v1/member-enable/3' | jq
 
-     * Base64: 
-       curl -s -u 'YXlydG9uLnNlbm5hQGJlc3QuY29tOmF5cnRvbl9wYXNz' \
-       -L -X GET 'http://localhost:8080/api/member/v1/member-enable/3' | jq
-
-       -------------- XML --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/xml' \
-       -L -X GET 'http://localhost:8080/api/member/v1/member-enable/3' | xmllint --format -
+       	-------------- XML --------------
+       	curl -s -u -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
+       		-L -X GET 'http://localhost:8080/api/member/v1/member-enable/3' | xmllint --format -
        
-       ------------- YAML --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/x-yaml' \
-       -L -X GET 'http://localhost:8080/api/member/v1/member-enable/3' | yq
+       	------------- YAML --------------
+       	curl -s -u -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
+       		-L -X GET 'http://localhost:8080/api/member/v1/member-enable/3' | yq
 
-       ------------- CORS --------------
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Origin: http://localhost:3000' \
-       -L -X GET 'http://localhost:8080/api/member/v1/member-enable/3' | jq
+       	------------- CORS --------------
+       	curl -s -u -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
+       		-L -X GET 'http://localhost:8080/api/member/v1/member-enable/3' | jq
      */
     @Override
     @PatchMapping(value = "/member-enable/{id}",
