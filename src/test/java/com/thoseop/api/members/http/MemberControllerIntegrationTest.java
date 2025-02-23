@@ -1,5 +1,7 @@
 package com.thoseop.api.members.http;
 
+import static com.thoseop.config.OtterWebMvcConfig._APPLICATION_YAML_VALUE;
+
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -38,7 +40,7 @@ import com.thoseop.api.members.http.request.MemberManagePasswordRequest;
 import com.thoseop.api.members.http.request.MemberUpdatePasswordRequest;
 import com.thoseop.api.members.http.response.MemberResponse;
 
-import static com.thoseop.config.OtterWebMvcConfig._APPLICATION_YAML_VALUE;
+import net.minidev.json.JSONObject;
 
 @DisplayName("Testing MemberController")
 @TestPropertySource(locations="classpath:application_test.properties")
@@ -77,22 +79,24 @@ class MemberControllerIntegrationTest {
 	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 
-	HttpEntity<String> request = new HttpEntity<>(null, headers);
+	HttpEntity<?> request = new HttpEntity<>(null, headers);
 	// w
-	ResponseEntity<String> response = testRestTemplate
+
+	ResponseEntity<JSONObject> response = testRestTemplate
 		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
-		.exchange(route, HttpMethod.GET, request, String.class);
+		.exchange(route, HttpMethod.GET, request, JSONObject.class);
 
 	// getting the JWT token and setting it to a property to use on the other
 	// authenticated tests.
 	this.jwtAuthToken = response.getHeaders().getValuesAsList("Authorization").get(0);
+//	this.jwtAuthToken = response.getBody().get("token").toString();
 
 	// t
-	Assertions.assertEquals(HttpStatus.OK, 
-		response.getStatusCode(), 
+	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(), 
 		() -> "The returned http status code was not the expected.");
 	Assertions.assertNotNull(this.jwtAuthToken, 
 		() -> "Response should contain the JWT token in the Authorization header field");
+	Assertions.assertEquals(response.getBody().get("token"), this.jwtAuthToken);
     }
 
     static Stream<Arguments> memberSeed() {
@@ -163,7 +167,8 @@ class MemberControllerIntegrationTest {
 	// w
 	ResponseEntity<PagedModel<EntityModel<MemberResponse>>> response = testRestTemplate
 //		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
-		.exchange(route, HttpMethod.GET, request, new ParameterizedTypeReference<PagedModel<EntityModel<MemberResponse>>>() {
+		.exchange(route, HttpMethod.GET, request,
+			new ParameterizedTypeReference<PagedModel<EntityModel<MemberResponse>>>() {
 		});
 
 //	Collection<EntityModel<MemberResponse>> members = response.getBody().getContent();
