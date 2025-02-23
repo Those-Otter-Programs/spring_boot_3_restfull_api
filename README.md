@@ -6,9 +6,11 @@
 ## Description:
 Project exemplifies the use of the following resources: 
 
-	- Different environment profiles with different sets of configurations for
-	  the Spring Security, Authenticated routes and databases.
-	- Custom database table to store and manage the system's users, which I 
+    - It was used S.O.L.I.D., DRY, KISS, F.I.R.S.T. and other useful principles.
+    - Design Patterns when reasonable to do so.
+    - Different environment profiles with different sets of configurations for
+      the Spring Security, Authenticated routes and databases.
+    - Custom database table to store and manage the system's users, which I 
       called Members in the system.
     - HATEOAS
     - Content Negotiation (JSON, XML and YML)
@@ -16,30 +18,30 @@ Project exemplifies the use of the following resources:
     - Automatic Code Coverage generation (maven-surefire-plugin and JaCoCo).
     - Spring Boot Security 6.4
     - Authentication based on JWT tokens
-	- JWT tokens generation and validation through filters.
-	- Authentication events capture.
-	- Authentication filters.
+    - JWT tokens generation and validation through filters.
+    - Authentication events capture.
+    - Authentication/Authorization filters.
     - Lombok
     - Mapstruct
     - OpenAPI
-    - H2 database in "file" mode, having the generated persistence 
-	  files store at the 'data' folder at the root of the project.
+    - H2 database in "file-mode", having the generated persistence 
+      files store on the 'data' folder at the root of the project.
     - Flyway to apply migrations to H2
-	- Using yaml files for the application properties.
+    - Using yaml files for the application properties.
     - Tests and mocks:
-			Junit, Assertj, Rest Assured, Mockito, BDDMockito, Hamcrest...
+    		Junit, Assertj, Rest Assured, Mockito, BDDMockito, Hamcrest...
 
 ## Features:
 
-- Project was written from a very basic, and simplistic implementation to a more 
+- Project was written going from a very basic, and simplistic implementation to a more 
   complex, but yet minimalistic implementation, using common Java resources/dependencies.
 - System implements different profiles and creates databases structures for those 
   different profiles (test, dev, prod), using Flyway migrations and H2 (file-mode) 
   database.
 - Code Coverage: on pom.xml maven-surefire-plugin and with JaCoCo have been 
-  configured to run together and generate automatic re 	 ports everytime 
+  configured to run together and generate automatic reports everytime 
   'mvn test' is run.
-- Mapstruct and Lombok working together Lombok Mapstruct Binding.
+- Mapstruct and Lombok working together along with Lombok Mapstruct Binding.
 
 ---
 
@@ -80,35 +82,47 @@ http://localhost:8080/h2
 ### To get the JWT token from the response body:
 
 ```bash
-# JSON response
-$ curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq
+# ------------- JSON --------------
+curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
+	-L -X GET 'http://localhost:8080/api/member/v1/token' | jq
 
-# XML response
-$ curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/xml' -L -X GET 'http://localhost:8080/api/member/v1/token' | xmllint --format -
+# Base64 encoded credentials:
+curl -s -u 'YXlydG9uLnNlbm5hQGJyYXZvLmNvbTpheXJ0b25fcGFzcw=='
+	-L -X GET 'http://localhost:8080/api/member/v1/token' | jq
 
-# YAML response
-$ curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/x-yaml' -L -X GET 'http://localhost:8080/api/member/v1/token' | yq
+# ------------- XML --------------
+curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/xml' \
+	-L -X GET 'http://localhost:8080/api/member/v1/token' | xmllint --format -
+
+# ------------- YAML --------------
+curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/x-yaml' \
+	-L -X GET 'http://localhost:8080/api/member/v1/token' | yq
+
+# ------------- CORS --------------
+curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Origin: http://localhost:3000' \
+	-L -X GET 'http://localhost:8080/api/member/v1/token' | yq
 ```
 
-- The default JSON response body would be:
+-- JSON response --
 
 ```bash
 {
-    "token": "eyJhbGciOiJIUzM4NCJ9.eyJpc3MiOiJzcHJpbmdfYm9vdF8zX3Jlc3RmdWxsX2FwaSIsInN1YiI6IkpXVCBUb2tlbiIsInVzZXJuYW1lIjoiYXlydG9uLnNlbm5hQGJyYXZvLmNvbSIsImF1dGhvcml0aWVzIjoiUk9MRV9BRE1JTixST0xFX0FTU09DSUFURSxST0xFX01BTkFHRVIsVklFV0lORk9DT1JQIiwiaWF0IjoxNzQwMzI1MjQ3LCJleHAiOjE3NDAzMjUzMDd9.o7hvWtWmwiM-OrabUCZB4vbF6nBDSwgyP_jci2cm97XRKIeVGxMHTIuRJOQJ7uCe"
+    "token": [your-jwt-token]
 }
 ```
 
 ### To get the JWT token from the response headers:
 
 ```bash
-$ curl -s -I -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token'
+curl -s -I -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token'
+
 ```
 
-- The response would be:
+-- response --
 
 ```bash
 HTTP/1.1 200 
-Authorization: eyJhbGciOiJIUzM4NCJ9.eyJpc3MiOiJzcHJpbmdfYm9vdF8zX3Jlc3RmdWxsX2FwaSIsInN1YiI6IkpXVCBUb2tlbiIsInVzZXJuYW1lIjoiYXlydG9uLnNlbm5hQGJyYXZvLmNvbSIsImF1dGhvcml0aWVzIjoiUk9MRV9BRE1JTixST0xFX0FTU09DSUFURSxST0xFX01BTkFHRVIsVklFV0lORk9DT1JQIiwiaWF0IjoxNzQwMzI1NDI0LCJleHAiOjE3NDAzMjU0ODR9.9cJECD286vmK2nThHTMw_OZssGPavf9k6M0fu7RQf2GoOmQLRRxQ6AHVsKBwsjPA
+Authorization: [your-jwt-toke] 
 Set-Cookie: JSESSIONID=598F62A04F9B40A6D85ECCF8F853F024; Path=/; HttpOnly
 Vary: Origin
 Vary: Access-Control-Request-Method
@@ -126,11 +140,13 @@ Date: Sun, 23 Feb 2025 15:43:44 GMT
 ### To get the JWT token from the response body and use it on other authenticated routes (in bash): 
 
 ```bash
+# BASH:
+
 # get the JWT token and stores it in a bash variable:
-$ myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
+myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
        	
 # run cURL using the variable as the authorization token:
-$ curl -L -X GET 'http://localhost:8080/api/member/v1/member-details/ayrton.senna@bravo.com' -H "Authorization: $myJWTToken"
+curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/member-details/ayrton.senna@bravo.com' | jq
 ```
 
 ---
@@ -157,50 +173,65 @@ This controller implements 3 actions:
 **/api/corporation/v1**
 
 ```bash
-# ----- Base64 -----
-curl -s -H 'Authorization: Basic ZG9uOnZpdG9fcGFzcw==' -H 'Accept: application/json' \
-        -L -X GET 'http://localhost:1110/api/corporation/v1' | jq
-```
+# JSON response:
+curl -s -L -X GET 'http://localhost:8080/api/corporation/v1' | jq
 
-```bash 
-curl -s -u 'don:vito_pass' -H 'Accept: application/json' \
-        -L -X GET 'http://localhost:1110/api/corporation/v1' | jq
+# XML response:
+curl -s -H 'Accept: application/xml' \
+	-L -X GET 'http://localhost:8080/api/corporation/v1' | xmllint --format -
+
+# YAML response:
+curl -s -H 'Accept: application/x-yaml' \
+	-L -X GET 'http://localhost:8080/api/corporation/v1' | yq
 ```
 
 **/api/corporation/v1/info**
 
 ```bash
-# ----- Base64 -----
-curl -s -H 'Authorization: Basic Y29uc2lnbGllcmk6dG9tX3Bhc3M=' -H 'Accept: application/json' \
-        -L -X GET 'http://localhost:1110/api/corporation/v1/info' | jq
-```
+# JSON response:
+curl -s -L -X GET 'http://localhost:8080/api/corporation/v1/info' | jq
 
-```bash
-curl -s -u 'consiglieri:tom_pass' -H 'Accept: application/json' \
-        -L -X GET 'http://localhost:1110/api/corporation/v1/info' | jq
+# XML response:
+curl -s -H 'Accept: application/xml' \
+	-L -X GET 'http://localhost:8080/api/corporation/v1/info' | xmllint --format -
+
+# YAML response:
+curl -s -H 'Accept: application/x-yaml' \
+	-L -X GET 'http://localhost:8080/api/corporation/v1/info' | yq
 ```
 
 **/api/corporation/v1/info-corp**
 
 ```bash
-# ----- Base64 -----
-curl -s -H 'Authorization: Basic Y2Fwbzpyb2Njb19wYXNz' -H 'Accept: application/json' \
-        -L -X GET 'http://localhost:1110/api/corporation/v1/info-corp' | jq
-```
+# BASH:
 
-```bash
-curl -s -u 'capo:rocco_pass' -H 'Accept: application/json' \
-        -L -X GET 'http://localhost:1110/api/corporation/v1/info-corp' | jq
+# get the JWT token and stores it in a bash variable:
+myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
+
+# run cURL using the variable as the authorization token:
+
+# ------------- JSON --------------
+curl -s -H "Authorization: $myJWTToken" \
+	-L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | jq
+
+# ------------- XML ---------------
+curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
+	-L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | xmllint --format -
+
+# ------------- YAML --------------
+curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
+	-L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | yq
+
+# ------------- CORS --------------
+curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/json' -H 'Origin: http://localhost:3000' \
+	-L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | jq
 ```
 
 ---
 
 ## MemberController (Description and URLs)
 
-This controller implements routes to manage Members (Users), and also the action
- to generate the JWT tokens:
-
-- This controller have the following actions, acessible by default, through:
+This controller implements routes to manage Members (Users), and also the action to generate the JWT tokens:
 
 - **HATEOAS** - regardless of the selected Response data format, Responses 
   include 'links' to make it a RESTful API.
@@ -219,6 +250,82 @@ This controller implements routes to manage Members (Users), and also the action
  [PATCH] /api/member/v1/manage-member-password
  [PATCH] /api/member/v1/member-disable/{id}
  [PATCH] /api/member/v1/member-enable/{id}
+```
+
+### REQUESTS (/api/member/v1/member-create):
+##### First Request JWT token ---> saving token into a bash variable:
+
+```bash
+
+# Requesting the JWT token and storing it in a bash variable
+myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
+
+```
+
+##### REQUEST ---> sending JSON data:
+
+```bash 
+# JSON request and response:
+curl -s -H "Authorization: $myJWTToken" -H 'Content-Type: application/json' \
+    -L -X POST 'http://localhost:8080/api/member/v1/member-create' \
+    -d '{
+            "memberName":"Rubens Barrichello", 
+            "memberEmail":"rubens.barrichello@bravo.com",
+            "memberMobileNumber":"(11) 98765-4321", 
+            "memberPassword": "barrichello_pass",
+            "memberAuthorities": [
+                "ROLE_ADMIN"
+            ]
+        }' | jq
+```
+
+##### REQUEST ---> sending XML data:
+
+```bash 
+# XML request and response:
+curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' -H 'Content-Type: application/xml' \
+    -L -X POST 'http://localhost:8080/api/member/v1/member-create' \
+    -d '<MemberCreateRequest>
+            <memberName>Emerson Fittipaldi</memberName>
+            <memberEmail>emerson.fittipaldi@bravo.com</memberEmail>
+            <memberMobileNumber>(11) 98765-4321</memberMobileNumber>
+            <memberPassword>fittipaldi_pass</memberPassword>
+            <memberAuthorities>
+                <memberAuthorities>ROLE_ADMIN</memberAuthorities>
+            </memberAuthorities>
+        </MemberCreateRequest>' | xmllint --format -
+```
+
+##### REQUEST ---> sending YAML data:
+
+```bash
+# YAML request and response:
+curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' -H 'Content-Type: application/x-yaml' \
+    -L -X POST 'http://localhost:8080/api/member/v1/member-create' \
+    -d '---
+        memberName: "Nelson Piquet"
+        memberEmail: "nelson.piquet@bravo.com"
+        memberMobileNumber: "(11) 98765-4321"
+        memberPassword: "piquet_pass"
+        memberAuthorities:
+            - "ROLE_ADMIN"' | yq
+```
+
+##### REQUEST ---> with CORS origin filtering:
+```bash
+# CORS - origin filter and JSON request / response
+curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
+    -H 'Content-Type: application/json' \
+    -L -X POST 'http://localhost:8080/api/member/v1/member-create' \
+    -d '{
+            "memberName":"Felipe Massa", 
+            "memberEmail":"felipe.massa@bravo.com",
+            "memberMobileNumber":"(11) 98765-4321", 
+            "memberPassword": "massa_pass",
+            "memberAuthorities": [
+                "ROLE_ADMIN"
+            ]
+        }' | jq
 ```
 
 ## TO BE CONTINUED...
