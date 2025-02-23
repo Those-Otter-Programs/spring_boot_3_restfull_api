@@ -53,29 +53,25 @@ public class InfoControllerImpl implements InfoController {
 	return ResponseEntity.ok(model);
     }
 
-    /* ============= cURL ==============
+    /* 	============= cURL ==============
+      	# BASH:
+	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
 
-       ------------- JSON --------------
-       curl -s -u 'ayrton.senna@bravo.com' -H 'Accept: application/json' -L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | jq
-       -- 
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/json' -L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | jq
+       	# ------------- JSON --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/json' \
+       		-L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | jq
 
-       -------------- XML --------------
-       curl -s -u 'ayrton.senna@bravo.com' -H 'Accept: application/xml' -L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | xmllint --format -
-       --
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/xml' -L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | xmllint --format -
+       	# -------------- XML --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
+       		-L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | xmllint --format -
        
-       ------------- YAML --------------
-       curl -s -u 'ayrton.senna@bravo.com' -H 'Accept: application/x-yaml' -L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | yq
-       --
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/x-yaml' -L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | yq
+       	# ------------- YAML --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
+       		-L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | yq
 
-       ------------- CORS --------------
-       curl -s -u 'ayrton.senna@bravo.com' -H 'Accept: application/json' -H 'Origin: http://localhost:3000' \
-       	-L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | jq
-       --
-       curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -H 'Accept: application/json' -H 'Origin: http://localhost:3000' \
-       	-L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | jq
+       	# ------------- CORS --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/json' -H 'Origin: http://localhost:3000' \
+       		-L -X GET 'http://localhost:8080/api/corporation/v1/info-corp' | jq
      */
     @Override
     @GetMapping(value = {"/info-corp"},
