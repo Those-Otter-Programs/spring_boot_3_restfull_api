@@ -172,11 +172,11 @@ public class MemberControllerImpl implements MemberController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedMember);
     }
 
-    /*  ============= cURL ==============
+    /*  # ============= cURL ==============
       	# BASH:
 	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
 
-       	------------- JSON - PAGINATED --------------
+       	# ------------- JSON - PAGINATED --------------
        	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | jq
        	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | jq
        
@@ -184,15 +184,15 @@ public class MemberControllerImpl implements MemberController {
        	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list?page=1' | jq
        	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list' | jq
 
-       	-------------- XML - PAGINATED --------------
+       	# -------------- XML - PAGINATED --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
        		-L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | xmllint --format -
        
-       	------------- YAML - PAGINATED --------------
+       	# ------------- YAML - PAGINATED --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
        		-L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | yq
 
-       	------------- CORS - PAGINATED --------------
+       	# ------------- CORS - PAGINATED --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
        		-L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | jq
      */
@@ -219,23 +219,23 @@ public class MemberControllerImpl implements MemberController {
 	return ResponseEntity.ok(membersPage_Assembler.toModel(members, link));
     }
 
-    /*  ============= cURL ==============
+    /*  # ============= cURL ==============
       	# BASH:
 	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
       
-       	------------- JSON --------------
+       	# ------------- JSON --------------
        	curl -s -H "Authorization: $myJWTToken" \
        		-L -X GET 'http://localhost:8080/api/member/v1/member-details/ayrton.senna@bravo.com' | jq
 
-       	-------------- XML --------------
+       	# -------------- XML --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
        		-L -X GET 'http://localhost:8080/api/member/v1/member-details/ayrton.senna@bravo.com' | xmllint --format -
        
-       	------------- YAML --------------
+       	# ------------- YAML --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
        		-L -X GET 'http://localhost:8080/api/member/v1/member-details/ayrton.senna@bravo.com' | yq
 
-       	------------- CORS --------------
+       	# ------------- CORS --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
        		-L -X GET 'http://localhost:8080/api/member/v1/member-details/ayrton.senna@bravo.com' | jq
      */
@@ -256,22 +256,22 @@ public class MemberControllerImpl implements MemberController {
 	return ResponseEntity.ok(member);
     }
 
-    /*  ============= cURL ==============
+    /*  # ============= cURL ==============
       	# BASH:
 	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
       
-	------------- JSON --------------
+	# ------------- JSON --------------
         curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/me' | jq
 
-        -------------- XML --------------
+        # -------------- XML --------------
         curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
         	-L -X GET 'http://localhost:8080/api/member/v1/me' | xmllint --format -
         
-        ------------- YAML --------------
+        # ------------- YAML --------------
         curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
         	-L -X GET 'http://localhost:8080/api/member/v1/me' | yq
 
-        ------------- CORS --------------
+        # ------------- CORS --------------
         curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
         	-L -X GET 'http://localhost:8080/api/member/v1/me' | jq
      */
@@ -298,14 +298,60 @@ public class MemberControllerImpl implements MemberController {
       	# BASH:
 	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
      
-       	------------- JSON --------------
+	# ------------- JSON (request and response) --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Content-Type: application/json' \
+		-L -X PUT 'http://localhost:8080/api/member/v1/member-update' \
+		-d '{
+			"membrerId": 51,
+			"memberName":"Rubens Barrichello", 
+			"memberEmail":"rubens.barrichello@bravo.com",
+		     	"memberMobileNumber":"(11) 98765-4321", 
+		     	"memberPassword": "barrichello_pass",
+		     	"memberAuthorities": [
+		     		"ROLE_ADMIN"
+		     	]
+		     }' | jq
 
-       	-------------- XML --------------
+       	# -------------- XML (request and response) --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' -H 'Content-Type: application/xml' \
+       		-L -X PUT 'http://localhost:8080/api/member/v1/member-update' \
+       		-d '<MemberCreateRequest>
+       			<memberId>52</memberId>
+                        <memberName>Emerson Fittipaldi</memberName>
+                        <memberEmail>emerson.fittipaldi@bravo.com</memberEmail>
+                        <memberMobileNumber>(11) 98765-4321</memberMobileNumber>
+                        <memberPassword>fittipaldi_pass</memberPassword>
+                        <memberAuthorities>
+                                <memberAuthorities>ROLE_ADMIN</memberAuthorities>
+                        </memberAuthorities>
+                   </MemberCreateRequest>' | xmllint --format - 
        
-       	------------- YAML --------------
+        # ------------- YAML (request and response) --------------
+	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' -H 'Content-Type: application/x-yaml' \
+		-L -X PUT 'http://localhost:8080/api/member/v1/member-update' \
+       		-d '---
+       		    memberId: 53
+                    memberName: "Nelson Piquet"
+                    memberEmail: "nelson.piquet@bravo.com"
+                    memberMobileNumber: "(11) 98765-4321"
+                    memberPassword: "piquet_pass"
+                    memberAuthorities:
+                        - "ROLE_ADMIN"' | yq
 
-       	------------- CORS --------------
-       
+        # ------------- CORS - origin filter and JSON request / response -------------
+        curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
+        	-H 'Content-Type: application/json' \
+        	-L -X PUT 'http://localhost:8080/api/member/v1/member-update' \
+        	-d '{
+        		"memberId": 54,
+        		"memberName":"Felipe Massa", 
+        		"memberEmail":"felipe.massa@bravo.com",
+	     		"memberMobileNumber":"(11) 98765-4321", 
+	     		"memberPassword": "massa_pass",
+	     		"memberAuthorities": [
+	     			"ROLE_ADMIN"
+	     		]
+	     	    }' | jq
      */
     @Override
     @PutMapping(value = "/member-update", 
@@ -330,30 +376,30 @@ public class MemberControllerImpl implements MemberController {
 	return ResponseEntity.ok(updatedMember);
     }
 
-    /*  ============= cURL ==============
+    /*  # ============= cURL ==============
       	# BASH:
 	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
       
-       	------------- JSON --------------
+       	# ------------- JSON --------------
        	curl -s -H "Authorization: $myJWTToken" \
-       		-L -X GET 'http://localhost:8080/api/member/v1/member-password' \
+       		-L -X PATCH 'http://localhost:8080/api/member/v1/member-password' \
        		-d '{"newPassword": "mynewpassword"}' | jq
        
-       	-------------- XML --------------
+       	# -------------- XML --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' -H 'Content-Type: application/xml' \
-       		-L -X GET 'http://localhost:8080/api/member/v1/member-password' \
+       		-L -X PATCH 'http://localhost:8080/api/member/v1/member-password' \
        		-d '<MemberUpdatePasswordRequest>
        			<newPassword>mynewpassword</newPassword>
        		    </MemberUpdatePasswordRequest>' | xmllint --format -
        
-       	------------- YAML --------------
+       	# ------------- YAML --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' -H 'Content-Type: application/x-yaml' \
-       		-L -X GET 'http://localhost:8080/api/member/v1/member-password' \
+       		-L -X PATCH 'http://localhost:8080/api/member/v1/member-password' \
        		-d '--- newPassword: "mynewpassword"' | yq
     
-       	------------- CORS --------------
+       	# ------------- CORS --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
-       		-L -X GET 'http://localhost:8080/api/member/v1/member-password' \
+       		-L -X PATCH 'http://localhost:8080/api/member/v1/member-password' \
        		-d '{"newPassword": "mynewpassword"}' | jq
     */
     @Override
@@ -379,33 +425,33 @@ public class MemberControllerImpl implements MemberController {
 	return ResponseEntity.ok(member);
     }
 
-    /*  ============= cURL ==============
+    /*  # ============= cURL ==============
       	# BASH:
 	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
       
-       	------------- JSON --------------       	
+       	# ------------- JSON --------------       	
        	curl -s -H "Authorization: $myJWTToken" \
-       		-L -X GET 'http://localhost:8080/api/member/v1/manage-member-password' \
+       		-L -X PATCH 'http://localhost:8080/api/member/v1/manage-member-password' \
             	-d '{"memberUsername": "mfredson2@amazon.com", "memberPassword": "newpassword"}' | jq
     
-       	-------------- XML --------------
+       	# -------------- XML --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' -H 'Content-Type: application/xml' \
-       	    	-L -X GET 'http://localhost:8080/api/member/v1/manage-member-password' \
+       	    	-L -X PATCH 'http://localhost:8080/api/member/v1/manage-member-password' \
        	    	-d '<MemberManagePasswordRequest>
        		    	<memberUsername>mfredson2@amazon.com</memberUsername>
        		    	<memberPassword>newpassword</memberPassword>
        		    </MemberManagePasswordRequest>' | xmllint --format -
        
-       	------------- YAML --------------
+       	# ------------- YAML --------------
 	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' -H 'Content-Type: application/x-yaml' \
-		-L -X POST 'http://localhost:8080/api/member/v1/manage-member-password' \
+		-L -X PATCH 'http://localhost:8080/api/member/v1/manage-member-password' \
        		-d '---
                     memberUsername: "Nelson Piquet"
                     memberPassword: "newpassword"' | yq
     
-       	------------- CORS --------------
+       	# ------------- CORS --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
-            -L -X GET 'http://localhost:8080/api/member/v1/manage-member-password' \
+            -L -X PATCH 'http://localhost:8080/api/member/v1/manage-member-password' \
             -d '{"memberUsername": "mfredson2@amazon.com", "memberPassword": "newpassword"}' \
             | jq
     */
@@ -428,25 +474,25 @@ public class MemberControllerImpl implements MemberController {
 	return ResponseEntity.ok(member);
     }
 
-    /*  ============= cURL ==============
+    /*  # ============= cURL ==============
       	# BASH:
 	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
       
-       	------------- JSON --------------
+       	# ------------- JSON --------------
        	curl -s -H "Authorization: $myJWTToken" \
-       		-L -X GET 'http://localhost:8080/api/member/v1/member-disable/3' | jq
+       		-L -X PATCH 'http://localhost:8080/api/member/v1/member-disable/3' | jq
     
-       	-------------- XML --------------
+       	# -------------- XML --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
-       		-L -X GET 'http://localhost:8080/api/member/v1/member-disable/3' | xmllint --format -
+       		-L -X PATCH 'http://localhost:8080/api/member/v1/member-disable/3' | xmllint --format -
        
-       	------------- YAML --------------
+       	# ------------- YAML --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
-       		-L -X GET 'http://localhost:8080/api/member/v1/member-disable/3' | yq
+       		-L -X PATCH 'http://localhost:8080/api/member/v1/member-disable/3' | yq
     
-       	------------- CORS --------------
+       	# ------------- CORS --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
-       		-L -X GET 'http://localhost:8080/api/member/v1/member-disable/3' | jq
+       		-L -X PATCH 'http://localhost:8080/api/member/v1/member-disable/3' | jq
     */
     @Override
     @PatchMapping(value = "/member-disable/{id}",
@@ -464,25 +510,25 @@ public class MemberControllerImpl implements MemberController {
 	return ResponseEntity.ok(member);
     }
 
-    /*  ============= cURL ==============
+    /*  # ============= cURL ==============
       	# BASH:
 	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
       
-       	------------- JSON --------------
+       	# ------------- JSON --------------
        	curl -s -u -H "Authorization: $myJWTToken" \
-       		-L -X GET 'http://localhost:8080/api/member/v1/member-enable/3' | jq
+       		-L -X PATCH 'http://localhost:8080/api/member/v1/member-enable/3' | jq
 
-       	-------------- XML --------------
+       	# -------------- XML --------------
        	curl -s -u -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
-       		-L -X GET 'http://localhost:8080/api/member/v1/member-enable/3' | xmllint --format -
+       		-L -X PATCH 'http://localhost:8080/api/member/v1/member-enable/3' | xmllint --format -
        
-       	------------- YAML --------------
+       	# ------------- YAML --------------
        	curl -s -u -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
-       		-L -X GET 'http://localhost:8080/api/member/v1/member-enable/3' | yq
+       		-L -X PATCH 'http://localhost:8080/api/member/v1/member-enable/3' | yq
 
-       	------------- CORS --------------
+       	# ------------- CORS --------------
        	curl -s -u -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
-       		-L -X GET 'http://localhost:8080/api/member/v1/member-enable/3' | jq
+       		-L -X PATCH 'http://localhost:8080/api/member/v1/member-enable/3' | jq
      */
     @Override
     @PatchMapping(value = "/member-enable/{id}",
