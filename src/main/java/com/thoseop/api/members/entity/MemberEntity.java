@@ -58,6 +58,18 @@ public class MemberEntity implements Serializable {
 	    nullable = false)
     private String password;
     
+    @Column(name = "account_not_expired", 
+	    columnDefinition = "Boolean default false")  
+    private Boolean accountNotExpired;
+    
+    @Column(name = "credentials_not_expired", 
+	    columnDefinition = "Boolean default false")  
+    private Boolean credentialsNotExpired;
+    
+    @Column(name = "account_not_locked", 
+	    columnDefinition = "Boolean default false")  
+    private Boolean accountNotLocked;
+    
     @Column(name = "enabled", 
 	    columnDefinition = "Boolean default false")  
     private Boolean enabled;
