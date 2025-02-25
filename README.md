@@ -8,7 +8,7 @@
 ## Description:
 Project exemplifies the use of the following resources: 
 
-    - It was used S.O.L.I.D., DRY, KISS, F.I.R.S.T. and other useful principles.
+    - It was used SOLID, DRY, KISS, FIRST and other useful principles.
     - Design Patterns when reasonable to do so.
     - Different environment profiles with different sets of configurations for
       the Spring Security, Authenticated routes and databases.
