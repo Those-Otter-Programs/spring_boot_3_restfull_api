@@ -38,15 +38,12 @@ public class MemberResponse extends RepresentationModel<MemberResponse> implemen
     @Schema(description = "The member's mobile number", example = "(11) 91234-5678")
     private String memberMobileNumber;
     
-    @Schema(description = "The member's status", example = "false")
-    private Boolean memberEnabled;
-    
     @Schema(description = "The member's creation date", example = "1945-09-02")
     private Date memberCreatedAt;
     
-    @Schema(description = "The member's last update date", example = "2025-02-18")
-    private Date memberUpdatedAt;
-    
     @Schema(description = "The member's authorities", example = "ROLE_ASSOCIATE, VIEWINFOCORP")
     private List<String> memberAuthorities;
+    
+    @Schema(description = "Message to member", example = "You need to confirm your account")
+    private String message;
 }
