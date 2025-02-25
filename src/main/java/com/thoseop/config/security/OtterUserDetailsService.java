@@ -35,7 +35,12 @@ public class OtterUserDetailsService implements UserDetailsService {
 	List<GrantedAuthority> authorities = member.getAuthorities().stream()
 		.map(authority -> new SimpleGrantedAuthority(authority.getName())).collect(Collectors.toList());
 
-	return new User(member.getEmail(), member.getPassword(), member.getEnabled(), member.getEnabled(),
-		member.getEnabled(), member.getEnabled(), authorities);
+	return new User(member.getEmail(), 
+		member.getPassword(), 
+		member.getEnabled(), 
+		member.getAccountNotExpired(),
+		member.getCredentialsNotExpired(), 
+		member.getAccountNotLocked(), 
+		authorities);
     }
 }
