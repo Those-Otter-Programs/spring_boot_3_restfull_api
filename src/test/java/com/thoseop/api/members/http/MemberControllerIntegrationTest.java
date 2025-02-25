@@ -38,6 +38,7 @@ import org.springframework.test.context.TestPropertySource;
 import com.thoseop.api.members.http.request.MemberCreateRequest;
 import com.thoseop.api.members.http.request.MemberManagePasswordRequest;
 import com.thoseop.api.members.http.request.MemberUpdatePasswordRequest;
+import com.thoseop.api.members.http.response.MemberDetailsResponse;
 import com.thoseop.api.members.http.response.MemberResponse;
 
 import net.minidev.json.JSONObject;
@@ -132,7 +133,6 @@ class MemberControllerIntegrationTest {
 		memberCreateRequest, headers);
 	// w
 	ResponseEntity<MemberResponse> response = testRestTemplate
-//		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.POST, request, MemberResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.CREATED, 
@@ -166,7 +166,6 @@ class MemberControllerIntegrationTest {
 		null, headers);
 	// w
 	ResponseEntity<PagedModel<EntityModel<MemberResponse>>> response = testRestTemplate
-//		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.GET, request,
 			new ParameterizedTypeReference<PagedModel<EntityModel<MemberResponse>>>() {
 		});
@@ -194,7 +193,6 @@ class MemberControllerIntegrationTest {
 		null, headers);
 	// w
 	ResponseEntity<MemberResponse> response = testRestTemplate
-//		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.GET, request, MemberResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
@@ -227,8 +225,62 @@ class MemberControllerIntegrationTest {
 		null, headers);
 	// w
 	ResponseEntity<MemberResponse> response = testRestTemplate
-//		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.GET, request, MemberResponse.class);
+	// t
+	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
+		() -> "The returned http status code was not the expected.");
+    }
+
+    @DisplayName("test Get Member Full Details By Username_when Member Authorized_then Returns HTTP 200")
+    @Test
+    @Order(6)
+    void testGetMemberFullDetailsByUsername_whenMemberAuthorized_thenReturnsHTTP200() {
+	// g
+	String route = "%s/member-full-details/ayrton.senna@bravo.com".formatted(this.baseRoute);
+
+	// creating the headers for the requestString
+	HttpHeaders headers = new HttpHeaders();
+	headers.setContentType(MediaType.APPLICATION_JSON);
+	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
+
+	HttpEntity<?> request = new HttpEntity<>(
+		null, headers);
+	// w
+	ResponseEntity<MemberDetailsResponse> response = testRestTemplate
+		.exchange(route, HttpMethod.GET, request, MemberDetailsResponse.class);
+	// t
+	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
+		() -> "The returned http status code was not the expected.");
+	Assertions.assertEquals("Ayrton Senna", response.getBody().getMemberName(), 
+		() -> "The returned member name was not the expected.");
+	Assertions.assertEquals("ayrton.senna@bravo.com", response.getBody().getMemberEmail(), 
+		() -> "The returned member email was not the expected.");
+	Assertions.assertEquals("(11) 98765-4321", response.getBody().getMemberMobileNumber(),
+		() -> "The returned member mobile number was not expected.");
+    }
+
+    @DisplayName("test Get Member Full Details By Username_when Request With Accepted Media Types_then Return HTTP 200")
+    @ParameterizedTest
+    @ValueSource(strings = {MediaType.APPLICATION_JSON_VALUE, 
+	    MediaType.APPLICATION_XML_VALUE, _APPLICATION_YAML_VALUE})
+    @Order(7)
+    void testGetMemberFullDetailsByUsername_whenRequestWithAcceptedMediaTypes_thenReturnHTTP200(String mediaTypeAccepted) {
+	// g
+	String route = "%s/member-full-details/ayrton.senna@bravo.com".formatted(this.baseRoute);
+
+	// creating the headers for the requestString
+	HttpHeaders headers = new HttpHeaders();
+//	headers.setContentType(MediaType.APPLICATION_JSON);
+	headers.set("Content-Type", mediaTypeAccepted);
+	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
+
+	HttpEntity<?> request = new HttpEntity<>(
+		null, headers);
+	// w
+	ResponseEntity<MemberDetailsResponse> response = testRestTemplate
+		.exchange(route, HttpMethod.GET, request, MemberDetailsResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
 		() -> "The returned http status code was not the expected.");
@@ -236,7 +288,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Get Me_when Member Authenticated_then Returns HTTP 200")
     @Test
-    @Order(6)
+    @Order(8)
     void testMe_whenMemberAuthenticated_thenReturnsHTTP200() {
 	// g
 	String route = "%s/me".formatted(this.baseRoute);
@@ -251,7 +303,6 @@ class MemberControllerIntegrationTest {
 		null, headers);
 	// w
 	ResponseEntity<MemberResponse> response = testRestTemplate
-//		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.GET, request, MemberResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
@@ -268,7 +319,7 @@ class MemberControllerIntegrationTest {
     @ParameterizedTest
     @ValueSource(strings = {MediaType.APPLICATION_JSON_VALUE, 
 	    MediaType.APPLICATION_XML_VALUE, _APPLICATION_YAML_VALUE})
-    @Order(7)
+    @Order(9)
     void testMe_whenRequestWithAcceptedMediaTypes_thenReturnHTTP200(String mediaTypeAccepted) {
 	// g
 	String route = "%s/me".formatted(this.baseRoute);
@@ -284,7 +335,6 @@ class MemberControllerIntegrationTest {
 		null, headers);
 	// w
 	ResponseEntity<MemberResponse> response = testRestTemplate
-//		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.GET, request, MemberResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
@@ -299,7 +349,7 @@ class MemberControllerIntegrationTest {
     
     @DisplayName("test Update Member Password_when Authenticated_then Returns HTTP 200")
     @Test
-    @Order(8)
+    @Order(10)
     void testUpdateMemberPassword_whenAuthenticated_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-password".formatted(this.baseRoute);
@@ -330,7 +380,6 @@ class MemberControllerIntegrationTest {
 	updPassHTTPrequest = new HttpEntity<>(memberUpdPassRequest, headers);
 	// w
 	responsePassChange = testRestTemplate
-//		.withBasicAuth("mfredson2@amazon.com", "new_mick_pass")
 		.exchange(route, HttpMethod.PATCH, updPassHTTPrequest, MemberResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, responsePassChange.getStatusCode(),
@@ -339,7 +388,7 @@ class MemberControllerIntegrationTest {
     
     @DisplayName("test Manage Member Password_when Authenticated_then Returns HTTP 200")
     @Test
-    @Order(9)
+    @Order(11)
     void testManageMemberPassword_whenAuthenticated_thenReturnsHTTP200() {
 	// g
 	String route = "%s/manage-member-password".formatted(this.baseRoute);
@@ -359,7 +408,6 @@ class MemberControllerIntegrationTest {
 	// w
 	// ...changing the members password...
 	ResponseEntity<MemberResponse> responsePassChange = testRestTemplate
-//		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.PATCH, updPassHTTPrequest, MemberResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, responsePassChange.getStatusCode(),
@@ -372,7 +420,6 @@ class MemberControllerIntegrationTest {
 	updPassHTTPrequest = new HttpEntity<>(memberMngPassRequest, headers);
 	// w
 	responsePassChange = testRestTemplate
-//		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.PATCH, updPassHTTPrequest, MemberResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, responsePassChange.getStatusCode(),
@@ -381,7 +428,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Inactivate Member_when Right Privileges_then Returns HTTP 200")
     @Test
-    @Order(10)
+    @Order(12)
     void testInactivateMember_whenRightPrivileges_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-disable/3".formatted(this.baseRoute);
@@ -396,18 +443,17 @@ class MemberControllerIntegrationTest {
 		null, headers);
 	// w
 	ResponseEntity<MemberResponse> response = testRestTemplate
-//		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.PATCH, request, MemberResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
 		() -> "The returned http status code was not the expected.");
-	Assertions.assertEquals(false, response.getBody().getMemberEnabled(),
-		() -> "The returned member status was not the expected.");
+	Assertions.assertEquals("User's account was disabled", response.getBody().getMessage(),
+		() -> "The returned message was not the expected");
     }
 
     @DisplayName("test Activate Member_when Right Privileges_then Returns HTTP 200")
     @Test
-    @Order(11)
+    @Order(13)
     void testActivateMember_whenRightPrivileges_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-enable/3".formatted(this.baseRoute);
@@ -422,12 +468,61 @@ class MemberControllerIntegrationTest {
 		null, headers);
 	// w
 	ResponseEntity<MemberResponse> response = testRestTemplate
-//		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.PATCH, request, MemberResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
 		() -> "The returned http status code was not the expected.");
-	Assertions.assertEquals(true, response.getBody().getMemberEnabled(),
-		() -> "The returned member status was not the expected.");
+	Assertions.assertEquals("User's account was enabled", response.getBody().getMessage(),
+		() -> "The returned message was not the expected");
+    }
+
+    @DisplayName("test Lock Member Account_when Right Privileges_then Returns HTTP 200")
+    @Test
+    @Order(14)
+    void testLockMemberAccount_whenRightPrivileges_thenReturnsHTTP200() {
+	// g
+	String route = "%s/member-lock/3".formatted(this.baseRoute);
+
+	// creating the headers for the requestString
+	HttpHeaders headers = new HttpHeaders();
+	headers.setContentType(MediaType.APPLICATION_JSON);
+	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
+
+	HttpEntity<?> request = new HttpEntity<>(
+		null, headers);
+	// w
+	ResponseEntity<MemberResponse> response = testRestTemplate
+		.exchange(route, HttpMethod.PATCH, request, MemberResponse.class);
+	// t
+	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
+		() -> "The returned http status code was not the expected.");
+	Assertions.assertEquals("User's account was locked", response.getBody().getMessage(),
+		() -> "The returned message was not the expected");
+    }
+
+    @DisplayName("test Unlock Member Account_when Right Privileges_then Returns HTTP 200")
+    @Test
+    @Order(15)
+    void testUnlockMemberAccount_whenRightPrivileges_thenReturnsHTTP200() {
+	// g
+	String route = "%s/member-unlock/3".formatted(this.baseRoute);
+
+	// creating the headers for the requestString
+	HttpHeaders headers = new HttpHeaders();
+	headers.setContentType(MediaType.APPLICATION_JSON);
+	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
+
+	HttpEntity<?> request = new HttpEntity<>(
+		null, headers);
+	// w
+	ResponseEntity<MemberResponse> response = testRestTemplate
+		.exchange(route, HttpMethod.PATCH, request, MemberResponse.class);
+	// t
+	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
+		() -> "The returned http status code was not the expected.");
+	Assertions.assertEquals("User's account was unlocked", response.getBody().getMessage(),
+		() -> "The returned message was not the expected");
     }
 }
