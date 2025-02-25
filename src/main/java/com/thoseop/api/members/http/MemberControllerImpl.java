@@ -1,10 +1,8 @@
 package com.thoseop.api.members.http;
 
+import static com.thoseop.config.OtterWebMvcConfig._APPLICATION_YAML_VALUE;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
-
-import static com.thoseop.config.OtterWebMvcConfig._APPLICATION_YAML_VALUE;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,6 +35,8 @@ import com.thoseop.api.members.http.request.MemberCreateRequest;
 import com.thoseop.api.members.http.request.MemberManagePasswordRequest;
 import com.thoseop.api.members.http.request.MemberUpdatePasswordRequest;
 import com.thoseop.api.members.http.request.MemberUpdateRequest;
+import com.thoseop.api.members.http.response.MemberCreatedResponse;
+import com.thoseop.api.members.http.response.MemberDetailsResponse;
 import com.thoseop.api.members.http.response.MemberResponse;
 import com.thoseop.api.members.service.MemberService;
 
@@ -156,12 +156,12 @@ public class MemberControllerImpl implements MemberController {
 	    produces = { _APPLICATION_YAML_VALUE,
 		    MediaType.APPLICATION_JSON_VALUE, 
 		    MediaType.APPLICATION_XML_VALUE })
-    public @ResponseBody ResponseEntity<MemberResponse> createMember(@RequestBody @Valid MemberCreateRequest request) 
+    public @ResponseBody ResponseEntity<MemberCreatedResponse> createMember(@RequestBody @Valid MemberCreateRequest request) 
 	    throws Exception {
 
         log.info("MemberController - creating member");
 
-	MemberResponse savedMember;
+	MemberCreatedResponse savedMember;
         try {
             savedMember = this.memberService.saveMember(request);
             savedMember.add(linkTo(methodOn(MemberControllerImpl.class)
@@ -249,6 +249,43 @@ public class MemberControllerImpl implements MemberController {
         log.info("MemberController - reading member by username: {}", username);
 
 	MemberResponse member = memberService.readMemberByEmail(username);
+	member.add(linkTo(methodOn(MemberControllerImpl.class)
+		.getMemberByUsername(member.getMemberEmail())).withSelfRel());
+
+//	return new ResponseEntity<MemberResponse>(member, HttpStatus.OK);
+	return ResponseEntity.ok(member);
+    }
+
+    /*  # ============= cURL ==============
+      	# BASH:
+	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
+      
+       	# ------------- JSON --------------
+       	curl -s -H "Authorization: $myJWTToken" \
+       		-L -X GET 'http://localhost:8080/api/member/v1/member-full-details/ayrton.senna@bravo.com' | jq
+
+       	# -------------- XML --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
+       		-L -X GET 'http://localhost:8080/api/member/v1/member-full-details/ayrton.senna@bravo.com' | xmllint --format -
+       
+       	# ------------- YAML --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
+       		-L -X GET 'http://localhost:8080/api/member/v1/member-full-details/ayrton.senna@bravo.com' | yq
+
+       	# ------------- CORS --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
+       		-L -X GET 'http://localhost:8080/api/member/v1/member-full-details/ayrton.senna@bravo.com' | jq
+     */
+    @Override
+    @GetMapping(value = "/member-full-details/{username}", 
+	    produces = { _APPLICATION_YAML_VALUE, 
+		    MediaType.APPLICATION_JSON_VALUE, 
+		    MediaType.APPLICATION_XML_VALUE })
+    public @ResponseBody ResponseEntity<MemberDetailsResponse> getMemberFullDetailsByUsername(@PathVariable String username) {
+
+        log.info("MemberController - reading member by username: {}", username);
+
+	MemberDetailsResponse member = memberService.readMemberDetailsByEmail(username);
 	member.add(linkTo(methodOn(MemberControllerImpl.class)
 		.getMemberByUsername(member.getMemberEmail())).withSelfRel());
 
@@ -501,11 +538,11 @@ public class MemberControllerImpl implements MemberController {
 		    MediaType.APPLICATION_XML_VALUE })
     public @ResponseBody ResponseEntity<MemberResponse> inactivateMember(@PathVariable Long id) {
 
-        log.info("MemberController - ennabling member id: {}", id);
+        log.info("MemberController - disabling member id: {}", id);
 
-	MemberResponse member = memberService.changeMemberStatus(id, MemberStatus.DISABLE);
+	MemberResponse member = memberService.changeMemberEnabledStatus(id, MemberStatus.DISABLE);
 	member.add(linkTo(methodOn(MemberControllerImpl.class)
-		.getMemberByUsername(member.getMemberEmail())).withSelfRel());
+		.getMemberByUsername(member.getMemberName())).withSelfRel());
 
 	return ResponseEntity.ok(member);
     }
@@ -537,11 +574,83 @@ public class MemberControllerImpl implements MemberController {
 		    MediaType.APPLICATION_XML_VALUE })
     public @ResponseBody ResponseEntity<MemberResponse> activateMember(@PathVariable Long id) {
 
-        log.info("MemberController - disabling member id: {}", id);
+        log.info("MemberController - enabling member id: {}", id);
 
-	MemberResponse member = memberService.changeMemberStatus(id, MemberStatus.ENABLE);
+	MemberResponse member = memberService.changeMemberEnabledStatus(id, MemberStatus.ENABLE);
 	member.add(linkTo(methodOn(MemberControllerImpl.class)
-		.getMemberByUsername(member.getMemberEmail())).withSelfRel());
+		.getMemberByUsername(member.getMemberName())).withSelfRel());
+
+	return ResponseEntity.ok(member);
+    }
+
+    /*  # ============= cURL ==============
+      	# BASH:
+	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
+      
+       	# ------------- JSON --------------
+       	curl -s -H "Authorization: $myJWTToken" \
+       		-L -X PATCH 'http://localhost:8080/api/member/v1/member-lock/3' | jq
+    
+       	# -------------- XML --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
+       		-L -X PATCH 'http://localhost:8080/api/member/v1/member-lock/3' | xmllint --format -
+       
+       	# ------------- YAML --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
+       		-L -X PATCH 'http://localhost:8080/api/member/v1/member-lock/3' | yq
+    
+       	# ------------- CORS --------------
+       	curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
+       		-L -X PATCH 'http://localhost:8080/api/member/v1/member-lock/3' | jq
+    */
+    @Override
+    @PatchMapping(value = "/member-lock/{id}",
+	    produces = { _APPLICATION_YAML_VALUE, 
+		    MediaType.APPLICATION_JSON_VALUE, 
+		    MediaType.APPLICATION_XML_VALUE })
+    public @ResponseBody ResponseEntity<MemberResponse> lockMemberAccount(@PathVariable Long id) {
+
+        log.info("MemberController - locking member account id: {}", id);
+
+	MemberResponse member = memberService.changeMemberAccountLockedStatus(id, MemberStatus.DISABLE);
+	member.add(linkTo(methodOn(MemberControllerImpl.class)
+		.getMemberByUsername(member.getMemberName())).withSelfRel());
+
+	return ResponseEntity.ok(member);
+    }
+
+    /*  # ============= cURL ==============
+      	# BASH:
+	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
+      
+       	# ------------- JSON --------------
+       	curl -s -u -H "Authorization: $myJWTToken" \
+       		-L -X PATCH 'http://localhost:8080/api/member/v1/member-unlock/3' | jq
+
+       	# -------------- XML --------------
+       	curl -s -u -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
+       		-L -X PATCH 'http://localhost:8080/api/member/v1/member-unlock/3' | xmllint --format -
+       
+       	# ------------- YAML --------------
+       	curl -s -u -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
+       		-L -X PATCH 'http://localhost:8080/api/member/v1/member-unlock/3' | yq
+
+       	# ------------- CORS --------------
+       	curl -s -u -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
+       		-L -X PATCH 'http://localhost:8080/api/member/v1/member-unlock/3' | jq
+     */
+    @Override
+    @PatchMapping(value = "/member-unlock/{id}",
+	    produces = { _APPLICATION_YAML_VALUE, 
+		    MediaType.APPLICATION_JSON_VALUE, 
+		    MediaType.APPLICATION_XML_VALUE })
+    public @ResponseBody ResponseEntity<MemberResponse> unlockMemberAccount(@PathVariable Long id) {
+
+        log.info("MemberController - unlocking member id: {}", id);
+
+	MemberResponse member = memberService.changeMemberAccountLockedStatus(id, MemberStatus.ENABLE);
+	member.add(linkTo(methodOn(MemberControllerImpl.class)
+		.getMemberByUsername(member.getMemberName())).withSelfRel());
 
 	return ResponseEntity.ok(member);
     }
