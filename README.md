@@ -667,7 +667,7 @@ curl -s -u -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
 - [linkedin](https://www.linkedin.com/in/roccojamesmallon/)
 
 ## License
-Apache 2.0
+[Apache 2.0](LICENSE)
 
 ---
 ### Have a drink...
