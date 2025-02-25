@@ -170,7 +170,7 @@ This controller implements 3 actions:
 ```
     
 - This controller implements 3 routes.
-- Only Web layer tests (mocks).
+- Only Web layer tests.
 - **HATEOAS** - regardless of the selected Response data format, Responses 
   include HATEOAS links to make it a RESTful API.
 - **Content Negotiation** allow for Responses and Requests in JSON, XML and YML 
@@ -253,6 +253,7 @@ This controller implements routes to manage Members (Users), and also the action
    [GET] /api/member/v1/token
   [POST] /api/member/v1/member-create
    [GET] /api/member/v1/list 
+   [GET] /api/member/v1/member-full-details/{username} 
    [GET] /api/member/v1/member-details/{username} 
    [GET] /api/member/v1/me 
    [PUT] /api/member/v1/member-update 
@@ -260,6 +261,8 @@ This controller implements routes to manage Members (Users), and also the action
  [PATCH] /api/member/v1/manage-member-password
  [PATCH] /api/member/v1/member-disable/{id}
  [PATCH] /api/member/v1/member-enable/{id}
+ [PATCH] /api/member/v1/member-lock/{id}
+ [PATCH] /api/member/v1/member-unlock/{id}
 ```
 
 ### REQUESTS /api/member/v1/member-create:
@@ -378,6 +381,34 @@ curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
 # ------------- CORS --------------
 curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
     -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | jq
+```
+
+### REQUESTS /api/member/v1/member-full-details/{username} 
+
+
+```bash
+# Requesting the JWT token and storing it in a bash variable
+myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
+    -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
+
+# run cURL using the variable as the authorization token:
+
+# ------------- JSON --------------
+curl -s -H "Authorization: $myJWTToken" \
+    -L -X GET 'http://localhost:8080/api/member/v1/member-full-details/ayrton.senna@bravo.com' | jq
+
+# ------------- XML --------------
+curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
+    -L -X GET 'http://localhost:8080/api/member/v1/member-full-details/ayrton.senna@bravo.com' \
+    | xmllint --format -
+
+# ------------- YAML --------------
+curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
+    -L -X GET 'http://localhost:8080/api/member/v1/member-full-details/ayrton.senna@bravo.com' | yq
+
+# ------------- CORS --------------
+curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
+    -L -X GET 'http://localhost:8080/api/member/v1/member-full-details/ayrton.senna@bravo.com' | jq
 ```
 
 ### REQUESTS /api/member/v1/member-details/{username} 
@@ -657,6 +688,56 @@ curl -s -u -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
 # ------------- CORS --------------
 curl -s -u -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
     -L -X PATCH 'http://localhost:8080/api/member/v1/member-enable/3' | jq
+```
+
+### REQUESTS /api/member/v1/member-lock/{id}
+
+```bash
+# Requesting the JWT token and storing it in a bash variable
+myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
+    -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
+
+# ------------- JSON --------------
+curl -s -H "Authorization: $myJWTToken" \
+    -L -X PATCH 'http://localhost:8080/api/member/v1/member-lock/3' | jq
+
+# -------------- XML --------------
+curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
+    -L -X PATCH 'http://localhost:8080/api/member/v1/member-lock/3' | xmllint --format -
+
+# ------------- YAML --------------
+curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
+    -L -X PATCH 'http://localhost:8080/api/member/v1/member-lock/3' | yq
+
+# ------------- CORS --------------
+curl -s -H "Authorization: $myJWTToken" \
+    -H 'Origin: http://localhost:3000' \
+    -L -X PATCH 'http://localhost:8080/api/member/v1/member-lock/3' | jq
+```
+
+### REQUESTS /api/member/v1/member-unlock/{id}
+
+```bash
+# Requesting the JWT token and storing it in a bash variable
+myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
+    -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
+
+# ------------- JSON --------------
+curl -s -u -H "Authorization: $myJWTToken" \
+    -L -X PATCH 'http://localhost:8080/api/member/v1/member-unlock/3' | jq
+
+# -------------- XML --------------
+curl -s -u -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
+    -L -X PATCH 'http://localhost:8080/api/member/v1/member-unlock/3' | xmllint --format -
+
+# ------------- YAML --------------
+curl -s -u -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
+    -L -X PATCH 'http://localhost:8080/api/member/v1/member-unlock/3' | yq
+
+# ------------- CORS --------------
+curl -s -u -H "Authorization: $myJWTToken" \
+    -H 'Origin: http://localhost:3000' \
+    -L -X PATCH 'http://localhost:8080/api/member/v1/member-unlock/3' | jq
 ```
 
 ## TO BE CONTINUED...
