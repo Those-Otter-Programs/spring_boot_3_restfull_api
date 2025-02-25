@@ -72,7 +72,10 @@ public class OtterSpringSecurityConf {
 		.requestMatchers(HttpMethod.POST, "/api/member/v1/member-create/**").hasRole("ADMIN")
 		.requestMatchers(HttpMethod.PATCH, "/api/member/v1/member-disable/**",
 						"/api/member/v1/member-enable/**").hasAnyRole("ADMIN", "MANAGER", "SUPERVISOR")
+		.requestMatchers(HttpMethod.PATCH, "/api/member/v1/member-lock/**",
+						"/api/member/v1/member-unlock/**").hasAnyRole("ADMIN", "MANAGER", "SUPERVISOR")
 		.requestMatchers(HttpMethod.PATCH, "/api/member/v1/manage-member-password/**").hasRole("ADMIN")
+		.requestMatchers(HttpMethod.GET, "/api/member/v1/member-full-details/**").hasAnyRole("ADMIN", "MANAGER", "SUPERVISOR")
 		.requestMatchers(HttpMethod.GET, "/api/member/v1/member-details/**").hasAnyRole("ADMIN", "MANAGER", "SUPERVISOR")
 		.requestMatchers(HttpMethod.GET, "/api/member/v1/list/**").hasAnyRole("ADMIN", "MANAGER")
 
@@ -102,6 +105,9 @@ public class OtterSpringSecurityConf {
 
     @Bean
     PasswordEncoder passwordEncoder() {
+	// using the delegating password encode approach, which determines the type
+	// of hashing by the "prefix" on the password ({noop}, {bcrypt}).
+	// By default BCrypt password hashing is used for newly created users.
 	return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
