@@ -35,15 +35,12 @@ Project exemplifies the use of the following resources:
 
 ## Features:
 
-- Project was written going from a very basic, and simplistic implementation to a more 
-  complex, but yet minimalistic implementation, using common Java resources/dependencies.
-- System implements different profiles and creates databases structures for those 
-  different profiles (test, dev, prod), using Flyway migrations and H2 (file-mode) 
-  database.
-- Code Coverage: on pom.xml maven-surefire-plugin and with JaCoCo have been 
-  configured to run together and generate automatic reports everytime 
-  'mvn test' is run.
-- Mapstruct and Lombok working together along with Lombok Mapstruct Binding.
+- The project evolved from a basic and simplistic implementation to a more complex yet minimalistic monolithic implementation, utilizing the latest versions of common Java resources and dependencies.
+- The objective was to test the new versions of the dependencies mentioned earlier by applying them to a micro-monolithic application. This test did not take into account concurrent or parallel access to the application's resources, particularly the database.
+- The decision to use the H2 database was based on its practicality. H2 is a relatively simple database, primarily used for testing. However, for a micro application like this, it allows us to complete tasks without the need to configure or run additional services or containers. It is portable and easy to manage.
+- The system creates database structures for different profiles (test, dev, prod) using Flyway migrations and an H2 (file-mode) database.
+- In the pom.xml file, the maven-surefire-plugin has been configured to work in conjunction with JaCoCo, generating automatic reports whenever 'mvn test' is executed.
+- MapStruct and Lombok working together, with the integration of Lombok’s MapStruct binding features.
 
 ---
 
@@ -344,7 +341,6 @@ curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
 
 ### REQUESTS /api/member/v1/list:
 
-##### Requesting the JWT token and saving it into a bash variable:
 
 ```bash
 
@@ -386,7 +382,6 @@ curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
 
 ### REQUESTS /api/member/v1/member-details/{username} 
 
-##### Requesting the JWT token and saving it into a bash variable:
 
 ```bash
 # Requesting the JWT token and storing it in a bash variable
@@ -414,8 +409,6 @@ curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
 ```
 
 ### REQUESTS /api/member/v1/me 
-
-##### Requesting the JWT token and saving it into a bash variable:
 
 ```bash
 # Requesting the JWT token and storing it in a bash variable
@@ -456,17 +449,17 @@ myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
 ```bash 
 # ------------- JSON (request and response) --------------
 curl -s -H "Authorization: $myJWTToken" -H 'Content-Type: application/json' \
--L -X PUT 'http://localhost:8080/api/member/v1/member-update' \
--d '{
-	"membrerId": 51,
-	"memberName":"Rubens Barrichello", 
-	"memberEmail":"rubens.barrichello@bravo.com",
-		"memberMobileNumber":"(11) 98765-4321", 
-		"memberPassword": "barrichello_pass",
-		"memberAuthorities": [
-		    "ROLE_ADMIN"
-		]
-	 }' | jq
+    -L -X PUT 'http://localhost:8080/api/member/v1/member-update' \
+    -d '{
+            "membrerId": 51,
+            "memberName":"Rubens Barrichello", 
+            "memberEmail":"rubens.barrichello@bravo.com",
+            "memberMobileNumber":"(11) 98765-4321", 
+            "memberPassword": "barrichello_pass",
+            "memberAuthorities": [
+                "ROLE_ADMIN"
+            ]
+        }' | jq
 ```
 
 ##### REQUEST ---> sending XML data:
@@ -476,15 +469,15 @@ curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
     -H 'Content-Type: application/xml' \
     -L -X PUT 'http://localhost:8080/api/member/v1/member-update' \
     -d '<MemberCreateRequest>
-       	<memberId>52</memberId>
-                <memberName>Emerson Fittipaldi</memberName>
-                <memberEmail>emerson.fittipaldi@bravo.com</memberEmail>
-                <memberMobileNumber>(11) 98765-4321</memberMobileNumber>
-                <memberPassword>fittipaldi_pass</memberPassword>
-                <memberAuthorities>
-                        <memberAuthorities>ROLE_ADMIN</memberAuthorities>
-                </memberAuthorities>
-           </MemberCreateRequest>' | xmllint --format - 
+            <memberId>52</memberId>
+            <memberName>Emerson Fittipaldi</memberName>
+            <memberEmail>emerson.fittipaldi@bravo.com</memberEmail>
+            <memberMobileNumber>(11) 98765-4321</memberMobileNumber>
+            <memberPassword>fittipaldi_pass</memberPassword>
+            <memberAuthorities>
+                <memberAuthorities>ROLE_ADMIN</memberAuthorities>
+            </memberAuthorities>
+        </MemberCreateRequest>' | xmllint --format - 
 ```
 
 ##### REQUEST ---> sending YAML data:
@@ -494,13 +487,13 @@ curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
     -H 'Content-Type: application/x-yaml' \
     -L -X PUT 'http://localhost:8080/api/member/v1/member-update' \
     -d '---
-       	memberId: 53
-            memberName: "Nelson Piquet"
-            memberEmail: "nelson.piquet@bravo.com"
-            memberMobileNumber: "(11) 98765-4321"
-            memberPassword: "piquet_pass"
-            memberAuthorities:
-                - "ROLE_ADMIN"' | yq
+        memberId: 53
+        memberName: "Nelson Piquet"
+        memberEmail: "nelson.piquet@bravo.com"
+        memberMobileNumber: "(11) 98765-4321"
+        memberPassword: "piquet_pass"
+        memberAuthorities:
+            - "ROLE_ADMIN"' | yq
 ```
 
 ##### REQUEST ---> with CORS origin filtering:
@@ -510,15 +503,15 @@ curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
     -H 'Content-Type: application/json' \
     -L -X PUT 'http://localhost:8080/api/member/v1/member-update' \
     -d '{
-        "memberId": 54,
-        "memberName":"Felipe Massa", 
-        "memberEmail":"felipe.massa@bravo.com",
-	    "memberMobileNumber":"(11) 98765-4321", 
-	    "memberPassword": "massa_pass",
-	    "memberAuthorities": [
-	     	"ROLE_ADMIN"
-	    ]
-	    }' | jq
+            "memberId": 54,
+            "memberName":"Felipe Massa", 
+            "memberEmail":"felipe.massa@bravo.com",
+            "memberMobileNumber":"(11) 98765-4321", 
+            "memberPassword": "massa_pass",
+            "memberAuthorities": [
+                "ROLE_ADMIN"
+            ]
+        }' | jq
 ```
 
 ### REQUESTS /api/member/v1/member-password
@@ -618,8 +611,6 @@ curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
 
 ### REQUESTS /api/member/v1/member-disable/{id}
 
-##### Requesting the JWT token and saving it into a bash variable:
-
 ```bash
 # Requesting the JWT token and storing it in a bash variable
 myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
@@ -646,14 +637,10 @@ curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
 
 ### REQUESTS /api/member/v1/member-enable/{id}
 
-##### Requesting the JWT token and saving it into a bash variable:
-
 ```bash
 # Requesting the JWT token and storing it in a bash variable
 myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
     -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
-    
-# run cURL using the variable as the authorization token:
 
 # ------------- JSON --------------
 curl -s -u -H "Authorization: $myJWTToken" \
@@ -680,10 +667,10 @@ curl -s -u -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
 - [linkedin](https://www.linkedin.com/in/roccojamesmallon/)
 
 ## License
-MIT
+Apache 2.0
 
 ---
-Have a drink. Cheers...
+### Have a drink...
 
 ![Have a good one](src/main/resources/imgs/cool_otter.jpg)
 
