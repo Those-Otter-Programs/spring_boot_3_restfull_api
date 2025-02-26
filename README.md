@@ -48,6 +48,7 @@ Project exemplifies the use of the following resources:
 
 - [InfoController](#infocontroller)
 - [MemberController](#membercontroller)
+- [AuthenticationFailureLogController](#authenticationfailurelogcontroller)
 
 ---
 
@@ -249,6 +250,8 @@ This controller implements routes to manage Members (Users), and also the action
 - **Content Negotiation** allow for Responses and Requests in JSON, XML and YML 
   data formats (**JSON by default**).
 
+- **Pagination** - paginated list of members on /api/member/v1/list, with page number, size (quantity), and sorting direction 
+
 ```
    [GET] /api/member/v1/token
   [POST] /api/member/v1/member-create
@@ -355,32 +358,32 @@ myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
 
 # ------------- JSON --------------
 curl -s -H "Authorization: $myJWTToken" \
-    -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | jq
+    -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sort=desc' | jq
         
 curl -s -H "Authorization: $myJWTToken" \
-    -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | jq
+    -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sort=desc' | jq
        
 curl -s -H "Authorization: $myJWTToken" \
-    -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8' | jq
+    -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8' | jq
 
 curl -s -H "Authorization: $myJWTToken" \
-    -L -X GET 'http://localhost:8080/api/member/v1/list?page=1' | jq
+    -L -X GET 'http://localhost:8080/api/member/v1/list?page=0' | jq
 
 curl -s -H "Authorization: $myJWTToken" \
     -L -X GET 'http://localhost:8080/api/member/v1/list' | jq
 
 # ------------- XML --------------
 curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
-    -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' \
+    -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sort=desc' \
     | xmllint --format -
 
 # ------------- YAML --------------
 curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
-    -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | yq
+    -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sort=desc' | yq
 
 # ------------- CORS --------------
 curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
-    -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | jq
+    -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sort=desc' | jq
 ```
 
 ### REQUESTS /api/member/v1/member-full-details/{username} 
@@ -738,6 +741,89 @@ curl -s -u -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
 curl -s -u -H "Authorization: $myJWTToken" \
     -H 'Origin: http://localhost:3000' \
     -L -X PATCH 'http://localhost:8080/api/member/v1/member-unlock/3' | jq
+```
+
+## AuthenticationFailureLogController
+
+This controller implements routes to manage Members (Users), and also the action to generate the JWT tokens:
+
+- **HATEOAS** - regardless of the selected Response data format, Responses 
+  include 'links' to make it a RESTful API.
+
+- **Content Negotiation** allow for Responses and Requests in JSON, XML and YML 
+  data formats (**JSON by default**).
+
+- **Pagination** - paginated list of members on /api/authentication-failure/v1/member/{username}, with page number, size (quantity), and sorting direction 
+
+```
+   [GET] /api/authentication-failure/v1/member/{username}
+   [GET] /api/authentication-failure/v1/log/{id} 
+```
+
+### REQUESTS /api/authentication-failure/v1/member/{username}:
+
+
+```bash
+
+# Requesting the JWT token and storing it in a bash variable
+myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
+    -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
+
+# run cURL using the variable as the authorization token:
+
+# ------------- JSON --------------
+curl -s -H "Authorization: $myJWTToken" \
+    -L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sort=desc' | jq
+
+curl -s -H "Authorization: $myJWTToken" \
+    -L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8' | jq
+    
+curl -s -H "Authorization: $myJWTToken" \
+    -L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0' | jq
+    
+curl -s -H "Authorization: $myJWTToken" \
+    -L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com' | jq
+
+# -------------- XML - PAGINATED --------------
+curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
+    -L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sort=desc' \
+    | xmllint --format -
+
+# ------------- YAML - PAGINATED --------------
+curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
+    -L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sort=desc' \
+    | yq
+
+# ------------- CORS - PAGINATED --------------
+curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
+    -L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sort=desc' \
+    | jq
+```
+
+### REQUESTS /api/member/v1/member-lock/{id}
+
+```bash
+# Requesting the JWT token and storing it in a bash variable
+myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
+    -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
+
+# run cURL using the variable as the authorization token:
+
+# ------------- JSON --------------
+curl -s -H "Authorization: $myJWTToken" \
+    -L -X GET 'http://localhost:8080/api/authentication-failure/v1/log/1' | jq
+
+# -------------- XML --------------
+curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
+    -L -X GET 'http://localhost:8080/api/authentication-failure/v1/log/1' | xmllint --format -
+
+# ------------- YAML --------------
+curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
+    -L -X GET 'http://localhost:8080/api/authentication-failure/v1/log/1' | yq
+
+# ------------- CORS --------------
+curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
+    -L -X GET 'http://localhost:8080/api/authentication-failure/v1/log/1' | jq
 ```
 
 ## TO BE CONTINUED...
