@@ -200,7 +200,7 @@ public interface MemberController {
 		    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
 		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))), 
     		})
-    public ResponseEntity<MemberResponse> activateMember(Long id);
+    public ResponseEntity<MemberResponse> activateMember(Long id) throws Exception;
     
     /**
      * 
@@ -217,7 +217,7 @@ public interface MemberController {
 		    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
 		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))), 
     		})
-    public ResponseEntity<MemberResponse> inactivateMember(Long id);
+    public ResponseEntity<MemberResponse> inactivateMember(Long id) throws Exception;
 
     /**
      * 
@@ -234,7 +234,7 @@ public interface MemberController {
 		    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
 		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))), 
     		})
-    public ResponseEntity<MemberResponse> lockMemberAccount(Long id);
+    public ResponseEntity<MemberResponse> lockMemberAccount(Long id) throws Exception;
     
     /**
      * 
@@ -251,5 +251,5 @@ public interface MemberController {
 		    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
 		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))), 
     		})
-    public ResponseEntity<MemberResponse> unlockMemberAccount(Long id);
+    public ResponseEntity<MemberResponse> unlockMemberAccount(Long id) throws Exception;
 }

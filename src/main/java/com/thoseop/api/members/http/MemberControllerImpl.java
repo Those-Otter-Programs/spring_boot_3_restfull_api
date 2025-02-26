@@ -536,7 +536,7 @@ public class MemberControllerImpl implements MemberController {
 	    produces = { _APPLICATION_YAML_VALUE, 
 		    MediaType.APPLICATION_JSON_VALUE, 
 		    MediaType.APPLICATION_XML_VALUE })
-    public @ResponseBody ResponseEntity<MemberResponse> inactivateMember(@PathVariable Long id) {
+    public @ResponseBody ResponseEntity<MemberResponse> inactivateMember(@PathVariable Long id) throws Exception {
 
         log.info("MemberController - disabling member id: {}", id);
 
@@ -572,7 +572,7 @@ public class MemberControllerImpl implements MemberController {
 	    produces = { _APPLICATION_YAML_VALUE, 
 		    MediaType.APPLICATION_JSON_VALUE, 
 		    MediaType.APPLICATION_XML_VALUE })
-    public @ResponseBody ResponseEntity<MemberResponse> activateMember(@PathVariable Long id) {
+    public @ResponseBody ResponseEntity<MemberResponse> activateMember(@PathVariable Long id) throws Exception {
 
         log.info("MemberController - enabling member id: {}", id);
 
@@ -608,7 +608,7 @@ public class MemberControllerImpl implements MemberController {
 	    produces = { _APPLICATION_YAML_VALUE, 
 		    MediaType.APPLICATION_JSON_VALUE, 
 		    MediaType.APPLICATION_XML_VALUE })
-    public @ResponseBody ResponseEntity<MemberResponse> lockMemberAccount(@PathVariable Long id) {
+    public @ResponseBody ResponseEntity<MemberResponse> lockMemberAccount(@PathVariable Long id) throws Exception {
 
         log.info("MemberController - locking member account id: {}", id);
 
@@ -644,7 +644,7 @@ public class MemberControllerImpl implements MemberController {
 	    produces = { _APPLICATION_YAML_VALUE, 
 		    MediaType.APPLICATION_JSON_VALUE, 
 		    MediaType.APPLICATION_XML_VALUE })
-    public @ResponseBody ResponseEntity<MemberResponse> unlockMemberAccount(@PathVariable Long id) {
+    public @ResponseBody ResponseEntity<MemberResponse> unlockMemberAccount(@PathVariable Long id) throws Exception {
 
         log.info("MemberController - unlocking member id: {}", id);
 
