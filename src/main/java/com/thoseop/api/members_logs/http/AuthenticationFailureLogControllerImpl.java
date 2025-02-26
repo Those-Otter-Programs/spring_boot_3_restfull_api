@@ -45,7 +45,7 @@ public class AuthenticationFailureLogControllerImpl implements AuthenticationFai
 
         # run cURL using the variable as the authorization token:
         
-        # ------------- JSON --------------
+        # ------------- JSON - PAGINATED --------------
      	curl -s -H "Authorization: $myJWTToken" \
      		-L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sort=desc' | jq
 
