@@ -552,19 +552,19 @@ public class MemberControllerImpl implements MemberController {
 	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
       
        	# ------------- JSON --------------
-       	curl -s -u -H "Authorization: $myJWTToken" \
+       	curl -s -H "Authorization: $myJWTToken" \
        		-L -X PATCH 'http://localhost:8080/api/member/v1/member-enable/3' | jq
 
        	# -------------- XML --------------
-       	curl -s -u -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
        		-L -X PATCH 'http://localhost:8080/api/member/v1/member-enable/3' | xmllint --format -
        
        	# ------------- YAML --------------
-       	curl -s -u -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
        		-L -X PATCH 'http://localhost:8080/api/member/v1/member-enable/3' | yq
 
        	# ------------- CORS --------------
-       	curl -s -u -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
+       	curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
        		-L -X PATCH 'http://localhost:8080/api/member/v1/member-enable/3' | jq
      */
     @Override
@@ -624,19 +624,19 @@ public class MemberControllerImpl implements MemberController {
 	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
       
        	# ------------- JSON --------------
-       	curl -s -u -H "Authorization: $myJWTToken" \
+       	curl -s -H "Authorization: $myJWTToken" \
        		-L -X PATCH 'http://localhost:8080/api/member/v1/member-unlock/3' | jq
 
        	# -------------- XML --------------
-       	curl -s -u -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
        		-L -X PATCH 'http://localhost:8080/api/member/v1/member-unlock/3' | xmllint --format -
        
        	# ------------- YAML --------------
-       	curl -s -u -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
+       	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
        		-L -X PATCH 'http://localhost:8080/api/member/v1/member-unlock/3' | yq
 
        	# ------------- CORS --------------
-       	curl -s -u -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
+       	curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
        		-L -X PATCH 'http://localhost:8080/api/member/v1/member-unlock/3' | jq
      */
     @Override
