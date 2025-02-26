@@ -40,6 +40,7 @@ import com.thoseop.api.members.http.request.MemberManagePasswordRequest;
 import com.thoseop.api.members.http.request.MemberUpdatePasswordRequest;
 import com.thoseop.api.members.http.response.MemberDetailsResponse;
 import com.thoseop.api.members.http.response.MemberResponse;
+import com.thoseop.exception.response.OtterAPIErrorResponse;
 
 import net.minidev.json.JSONObject;
 
@@ -82,7 +83,6 @@ class MemberControllerIntegrationTest {
 
 	HttpEntity<?> request = new HttpEntity<>(null, headers);
 	// w
-
 	ResponseEntity<JSONObject> response = testRestTemplate
 		.withBasicAuth("ayrton.senna@bravo.com", "ayrton_pass")
 		.exchange(route, HttpMethod.GET, request, JSONObject.class);
@@ -98,6 +98,36 @@ class MemberControllerIntegrationTest {
 	Assertions.assertNotNull(this.jwtAuthToken, 
 		() -> "Response should contain the JWT token in the Authorization header field");
 	Assertions.assertEquals(response.getBody().get("token"), this.jwtAuthToken);
+    }
+    
+    @DisplayName("test Member Token_when Search Member Doest Exists_then Returns Error Response")
+    @Test
+    @Order(2)
+    void testMemberToken_whenSearchMemberDoestExists_thenReturnsErrorResponse() {
+	// g
+	String route = "%s/token".formatted(this.baseRoute);
+
+	// creating the headers for the request
+	HttpHeaders headers = new HttpHeaders();
+	headers.setContentType(MediaType.APPLICATION_JSON);
+	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+
+	HttpEntity<?> request = new HttpEntity<>(null, headers);
+	// w
+	ResponseEntity<OtterAPIErrorResponse> response = testRestTemplate
+		.withBasicAuth("unknown@none.com", "rumpelstiltskin")
+		.exchange(route, HttpMethod.GET, request, OtterAPIErrorResponse.class);
+	// t
+	Assertions.assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode(),
+		() -> "The returned http status code was not the expected.");	
+	Assertions.assertTrue(response.getBody().getError()
+		.contains("UsernameNotFoundException"), 
+		() -> "The error message was not the expected.");
+	Assertions.assertEquals("User details not found for the user: unknown@none.com", 
+		response.getBody().getMessage(), 
+		() -> "The message was not the expected.");
+	Assertions.assertEquals("/token", response.getBody().getPath(), 
+		() -> "The path was not the expected.");
     }
 
     static Stream<Arguments> memberSeed() {
@@ -205,11 +235,41 @@ class MemberControllerIntegrationTest {
 		() -> "The returned member mobile number was not expected.");
     }
 
+    @DisplayName("test Get Member By Username_when Search Member Doest Exists_then Throws Member Not Found Exception")
+    @Test
+    @Order(5)
+    void testGetMemberByUsername_whenSearchMemberDoestExists_thenReturnsErrorResponse() {
+	// g
+	String route = "%s/member-details/unknown@none.com".formatted(this.baseRoute);
+
+	// creating the headers for the requestString
+	HttpHeaders headers = new HttpHeaders();
+	headers.setContentType(MediaType.APPLICATION_JSON);
+	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
+
+	HttpEntity<?> request = new HttpEntity<>(
+		null, headers);
+	// w
+	ResponseEntity<OtterAPIErrorResponse> response = testRestTemplate
+		.exchange(route, HttpMethod.GET, request, OtterAPIErrorResponse.class);
+	// t
+	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
+		() -> "The returned http status code was not the expected.");	
+	Assertions.assertTrue(response.getBody().getError()
+		.contains("MemberNotFoundException"), 
+		() -> "The error message was not the expected.");
+	Assertions.assertEquals("Member not found", response.getBody().getMessage(), 
+		() -> "The message was not the expected.");
+	Assertions.assertEquals("Member not found", response.getBody().getPath(), 
+		() -> "The path was not the expected.");
+    }
+
     @DisplayName("test Get Member By Username_when Request With Accepted Media Types_then Return HTTP 200")
     @ParameterizedTest
     @ValueSource(strings = {MediaType.APPLICATION_JSON_VALUE, 
 	    MediaType.APPLICATION_XML_VALUE, _APPLICATION_YAML_VALUE})
-    @Order(5)
+    @Order(6)
     void testGetMemberByUsername_whenRequestWithAcceptedMediaTypes_thenReturnHTTP200(String mediaTypeAccepted) {
 	// g
 	String route = "%s/member-details/ayrton.senna@bravo.com".formatted(this.baseRoute);
@@ -233,7 +293,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Get Member Full Details By Username_when Member Authorized_then Returns HTTP 200")
     @Test
-    @Order(6)
+    @Order(7)
     void testGetMemberFullDetailsByUsername_whenMemberAuthorized_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-full-details/ayrton.senna@bravo.com".formatted(this.baseRoute);
@@ -260,11 +320,41 @@ class MemberControllerIntegrationTest {
 		() -> "The returned member mobile number was not expected.");
     }
 
+    @DisplayName("test Get Member Full Details By Username_when Search Member Doest Exists_then Returns Error Response")
+    @Test
+    @Order(8)
+    void testGetMemberFullDetailsByUsername_whenSearchMemberDoestExists_thenReturnsErrorResponse() {
+	// g
+	String route = "%s/member-full-details/unknown@none.com".formatted(this.baseRoute);
+
+	// creating the headers for the requestString
+	HttpHeaders headers = new HttpHeaders();
+	headers.setContentType(MediaType.APPLICATION_JSON);
+	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
+
+	HttpEntity<?> request = new HttpEntity<>(
+		null, headers);
+	// w
+	ResponseEntity<OtterAPIErrorResponse> response = testRestTemplate
+		.exchange(route, HttpMethod.GET, request, OtterAPIErrorResponse.class);
+	// t
+	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
+		() -> "The returned http status code was not the expected.");	
+	Assertions.assertTrue(response.getBody().getError()
+		.contains("MemberNotFoundException"), 
+		() -> "The error message was not the expected.");
+	Assertions.assertEquals("Member not found", response.getBody().getMessage(), 
+		() -> "The message was not the expected.");
+	Assertions.assertEquals("Member not found", response.getBody().getPath(), 
+		() -> "The path was not the expected.");
+    }
+
     @DisplayName("test Get Member Full Details By Username_when Request With Accepted Media Types_then Return HTTP 200")
     @ParameterizedTest
     @ValueSource(strings = {MediaType.APPLICATION_JSON_VALUE, 
 	    MediaType.APPLICATION_XML_VALUE, _APPLICATION_YAML_VALUE})
-    @Order(7)
+    @Order(9)
     void testGetMemberFullDetailsByUsername_whenRequestWithAcceptedMediaTypes_thenReturnHTTP200(String mediaTypeAccepted) {
 	// g
 	String route = "%s/member-full-details/ayrton.senna@bravo.com".formatted(this.baseRoute);
@@ -288,7 +378,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Get Me_when Member Authenticated_then Returns HTTP 200")
     @Test
-    @Order(8)
+    @Order(10)
     void testMe_whenMemberAuthenticated_thenReturnsHTTP200() {
 	// g
 	String route = "%s/me".formatted(this.baseRoute);
@@ -319,7 +409,7 @@ class MemberControllerIntegrationTest {
     @ParameterizedTest
     @ValueSource(strings = {MediaType.APPLICATION_JSON_VALUE, 
 	    MediaType.APPLICATION_XML_VALUE, _APPLICATION_YAML_VALUE})
-    @Order(9)
+    @Order(11)
     void testMe_whenRequestWithAcceptedMediaTypes_thenReturnHTTP200(String mediaTypeAccepted) {
 	// g
 	String route = "%s/me".formatted(this.baseRoute);
@@ -349,7 +439,7 @@ class MemberControllerIntegrationTest {
     
     @DisplayName("test Update Member Password_when Authenticated_then Returns HTTP 200")
     @Test
-    @Order(10)
+    @Order(12)
     void testUpdateMemberPassword_whenAuthenticated_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-password".formatted(this.baseRoute);
@@ -388,7 +478,7 @@ class MemberControllerIntegrationTest {
     
     @DisplayName("test Manage Member Password_when Authenticated_then Returns HTTP 200")
     @Test
-    @Order(11)
+    @Order(13)
     void testManageMemberPassword_whenAuthenticated_thenReturnsHTTP200() {
 	// g
 	String route = "%s/manage-member-password".formatted(this.baseRoute);
@@ -425,10 +515,44 @@ class MemberControllerIntegrationTest {
 	Assertions.assertEquals(HttpStatus.OK, responsePassChange.getStatusCode(),
 		() -> "The returned http status code was not the expected.");
     }
+    
+    @DisplayName("test Manage Member Password_when Search Member Doest Exists_then Returns Error Response")
+    @Test
+    @Order(13)
+    void testManageMemberPassword_whenSearchMemberDoestExists_thenReturnsErrorResponse() {
+	// g
+	String route = "%s/manage-member-password".formatted(this.baseRoute);
+	
+	MemberManagePasswordRequest request = 
+		new MemberManagePasswordRequest("unknow@test.com", "something"); 
+
+	// creating the headers for the requestString
+	HttpHeaders headers = new HttpHeaders();
+	headers.setContentType(MediaType.APPLICATION_JSON);
+	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
+
+	HttpEntity<MemberManagePasswordRequest> rrequest = new HttpEntity<>(
+		request, headers);
+	// w
+	// ...changing the members password...
+	ResponseEntity<OtterAPIErrorResponse> response = testRestTemplate
+		.exchange(route, HttpMethod.PATCH, rrequest, OtterAPIErrorResponse.class);
+	// t
+	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
+		() -> "The returned http status code was not the expected.");
+	Assertions.assertTrue(response.getBody().getError()
+		.contains("MemberNotFoundException"), 
+		() -> "The error message was not the expected.");
+	Assertions.assertEquals("Member not found", response.getBody().getMessage(), 
+		() -> "The message was not the expected.");
+	Assertions.assertEquals("Member not found", response.getBody().getPath(), 
+		() -> "The path was not the expected.");
+    }
 
     @DisplayName("test Inactivate Member_when Right Privileges_then Returns HTTP 200")
     @Test
-    @Order(12)
+    @Order(14)
     void testInactivateMember_whenRightPrivileges_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-disable/3".formatted(this.baseRoute);
@@ -451,9 +575,39 @@ class MemberControllerIntegrationTest {
 		() -> "The returned message was not the expected");
     }
 
+    @DisplayName("test Inactivate Member_when Search Member Doest Exists_then Returns Error Response")
+    @Test
+    @Order(15)
+    void testInactivateMember_whenSearchMemberDoestExists_thenReturnsErrorResponse() {
+	// g
+	String route = "%s/member-disable/1000".formatted(this.baseRoute);
+
+	// creating the headers for the requestString
+	HttpHeaders headers = new HttpHeaders();
+	headers.setContentType(MediaType.APPLICATION_JSON);
+	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
+
+	HttpEntity<?> request = new HttpEntity<>(
+		null, headers);
+	// w
+	ResponseEntity<OtterAPIErrorResponse> response = testRestTemplate
+		.exchange(route, HttpMethod.PATCH, request, OtterAPIErrorResponse.class);
+	// t
+	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
+		() -> "The returned http status code was not the expected.");
+	Assertions.assertTrue(response.getBody().getError()
+		.contains("MemberNotFoundException"), 
+		() -> "The error message was not the expected.");
+	Assertions.assertEquals("Member not found", response.getBody().getMessage(), 
+		() -> "The message was not the expected.");
+	Assertions.assertEquals("Member not found", response.getBody().getPath(), 
+		() -> "The path was not the expected.");
+    }
+
     @DisplayName("test Activate Member_when Right Privileges_then Returns HTTP 200")
     @Test
-    @Order(13)
+    @Order(15)
     void testActivateMember_whenRightPrivileges_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-enable/3".formatted(this.baseRoute);
@@ -476,9 +630,39 @@ class MemberControllerIntegrationTest {
 		() -> "The returned message was not the expected");
     }
 
+    @DisplayName("test Activate Member_when Search Member Doest Exists_then Returns Error Response")
+    @Test
+    @Order(16)
+    void testActivateMember_whenSearchMemberDoestExists_thenReturnsErrorResponse() {
+	// g
+	String route = "%s/member-enable/1000".formatted(this.baseRoute);
+
+	// creating the headers for the requestString
+	HttpHeaders headers = new HttpHeaders();
+	headers.setContentType(MediaType.APPLICATION_JSON);
+	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
+
+	HttpEntity<?> request = new HttpEntity<>(
+		null, headers);
+	// w
+	ResponseEntity<OtterAPIErrorResponse> response = testRestTemplate
+		.exchange(route, HttpMethod.PATCH, request, OtterAPIErrorResponse.class);
+	// t
+	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
+		() -> "The returned http status code was not the expected.");
+	Assertions.assertTrue(response.getBody().getError()
+		.contains("MemberNotFoundException"), 
+		() -> "The error message was not the expected.");
+	Assertions.assertEquals("Member not found", response.getBody().getMessage(), 
+		() -> "The message was not the expected.");
+	Assertions.assertEquals("Member not found", response.getBody().getPath(), 
+		() -> "The path was not the expected.");
+    }
+
     @DisplayName("test Lock Member Account_when Right Privileges_then Returns HTTP 200")
     @Test
-    @Order(14)
+    @Order(16)
     void testLockMemberAccount_whenRightPrivileges_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-lock/3".formatted(this.baseRoute);
@@ -501,9 +685,39 @@ class MemberControllerIntegrationTest {
 		() -> "The returned message was not the expected");
     }
 
+    @DisplayName("test Lock Member Account_when Search Member Doest Exists_then Returns Error Response")
+    @Test
+    @Order(17)
+    void testLockMemberAccount_whenSearchMemberDoestExists_thenReturnsErrorResponse() {
+	// g
+	String route = "%s/member-lock/1000".formatted(this.baseRoute);
+
+	// creating the headers for the requestString
+	HttpHeaders headers = new HttpHeaders();
+	headers.setContentType(MediaType.APPLICATION_JSON);
+	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
+
+	HttpEntity<?> request = new HttpEntity<>(
+		null, headers);
+	// w
+	ResponseEntity<OtterAPIErrorResponse> response = testRestTemplate
+		.exchange(route, HttpMethod.PATCH, request, OtterAPIErrorResponse.class);
+	// t
+	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
+		() -> "The returned http status code was not the expected.");
+	Assertions.assertTrue(response.getBody().getError()
+		.contains("MemberNotFoundException"), 
+		() -> "The error message was not the expected.");
+	Assertions.assertEquals("Member not found", response.getBody().getMessage(), 
+		() -> "The message was not the expected.");
+	Assertions.assertEquals("Member not found", response.getBody().getPath(), 
+		() -> "The path was not the expected.");
+    }
+
     @DisplayName("test Unlock Member Account_when Right Privileges_then Returns HTTP 200")
     @Test
-    @Order(15)
+    @Order(18)
     void testUnlockMemberAccount_whenRightPrivileges_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-unlock/3".formatted(this.baseRoute);
@@ -524,5 +738,35 @@ class MemberControllerIntegrationTest {
 		() -> "The returned http status code was not the expected.");
 	Assertions.assertEquals("User's account was unlocked", response.getBody().getMessage(),
 		() -> "The returned message was not the expected");
+    }
+
+    @DisplayName("test Unlock Member Account_when Search Member Doest Exists_then Returns Error Response")
+    @Test
+    @Order(19)
+    void testUnlockMemberAccount_whenSearchMemberDoestExists_thenReturnsErrorResponse() {
+	// g
+	String route = "%s/member-unlock/1000".formatted(this.baseRoute);
+
+	// creating the headers for the requestString
+	HttpHeaders headers = new HttpHeaders();
+	headers.setContentType(MediaType.APPLICATION_JSON);
+	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
+
+	HttpEntity<?> request = new HttpEntity<>(
+		null, headers);
+	// w
+	ResponseEntity<OtterAPIErrorResponse> response = testRestTemplate
+		.exchange(route, HttpMethod.PATCH, request, OtterAPIErrorResponse.class);
+	// t
+	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
+		() -> "The returned http status code was not the expected.");
+	Assertions.assertTrue(response.getBody().getError()
+		.contains("MemberNotFoundException"), 
+		() -> "The error message was not the expected.");
+	Assertions.assertEquals("Member not found", response.getBody().getMessage(), 
+		() -> "The message was not the expected.");
+	Assertions.assertEquals("Member not found", response.getBody().getPath(), 
+		() -> "The path was not the expected.");
     }
 }
