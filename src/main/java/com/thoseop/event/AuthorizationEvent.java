@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class AuthorizationEvents {
+public class AuthorizationEvent {
     //    @EventListener
     //    public void onSuccess(AuthorizationGrantedEvent<?> successEvent)
     //    {
