@@ -183,14 +183,18 @@ public class MemberService {
     public MemberResponse changeMemberAccountExpiredStatus(Long id, MemberStatus status) throws Exception {
         log.info("Changing member id[{}] status to {}", id, status.getStatus());
 
+        MemberResponse response = null;
 	Optional<MemberEntity> search = Optional.empty();
 	
 	if (this.memberRepository.setMemberAccountExpiredStatus(id, status.getStatus()) == 1) 
 	    search = this.memberRepository.findOneById(id);
 	    
-	if (search.isPresent()) 
-            return this.memberMapper.mapToResponse(search.get()).setMessage("Password updated");
-	else
+	if (search.isPresent()) { 
+	    response = this.memberMapper.mapToResponse(search.get()).setMessage("Password updated");
+            return (status == MemberStatus.ENABLE) ?
+                    response.setMessage("User's account not expired") :
+                    response.setMessage("User's account expired");
+	} else
 	    throw new Exception("An error occurred, and the Member's account expiration status could not be modified");
     }
     
@@ -202,14 +206,19 @@ public class MemberService {
     public MemberResponse changeMemberCredentialsExpiredStatus(Long id, MemberStatus status) throws Exception {
         log.info("Changing member id[{}] status to {}", id, status.getStatus());
 
+        MemberResponse response = null;
 	Optional<MemberEntity> search = Optional.empty();
 	
 	if (this.memberRepository.setMemberAccountExpiredStatus(id, status.getStatus()) == 1) 
 	    search = this.memberRepository.findOneById(id);
 	    
-	if (search.isPresent()) 
-            return this.memberMapper.mapToResponse(search.get()).setMessage("Password updated");
-	else
+	if (search.isPresent()) { 
+            response = this.memberMapper.mapToResponse(search.get());
+
+            return (status == MemberStatus.ENABLE) ?
+                    response.setMessage("User's credentials not expired") :
+                    response.setMessage("User's credentials expired");
+	} else
 	    throw new Exception("An error occurred, and the Member's credentials expiration status could not be modified");
     }
     
@@ -221,14 +230,19 @@ public class MemberService {
     public MemberResponse changeMemberAccountLockedStatus(Long id, MemberStatus status) throws Exception {
         log.info("Changing member id[{}] status to {}", id, status.getStatus());
 
+        MemberResponse response = null;
 	Optional<MemberEntity> search = Optional.empty();
 	
 	if (this.memberRepository.setMemberAccountExpiredStatus(id, status.getStatus()) == 1) 
 	    search = this.memberRepository.findOneById(id);
 	    
-	if (search.isPresent()) 
-            return this.memberMapper.mapToResponse(search.get()).setMessage("Password updated");
-	else
+	if (search.isPresent()) { 
+	    response = this.memberMapper.mapToResponse(search.get());
+
+            return (status == MemberStatus.ENABLE) ?
+                    response.setMessage("User's account was unlocked") :
+                    response.setMessage("User's account was locked");
+	} else
 	    throw new Exception("An error occurred, and the Member's account locked status could not be modified");
     }
     
@@ -240,14 +254,19 @@ public class MemberService {
     public MemberResponse changeMemberEnabledStatus(Long id, MemberStatus status) throws Exception {
         log.info("Changing member id[{}] status to {}", id, status.getStatus());
 
+        MemberResponse response = null;
 	Optional<MemberEntity> search = Optional.empty();
 	
 	if (this.memberRepository.setMemberAccountExpiredStatus(id, status.getStatus()) == 1) 
 	    search = this.memberRepository.findOneById(id);
 	    
-	if (search.isPresent()) 
-            return this.memberMapper.mapToResponse(search.get()).setMessage("Password updated");
-	else
+	if (search.isPresent()) { 
+	    response = this.memberMapper.mapToResponse(search.get());
+
+            return (status == MemberStatus.ENABLE) ?
+                    response.setMessage("User's account was enabled") :
+                    response.setMessage("User's account was disabled");
+	} else
 	    throw new Exception("An error occurred, and the Member's enabled status could not be modified");
     }
 }
