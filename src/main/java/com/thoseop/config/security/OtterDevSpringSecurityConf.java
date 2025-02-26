@@ -16,8 +16,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
-import com.thoseop.exception.OtterAccessDeniedHandler;
 import com.thoseop.exception.OtterBasicAuthenticationEntryPoint;
+import com.thoseop.exception.handler.OtterAccessDeniedHandler;
 import com.thoseop.filter.AuthenticationLoggingAfterFilter;
 import com.thoseop.filter.AuthenticationLoggingAtFilter;
 import com.thoseop.filter.AuthenticationLoggingBeforeFilter;
