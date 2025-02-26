@@ -177,24 +177,22 @@ public class MemberControllerImpl implements MemberController {
 	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
 
        	# ------------- JSON - PAGINATED --------------
-       	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | jq
-       	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | jq
-       
-       	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8' | jq
-       	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list?page=1' | jq
+       	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sort=desc' | jq
+       	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8' | jq
+       	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list?page=0' | jq
        	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list' | jq
 
        	# -------------- XML - PAGINATED --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
-       		-L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | xmllint --format -
+       		-L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sort=desc' | xmllint --format -
        
        	# ------------- YAML - PAGINATED --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
-       		-L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | yq
+       		-L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sort=desc' | yq
 
        	# ------------- CORS - PAGINATED --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
-       		-L -X GET 'http://localhost:8080/api/member/v1/list?page=1&size=8&sort=desc' | jq
+       		-L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sort=desc' | jq
      */
     @Override
     @GetMapping(value = "/list", 
@@ -210,8 +208,10 @@ public class MemberControllerImpl implements MemberController {
 	var sortDirection = "desc".equalsIgnoreCase(sort) ? Direction.DESC : Direction.ASC;
 	Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "email"));
 	Page<MemberResponse> members = memberService.readMembers(pageable);
+	
 	members.map(m -> m.add(linkTo(methodOn(MemberControllerImpl.class)
 		.getMemberByUsername(m.getMemberEmail())).withSelfRel()));
+	
 	Link link = linkTo(methodOn(MemberControllerImpl.class)
 		.getMembers(pageable.getPageNumber(), 
 			pageable.getPageSize(), "asc")).withSelfRel();
