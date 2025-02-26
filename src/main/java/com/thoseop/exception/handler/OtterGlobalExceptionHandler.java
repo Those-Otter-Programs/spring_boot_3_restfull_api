@@ -1,4 +1,4 @@
-package com.thoseop.exception;
+package com.thoseop.exception.handler;
 
 import java.util.Date;
 
