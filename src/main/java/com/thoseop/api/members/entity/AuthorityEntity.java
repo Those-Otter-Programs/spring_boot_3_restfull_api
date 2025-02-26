@@ -1,6 +1,7 @@
 package com.thoseop.api.members.entity;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -46,4 +47,7 @@ public class AuthorityEntity implements Serializable {
 		CascadeType.REFRESH })
     @JoinColumn(name = "member_id")
     private MemberEntity member;
+    
+    @Column(name = "created_at")
+    private Date createdAt;
 }
