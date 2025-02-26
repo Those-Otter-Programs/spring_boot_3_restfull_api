@@ -63,21 +63,24 @@ public class OtterSpringSecurityConf {
 		// AUTHENTICATED ROUTES
 		.requestMatchers(HttpMethod.GET, "/api/member/v1/token").authenticated() 
 		.requestMatchers(HttpMethod.GET, 
-			"/api/corporation/v1/info-corp", "/api/corporation/v1/info-corp/"
+			"/api/corporation/v1/info-corp","/api/corporation/v1/info-corp/"
 			).authenticated()
 		.requestMatchers(HttpMethod.PATCH, "/api/member/v1/member-password/**").authenticated()
 		.requestMatchers(HttpMethod.GET, "/api/member/v1/me").authenticated()
 
 		// ROLE BASED AUTHENTICATED ROUTES
 		.requestMatchers(HttpMethod.POST, "/api/member/v1/member-create/**").hasRole("ADMIN")
-		.requestMatchers(HttpMethod.PATCH, "/api/member/v1/member-disable/**",
-						"/api/member/v1/member-enable/**").hasAnyRole("ADMIN", "MANAGER", "SUPERVISOR")
-		.requestMatchers(HttpMethod.PATCH, "/api/member/v1/member-lock/**",
-						"/api/member/v1/member-unlock/**").hasAnyRole("ADMIN", "MANAGER", "SUPERVISOR")
+		.requestMatchers(HttpMethod.PATCH, "/api/member/v1/member-disable/{id}",
+						"/api/member/v1/member-enable/{id}").hasAnyRole("ADMIN", "MANAGER", "SUPERVISOR")
+		.requestMatchers(HttpMethod.PATCH, "/api/member/v1/member-lock/{id}",
+						"/api/member/v1/member-unlock/{id}").hasAnyRole("ADMIN", "MANAGER", "SUPERVISOR")
 		.requestMatchers(HttpMethod.PATCH, "/api/member/v1/manage-member-password/**").hasRole("ADMIN")
-		.requestMatchers(HttpMethod.GET, "/api/member/v1/member-full-details/**").hasAnyRole("ADMIN", "MANAGER", "SUPERVISOR")
-		.requestMatchers(HttpMethod.GET, "/api/member/v1/member-details/**").hasAnyRole("ADMIN", "MANAGER", "SUPERVISOR")
+		.requestMatchers(HttpMethod.GET, "/api/member/v1/member-full-details/{username}").hasAnyRole("ADMIN", "MANAGER", "SUPERVISOR")
+		.requestMatchers(HttpMethod.GET, "/api/member/v1/member-details/{username}").hasAnyRole("ADMIN", "MANAGER", "SUPERVISOR")
 		.requestMatchers(HttpMethod.GET, "/api/member/v1/list/**").hasAnyRole("ADMIN", "MANAGER")
+
+		.requestMatchers(HttpMethod.GET, "/api/authentication-failure/v1/member/{username}",
+						"/api/authentication-failure/v1/log/**").hasRole("ADMIN")
 
 		// NON-AUTHENTICATED ROUTES
 		.requestMatchers("/swagger-ui/**", "/v3/**").denyAll() // OpenAPI
