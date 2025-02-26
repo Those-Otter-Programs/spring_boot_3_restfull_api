@@ -80,7 +80,7 @@ public class MemberEntity implements Serializable {
     private Date createdAt;
 
     @Column(name = "updated_at",
-	    columnDefinition = "Date default CURDATE()")
+	    columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP on UPDATE CURRENT_TIMESTAMP")
     @JsonIgnore
     private Date updatedAt;
 
