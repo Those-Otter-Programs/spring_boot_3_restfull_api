@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.thoseop.api.members_logs.entity.AuthenticationFailureLogEntity;
+import com.thoseop.api.members_logs.exception.AuthLogNotFoundException;
 import com.thoseop.api.members_logs.http.response.AuthenticationFailureLogResponse;
 import com.thoseop.api.members_logs.mapper.AuthLogMapper;
 import com.thoseop.api.members_logs.repository.AuthenticationFailureLogRepository;
@@ -35,10 +36,20 @@ public class AuthenticationFailureLogService {
 	return authLogMapper.mapToAuthenticationFailureResponse(savedEntity);
     }
     
+    /**
+     * 
+     * @param id
+     * @return
+     */
     public AuthenticationFailureLogResponse readlogById(Long id) {
 	log.info("AuthenticationLogService - read authentication failure log by id");
         
+	// try to find log by id
 	Optional<AuthenticationFailureLogEntity> entity = authFailLogRepository.findOneById(id);
+	
+	// check if log exists
+	if (entity.isEmpty()) 
+	    throw new AuthLogNotFoundException("Log not found"); 
         
 	return authLogMapper.mapToAuthenticationFailureResponse(entity.get());
     }
@@ -57,19 +68,4 @@ public class AuthenticationFailureLogService {
 
 	return logListResponse;
     }
-//    
-//    /**
-//     * 
-//     * @param pageable
-//     * @return
-//     */
-//    public Page<MemberAuthenticationFailureLogResponse> readMemberDetailsAuthenticationFailLogs(String username, Pageable pageable) {
-//	log.info("AuthenticationLogService - read member details with authentication failures logss");
-//
-//	Page<AuthenticationFailureLogEntity> logList = authFailLogRepository.findAllByUsername(username, pageable);
-//	Page<MemberAuthenticationFailureLogResponse> logListResponse = 
-//		logList.map(log -> authLogMapper.mapToMemberAuthenticationFailureResponse(log));
-//
-//	return logListResponse;
-//    }
 }
