@@ -800,7 +800,7 @@ curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
     | jq
 ```
 
-### REQUESTS /api/member/v1/member-lock/{id}
+### REQUESTS /api/authentication-failure/v1/log/{id}
 
 ```bash
 # Requesting the JWT token and storing it in a bash variable
