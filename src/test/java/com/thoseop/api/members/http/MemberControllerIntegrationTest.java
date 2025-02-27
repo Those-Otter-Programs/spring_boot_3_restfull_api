@@ -40,10 +40,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thoseop.api.members.entity.enums.MemberEnabledStatus;
+import com.thoseop.api.members.entity.enums.MemberLockedStatus;
 import com.thoseop.api.members.http.request.MemberCreateRequest;
 import com.thoseop.api.members.http.request.MemberManagePasswordRequest;
 import com.thoseop.api.members.http.request.MemberUpdatePasswordRequest;
+import com.thoseop.api.members.http.response.MemberAccountLockedResponse;
 import com.thoseop.api.members.http.response.MemberDetailsResponse;
+import com.thoseop.api.members.http.response.MemberEnabledResponse;
 import com.thoseop.api.members.http.response.MemberResponse;
 import com.thoseop.exception.response.OtterAPIErrorResponse;
 
@@ -609,10 +613,10 @@ class MemberControllerIntegrationTest {
 		() -> "The returned http status code was not the expected.");
     }
     
-    @DisplayName("test Manage Member Password_when Search Member Doest Exists_then Returns Error Response")
+    @DisplayName("test Manage Member Password_when Searched Member Doest Exists_then Returns Error Response")
     @Test
     @Order(17)
-    void testManageMemberPassword_whenSearchMemberDoestExists_thenReturnsErrorResponse() {
+    void testManageMemberPassword_whenSearchedMemberDoestExists_thenReturnsErrorResponse() {
 	// g
 	String route = "%s/manage-member-password".formatted(this.baseRoute);
 	
@@ -643,10 +647,10 @@ class MemberControllerIntegrationTest {
 		() -> "The path was not the expected.");
     }
 
-    @DisplayName("test Inactivate Member_when Right Privileges_then Returns HTTP 200")
+    @DisplayName("test Inactivate Member_when Inactivating Member_then Returns HTTP 200")
     @Test
     @Order(18)
-    void testInactivateMember_whenRightPrivileges_thenReturnsHTTP200() {
+    void testInactivateMember_whenInactivatingMember_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-disable/3".formatted(this.baseRoute);
 
@@ -656,22 +660,21 @@ class MemberControllerIntegrationTest {
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 	headers.set("Authorization", this.jwtAuthToken);
 
-	HttpEntity<?> request = new HttpEntity<>(
-		null, headers);
+	HttpEntity<?> request = new HttpEntity<>(null, headers);
 	// w
-	ResponseEntity<MemberResponse> response = testRestTemplate
-		.exchange(route, HttpMethod.PATCH, request, MemberResponse.class);
+	ResponseEntity<MemberEnabledResponse> response = testRestTemplate
+		.exchange(route, HttpMethod.PATCH, request, MemberEnabledResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
 		() -> "The returned http status code was not the expected.");
-	Assertions.assertEquals("User's account was disabled", response.getBody().getMessage(),
-		() -> "The returned message was not the expected");
+	Assertions.assertEquals(MemberEnabledStatus.DISABLED.getStatus(), response.getBody().getMemberEnabled(),
+		() -> "The member should be disabled.");
     }
 
-    @DisplayName("test Inactivate Member_when Search Member Doest Exists_then Returns Error Response")
+    @DisplayName("test Inactivate Member_when Searched Member Doest Exists_then Returns Error Response")
     @Test
     @Order(19)
-    void testInactivateMember_whenSearchMemberDoestExists_thenReturnsErrorResponse() {
+    void testInactivateMember_whenSearchedMemberDoestExists_thenReturnsErrorResponse() {
 	// g
 	String route = "%s/member-disable/1000".formatted(this.baseRoute);
 
@@ -698,10 +701,10 @@ class MemberControllerIntegrationTest {
 		() -> "The path was not the expected.");
     }
 
-    @DisplayName("test Activate Member_when Right Privileges_then Returns HTTP 200")
+    @DisplayName("test Activate Member_when Activating Member_then Returns HTTP 200")
     @Test
     @Order(20)
-    void testActivateMember_whenRightPrivileges_thenReturnsHTTP200() {
+    void testActivateMember_whenActivatingMember_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-enable/3".formatted(this.baseRoute);
 
@@ -714,19 +717,19 @@ class MemberControllerIntegrationTest {
 	HttpEntity<?> request = new HttpEntity<>(
 		null, headers);
 	// w
-	ResponseEntity<MemberResponse> response = testRestTemplate
-		.exchange(route, HttpMethod.PATCH, request, MemberResponse.class);
+	ResponseEntity<MemberEnabledResponse> response = testRestTemplate
+		.exchange(route, HttpMethod.PATCH, request, MemberEnabledResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
 		() -> "The returned http status code was not the expected.");
-	Assertions.assertEquals("User's account was enabled", response.getBody().getMessage(),
-		() -> "The returned message was not the expected");
+	Assertions.assertEquals(MemberEnabledStatus.ENABLED.getStatus(), response.getBody().getMemberEnabled(),
+		() -> "The member enabled should be enabled.");
     }
 
-    @DisplayName("test Activate Member_when Search Member Doest Exists_then Returns Error Response")
+    @DisplayName("test Activate Member_when Searched Member Doest Exists_then Returns Error Response")
     @Test
     @Order(21)
-    void testActivateMember_whenSearchMemberDoestExists_thenReturnsErrorResponse() {
+    void testActivateMember_whenSearchedMemberDoestExists_thenReturnsErrorResponse() {
 	// g
 	String route = "%s/member-enable/1000".formatted(this.baseRoute);
 
@@ -753,10 +756,10 @@ class MemberControllerIntegrationTest {
 		() -> "The path was not the expected.");
     }
 
-    @DisplayName("test Lock Member Account_when Right Privileges_then Returns HTTP 200")
+    @DisplayName("testLockMemberAccount_whenAccountLocking_thenReturnsHTTP200")
     @Test
     @Order(22)
-    void testLockMemberAccount_whenRightPrivileges_thenReturnsHTTP200() {
+    void testLockMemberAccount_whenAccountLocking_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-lock/3".formatted(this.baseRoute);
 
@@ -769,19 +772,19 @@ class MemberControllerIntegrationTest {
 	HttpEntity<?> request = new HttpEntity<>(
 		null, headers);
 	// w
-	ResponseEntity<MemberResponse> response = testRestTemplate
-		.exchange(route, HttpMethod.PATCH, request, MemberResponse.class);
+	ResponseEntity<MemberAccountLockedResponse> response = testRestTemplate
+		.exchange(route, HttpMethod.PATCH, request, MemberAccountLockedResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
 		() -> "The returned http status code was not the expected.");
-	Assertions.assertEquals("User's account was locked", response.getBody().getMessage(),
-		() -> "The returned message was not the expected");
+	Assertions.assertEquals(MemberLockedStatus.LOCKED.getStatus(), response.getBody().getMemberAccountNotLocked(),
+		() -> "The member's account should be locked.");
     }
 
-    @DisplayName("test Lock Member Account_when Search Member Doest Exists_then Returns Error Response")
+    @DisplayName("test Lock Member Account_when Searched Member Doest Exists_then Returns Error Response")
     @Test
     @Order(23)
-    void testLockMemberAccount_whenSearchMemberDoestExists_thenReturnsErrorResponse() {
+    void testLockMemberAccount_whenSearchedhMemberDoestExists_thenReturnsErrorResponse() {
 	// g
 	String route = "%s/member-lock/1000".formatted(this.baseRoute);
 
@@ -808,10 +811,10 @@ class MemberControllerIntegrationTest {
 		() -> "The path was not the expected.");
     }
 
-    @DisplayName("test Unlock Member Account_when Right Privileges_then Returns HTTP 200")
+    @DisplayName("test Unlock Member Account_when Account Locking_then Returns HTTP 200")
     @Test
     @Order(24)
-    void testUnlockMemberAccount_whenRightPrivileges_thenReturnsHTTP200() {
+    void testUnlockMemberAccount_whenAccountLocking_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-unlock/3".formatted(this.baseRoute);
 
@@ -824,13 +827,13 @@ class MemberControllerIntegrationTest {
 	HttpEntity<?> request = new HttpEntity<>(
 		null, headers);
 	// w
-	ResponseEntity<MemberResponse> response = testRestTemplate
-		.exchange(route, HttpMethod.PATCH, request, MemberResponse.class);
+	ResponseEntity<MemberAccountLockedResponse> response = testRestTemplate
+		.exchange(route, HttpMethod.PATCH, request, MemberAccountLockedResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
 		() -> "The returned http status code was not the expected.");
-	Assertions.assertEquals("User's account was unlocked", response.getBody().getMessage(),
-		() -> "The returned message was not the expected");
+	Assertions.assertEquals(MemberLockedStatus.UNLOCKED.getStatus(), response.getBody().getMemberAccountNotLocked(),
+		() -> "The member's account should be unlocked");
     }
 
     @DisplayName("test Unlock Member Account_when Search Member Doest Exists_then Returns Error Response")
