@@ -106,10 +106,10 @@ public class MemberService {
     public MemberDetailsResponse readMemberDetailsByEmail(String email) {
 	log.info("Reading member by email");
 
-	Optional<MemberEntity> result = this.memberRepository.findByEmail(email);
+	Optional<MemberEntity> entity = this.memberRepository.findByEmail(email);
 
-	if (result.isPresent())   
-	    return this.memberMapper.mapToDetailsResponse(result.get());
+	if (entity.isPresent())
+	    return this.memberMapper.mapToDetailsResponse(entity.get());
 	else
 	    throw new MemberNotFoundException("Member not found");
     }
@@ -122,10 +122,10 @@ public class MemberService {
     public MemberResponse readMemberByEmail(String email) {
 	log.info("Reading member by email");
 
-	Optional<MemberEntity> result = this.memberRepository.findByEmail(email);
+	Optional<MemberEntity> entity = this.memberRepository.findByEmail(email);
 
-	if (result.isPresent())   
-	    return this.memberMapper.mapToResponse(result.get());
+	if (entity.isPresent())
+	    return this.memberMapper.mapToResponse(entity.get());
 	else	
 	    throw new MemberNotFoundException("Member not found"); 
     }
@@ -140,10 +140,10 @@ public class MemberService {
 	log.info("Updating member {} password", username);
 
         // try to find user by its email (username)
-	Optional<MemberEntity> search = this.memberRepository.findByEmail(username);
+	Optional<MemberEntity> entity = this.memberRepository.findByEmail(username);
 	
 	// check if user exists
-	if (search.isPresent()) 
+	if (entity.isPresent()) 
 	    throw new MemberNotFoundException("Member not found"); 
 	
 	// try changing member's password 
@@ -152,7 +152,7 @@ public class MemberService {
 	if (this.memberRepository.setMemberPassword(username, hashPwd) == 0) 
 	    throw new PasswordNotChangedException("Password does not match the requirements.");
 	    
-        return this.memberMapper.mapToResponse(search.get())
+        return this.memberMapper.mapToResponse(entity.get())
         	.setMessage("Password updated");
     }
     
@@ -165,10 +165,10 @@ public class MemberService {
 	log.info("Managing member {} password", request.getMemberUsername());
 
         // try to find user by its email (username)
-	Optional<MemberEntity> search = this.memberRepository.findByEmail(request.getMemberUsername());
+	Optional<MemberEntity> entity = this.memberRepository.findByEmail(request.getMemberUsername());
 	    
 	// check if user exists
-	if (search.isEmpty()) 
+	if (entity.isEmpty())
 	    throw new MemberNotFoundException("Member not found"); 
 	
 	// try changing member's password 
@@ -176,7 +176,7 @@ public class MemberService {
 	if (this.memberRepository.setMemberPassword(request.getMemberUsername(), hashPwd) == 0) 
 	    throw new PasswordNotChangedException("Password does not match the requirements.");
 	
-        return this.memberMapper.mapToResponse(search.get())
+        return this.memberMapper.mapToResponse(entity.get())
         	.setMessage("Password updated");
     }
     
@@ -189,17 +189,17 @@ public class MemberService {
         log.info("Changing member id[{}] status to {}", id, status.getStatus());
 
         // try to find user by its id
-	Optional<MemberEntity> search = this.memberRepository.findOneById(id);
+	Optional<MemberEntity> entity = this.memberRepository.findOneById(id);
 	    
 	// check if user exists
-	if (search.isEmpty())
+	if (entity.isEmpty())
 	    throw new MemberNotFoundException("Member not found"); 
 	
 	// try changing member's specific status 
 	if (this.memberRepository.setMemberAccountExpiredStatus(id, status.getStatus()) == 1) 
 	    throw new Exception("An error occurred, and the Member's account expiration status could not be modified");
 
-        MemberResponse response = this.memberMapper.mapToResponse(search.get()).setMessage("Password updated");
+        MemberResponse response = this.memberMapper.mapToResponse(entity.get()).setMessage("Password updated");
 	return (status == MemberStatus.ENABLE) ?
                 response.setMessage("User's account not expired") :
                 response.setMessage("User's account expired");
@@ -214,17 +214,17 @@ public class MemberService {
         log.info("Changing member id[{}] status to {}", id, status.getStatus());
 
         // try to find user by its id
-	Optional<MemberEntity> search = this.memberRepository.findOneById(id);
+	Optional<MemberEntity> entity = this.memberRepository.findOneById(id);
 
 	// check if user exists
-	if (search.isEmpty())  
+	if (entity.isEmpty())
 	    throw new MemberNotFoundException("Member not found");
 	    
 	// try changing member's specific status 
 	if (this.memberRepository.setMemberCredentialsExpiredStatus(id, status.getStatus()) == 0) 
 	    throw new Exception("An error occurred, and the Member's credentials expiration status could not be modified");
 	
-        MemberResponse response = this.memberMapper.mapToResponse(search.get());
+        MemberResponse response = this.memberMapper.mapToResponse(entity.get());
         return (status == MemberStatus.ENABLE) ?
             response.setMessage("User's credentials not expired") :
             response.setMessage("User's credentials expired");
@@ -239,17 +239,17 @@ public class MemberService {
         log.info("Changing member (id[{}]) account locked status to {}", id, status.getStatus());
 
         // try to find user by its id
-	Optional<MemberEntity> search = this.memberRepository.findOneById(id);
+	Optional<MemberEntity> entity = this.memberRepository.findOneById(id);
 	
 	// check if user exists
-	if (search.isEmpty()) 
+	if (entity.isEmpty()) 
 	    throw new MemberNotFoundException("Member not found");
 	    
 	// try changing member's specific status 
 	if (this.memberRepository.setMemberAccountLockedStatus(id, status.getStatus()) == 0) 
 	    throw new Exception("An error occurred, and the Member's account locked status could not be modified");
 
-        MemberResponse response = this.memberMapper.mapToResponse(search.get());
+        MemberResponse response = this.memberMapper.mapToResponse(entity.get());
         return (status == MemberStatus.ENABLE) ?
             response.setMessage("User's account was unlocked") :
             response.setMessage("User's account was locked");
@@ -264,17 +264,17 @@ public class MemberService {
         log.info("Changing member (id[{}]) enabled status to {}", id, status.getStatus());
 
         // try to find user by its id
-	Optional<MemberEntity> search = this.memberRepository.findOneById(id);
+	Optional<MemberEntity> entity = this.memberRepository.findOneById(id);
 	
 	// check if user exists
-	if (search.isEmpty()) 
+	if (entity.isEmpty()) 
 	    throw new MemberNotFoundException("Member not found"); 
 
 	// try changing member's specific status 
 	if (this.memberRepository.setMemberEnabledStatus(id, status.getStatus()) == 0)
 	    throw new Exception("An error occurred, and the Member's enabled status could not be modified");
 
-        MemberResponse response = this.memberMapper.mapToResponse(search.get());
+        MemberResponse response = this.memberMapper.mapToResponse(entity.get());
         return (status == MemberStatus.ENABLE) ?
             response.setMessage("User's account was enabled") :
             response.setMessage("User's account was disabled");
