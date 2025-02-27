@@ -30,13 +30,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.thoseop.api.members.entity.enums.MemberStatus;
+import com.thoseop.api.members.entity.enums.MemberEnabledStatus;
+import com.thoseop.api.members.entity.enums.MemberLockedStatus;
 import com.thoseop.api.members.http.request.MemberCreateRequest;
 import com.thoseop.api.members.http.request.MemberManagePasswordRequest;
 import com.thoseop.api.members.http.request.MemberUpdatePasswordRequest;
 import com.thoseop.api.members.http.request.MemberUpdateRequest;
+import com.thoseop.api.members.http.response.MemberAccountLockedResponse;
 import com.thoseop.api.members.http.response.MemberCreatedResponse;
 import com.thoseop.api.members.http.response.MemberDetailsResponse;
+import com.thoseop.api.members.http.response.MemberEnabledResponse;
 import com.thoseop.api.members.http.response.MemberResponse;
 import com.thoseop.api.members.service.MemberService;
 
@@ -536,13 +539,13 @@ public class MemberControllerImpl implements MemberController {
 	    produces = { _APPLICATION_YAML_VALUE, 
 		    MediaType.APPLICATION_JSON_VALUE, 
 		    MediaType.APPLICATION_XML_VALUE })
-    public @ResponseBody ResponseEntity<MemberResponse> inactivateMember(@PathVariable Long id) throws Exception {
+    public @ResponseBody ResponseEntity<MemberEnabledResponse> inactivateMember(@PathVariable Long id) throws Exception {
 
         log.info("MemberController - disabling member id: {}", id);
 
-	MemberResponse member = memberService.changeMemberEnabledStatus(id, MemberStatus.DISABLE);
+	MemberEnabledResponse member = memberService.changeMemberEnabledStatus(id, MemberEnabledStatus.DISABLED);
 	member.add(linkTo(methodOn(MemberControllerImpl.class)
-		.getMemberByUsername(member.getMemberName())).withSelfRel());
+		.getMemberByUsername(member.getMemberUsername())).withSelfRel());
 
 	return ResponseEntity.ok(member);
     }
@@ -572,13 +575,13 @@ public class MemberControllerImpl implements MemberController {
 	    produces = { _APPLICATION_YAML_VALUE, 
 		    MediaType.APPLICATION_JSON_VALUE, 
 		    MediaType.APPLICATION_XML_VALUE })
-    public @ResponseBody ResponseEntity<MemberResponse> activateMember(@PathVariable Long id) throws Exception {
+    public @ResponseBody ResponseEntity<MemberEnabledResponse> activateMember(@PathVariable Long id) throws Exception {
 
         log.info("MemberController - enabling member id: {}", id);
 
-	MemberResponse member = memberService.changeMemberEnabledStatus(id, MemberStatus.ENABLE);
+	MemberEnabledResponse member = memberService.changeMemberEnabledStatus(id, MemberEnabledStatus.ENABLED);
 	member.add(linkTo(methodOn(MemberControllerImpl.class)
-		.getMemberByUsername(member.getMemberName())).withSelfRel());
+		.getMemberByUsername(member.getMemberUsername())).withSelfRel());
 
 	return ResponseEntity.ok(member);
     }
@@ -608,13 +611,13 @@ public class MemberControllerImpl implements MemberController {
 	    produces = { _APPLICATION_YAML_VALUE, 
 		    MediaType.APPLICATION_JSON_VALUE, 
 		    MediaType.APPLICATION_XML_VALUE })
-    public @ResponseBody ResponseEntity<MemberResponse> lockMemberAccount(@PathVariable Long id) throws Exception {
+    public @ResponseBody ResponseEntity<MemberAccountLockedResponse> lockMemberAccount(@PathVariable Long id) throws Exception {
 
         log.info("MemberController - locking member account id: {}", id);
 
-	MemberResponse member = memberService.changeMemberAccountLockedStatus(id, MemberStatus.DISABLE);
+        MemberAccountLockedResponse member = memberService.changeMemberAccountLockedStatus(id, MemberLockedStatus.LOCKED);
 	member.add(linkTo(methodOn(MemberControllerImpl.class)
-		.getMemberByUsername(member.getMemberName())).withSelfRel());
+		.getMemberByUsername(member.getMemberUsername())).withSelfRel());
 
 	return ResponseEntity.ok(member);
     }
@@ -644,13 +647,13 @@ public class MemberControllerImpl implements MemberController {
 	    produces = { _APPLICATION_YAML_VALUE, 
 		    MediaType.APPLICATION_JSON_VALUE, 
 		    MediaType.APPLICATION_XML_VALUE })
-    public @ResponseBody ResponseEntity<MemberResponse> unlockMemberAccount(@PathVariable Long id) throws Exception {
+    public @ResponseBody ResponseEntity<MemberAccountLockedResponse> unlockMemberAccount(@PathVariable Long id) throws Exception {
 
         log.info("MemberController - unlocking member id: {}", id);
 
-	MemberResponse member = memberService.changeMemberAccountLockedStatus(id, MemberStatus.ENABLE);
+        MemberAccountLockedResponse member = memberService.changeMemberAccountLockedStatus(id, MemberLockedStatus.UNLOCKED);
 	member.add(linkTo(methodOn(MemberControllerImpl.class)
-		.getMemberByUsername(member.getMemberName())).withSelfRel());
+		.getMemberByUsername(member.getMemberUsername())).withSelfRel());
 
 	return ResponseEntity.ok(member);
     }
