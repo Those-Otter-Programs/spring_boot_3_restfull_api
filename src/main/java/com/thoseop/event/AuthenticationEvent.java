@@ -9,9 +9,9 @@ import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 
 import com.thoseop.api.members_logs.entity.AuthenticationFailureLogEntity;
-import com.thoseop.api.members_logs.entity.enums.AuthStatus;
 import com.thoseop.api.members_logs.service.AuthenticationFailureLogService;
 
+import jakarta.security.auth.message.AuthStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,7 +41,7 @@ public class AuthenticationEvent {
 
 	authFailLogService.saveAuthLog(new AuthenticationFailureLogEntity( 
 		authFailureEvent.getAuthentication().getName(),
-		AuthStatus.FAILURE,
+		AuthStatus.FAILURE.toString(),
 		authDetails.getRemoteAddress(),
 		authFailureEvent.getException().getMessage(),
 		new Date(authFailureEvent.getTimestamp())));

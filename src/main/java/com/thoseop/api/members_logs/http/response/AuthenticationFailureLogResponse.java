@@ -5,8 +5,6 @@ import java.util.Date;
 
 import org.springframework.hateoas.RepresentationModel;
 
-import com.thoseop.api.members_logs.entity.enums.AuthStatus;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -35,7 +33,7 @@ public class AuthenticationFailureLogResponse extends RepresentationModel<Authen
     private String logMemberUsername;
     
     @Schema( description = "The result of authentication", example = "SUCCESS/FAILURE")
-    private AuthStatus logEventResult;
+    private String logEventResult;
     
     @Schema( description = "The remote ip address of the member", example = "0.0.0.0")
     private String logRemoteIpAddress;

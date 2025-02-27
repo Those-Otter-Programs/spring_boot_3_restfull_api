@@ -3,12 +3,8 @@ package com.thoseop.api.members_logs.entity;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.thoseop.api.members_logs.entity.enums.AuthStatus;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -41,8 +37,8 @@ public class AuthenticationFailureLogEntity implements Serializable {
     private String username;
     
     @Column(name = "event_result")
-    @Enumerated(EnumType.STRING)
-    private AuthStatus eventResult;
+//    @Enumerated(EnumType.STRING)
+    private String eventResult;
     
     @Column(name = "remote_address")
     private String remoteIpAddress;
@@ -57,7 +53,7 @@ public class AuthenticationFailureLogEntity implements Serializable {
     @Column(name = "created_at")
     private Date createdAt;
 
-    public AuthenticationFailureLogEntity(String username, AuthStatus eventResult, String remoteIpAddress,
+    public AuthenticationFailureLogEntity(String username, String eventResult, String remoteIpAddress,
 	    String logMessage, Date logTime) {
 	this.username = username;
 	this.eventResult = eventResult;
