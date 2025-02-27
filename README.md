@@ -648,7 +648,7 @@ curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
 ```bash
 # Requesting the JWT token and storing it in a bash variable
 myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
-    -L -X PATCH 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
+    -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
 
 # run cURL using the variable as the authorization token:
 
