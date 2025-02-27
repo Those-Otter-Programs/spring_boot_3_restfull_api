@@ -4,6 +4,7 @@ import static com.thoseop.config.OtterWebMvcConfig._APPLICATION_YAML_VALUE;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Assertions;
@@ -35,6 +36,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoseop.api.members.http.request.MemberCreateRequest;
 import com.thoseop.api.members.http.request.MemberManagePasswordRequest;
 import com.thoseop.api.members.http.request.MemberUpdatePasswordRequest;
@@ -148,7 +153,7 @@ class MemberControllerIntegrationTest {
     @DisplayName("test Create Member_when Member Authorized_then Returns HTTP 201")
     @ParameterizedTest
     @MethodSource("memberSeed")
-    @Order(2)
+    @Order(3)
     void testCreateMember_whenMemberAuthorized_thenReturnsHTTP201(MemberCreateRequest memberCreateRequest) {
 	// g
 	String route = "%s/member-create".formatted(this.baseRoute);
@@ -181,8 +186,8 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Get Members_when Member Authorized_then Returns HTTP 200")
     @Test
-    @Order(3)
-    void testGetMembers_whenMemberAuthorized_thenReturnsHTTP200() {
+    @Order(4)
+    void testGetMembers_whenMemberAuthorized_thenReturnsHTTP200() throws JsonMappingException, JsonProcessingException {
 	// g
 	String route = "%s/list".formatted(this.baseRoute);
 
@@ -192,23 +197,111 @@ class MemberControllerIntegrationTest {
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 	headers.set("Authorization", this.jwtAuthToken);
 
-	HttpEntity<?> request = new HttpEntity<>(
-		null, headers);
+	HttpEntity<?> request = new HttpEntity<>(null, headers);
 	// w
 	ResponseEntity<PagedModel<EntityModel<MemberResponse>>> response = testRestTemplate
 		.exchange(route, HttpMethod.GET, request,
 			new ParameterizedTypeReference<PagedModel<EntityModel<MemberResponse>>>() {
 		});
-
-//	Collection<EntityModel<MemberResponse>> members = response.getBody().getContent();
 	// t
 	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(), 
 		() -> "The returned http status code returned was not the expected.");
     }
 
+    @DisplayName("test Get Members_when Member Authorized_then Returns Paginated List Of Members")
+    @Test
+    @Order(5)
+    void testGetMembers_whenMemberAuthorized_thenReturnsPaginatedListOfMembers() throws JsonMappingException, JsonProcessingException {
+	// g
+	String route = "%s/list?page=2&size=10&sort=desc".formatted(this.baseRoute);
+
+	// creating the headers for the request
+	HttpHeaders headers = new HttpHeaders();
+	headers.setContentType(MediaType.APPLICATION_JSON);
+	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
+
+	HttpEntity<?> request = new HttpEntity<>(null, headers);
+	// w
+	ResponseEntity<PagedModel<EntityModel<MemberResponse>>> response = testRestTemplate
+		.exchange(route, HttpMethod.GET, request,
+			new ParameterizedTypeReference<PagedModel<EntityModel<MemberResponse>>>() {
+		});
+	
+        PagedModel<EntityModel<MemberResponse>> pagedMembers = response.getBody();        
+        
+        List<EntityModel<MemberResponse>> membersEM = pagedMembers.getContent().stream().collect(Collectors.toList());
+        MemberResponse m1 = membersEM.get(0).getContent();
+	
+	// t
+	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(), 
+		() -> "The returned http status code returned was not the expected.");
+
+	Assertions.assertEquals(10, pagedMembers.getMetadata().getSize(), 
+		() -> "The page size was not the expected");
+	Assertions.assertTrue(pagedMembers.getMetadata().getTotalElements() >= 50, 
+		() -> "The total number of elements was not the expected");
+	Assertions.assertTrue(pagedMembers.getMetadata().getTotalPages() >= 5, 
+		() -> "The total number of pages was not the expected");
+	Assertions.assertEquals(2, pagedMembers.getMetadata().getNumber(), 
+		() -> "The page number was not the expected");
+	
+	Assertions.assertEquals("Mick Fredson", m1.getMemberName(), 
+		() -> "The member name was not the expected");
+	Assertions.assertEquals("mfredson2@amazon.com", m1.getMemberEmail(), 
+		() -> "The member email was not the expected");
+	Assertions.assertEquals("+996 (177) 963-3057", m1.getMemberMobileNumber(), 
+		() -> "The member phone number was not the expected");
+    }
+
+     // NOT SO GOOD APPROACH...
+    @DisplayName("test Get Members_when Member Authorized_then Returns Paginated List Of Members - JSON Way")
+    @Test
+    @Order(6)
+    void testGetMembers_whenMemberAuthorized_thenReturnsPaginatedListOfMembersJSONWay() throws JsonMappingException, JsonProcessingException {
+	// g
+	String route = "%s/list?page=2&size=10&sort=desc".formatted(this.baseRoute);
+
+	// creating the headers for the request
+	HttpHeaders headers = new HttpHeaders();
+	headers.setContentType(MediaType.APPLICATION_JSON);
+	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
+
+	HttpEntity<?> request = new HttpEntity<>(null, headers);
+	// w
+	ResponseEntity<PagedModel<EntityModel<MemberResponse>>> response = testRestTemplate
+		.exchange(route, HttpMethod.GET, request,
+			new ParameterizedTypeReference<PagedModel<EntityModel<MemberResponse>>>() {
+		});
+        
+	// getting the body as a JSON 
+	ObjectMapper mapper = new ObjectMapper();
+	
+	String responseStr = mapper.writeValueAsString(response.getBody());
+	JsonNode jsonObjectBody = new ObjectMapper().readTree(responseStr);
+//	System.out.println(jsonObjectBody.toPrettyString());
+//	System.out.println(jsonObjectBody.get("page").toPrettyString());
+//	System.out.println(jsonObjectBody.get("page").get("size").toPrettyString());
+	
+	String pageSize = jsonObjectBody.get("page").get("size").toString();
+	String totalElements = jsonObjectBody.get("page").get("totalElements").toString();
+	String totalPages = jsonObjectBody.get("page").get("totalPages").toString();
+	String pageNumber = jsonObjectBody.get("page").get("number").toString();
+	// t  
+	Assertions.assertEquals(10, Integer.valueOf(pageSize), 
+		() -> "The page size was not the expected");
+	Assertions.assertTrue(Integer.valueOf(totalElements) >= 50, 
+		() -> "The total number of elements was not the expected");
+	Assertions.assertTrue(Integer.valueOf(totalPages) >= 5, 
+		() -> "The total number of pages was not the expected");
+	Assertions.assertEquals(2, Integer.valueOf(pageNumber), 
+		() -> "The page number was not the expected");
+    }
+
     @DisplayName("test Get Member By Username_when Member Authorized_then Returns HTTP 200")
     @Test
-    @Order(4)
+    @Order(7)
     void testGetMemberByUsername_whenMemberAuthorized_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-details/ayrton.senna@bravo.com".formatted(this.baseRoute);
@@ -237,7 +330,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Get Member By Username_when Search Member Doest Exists_then Throws Member Not Found Exception")
     @Test
-    @Order(5)
+    @Order(8)
     void testGetMemberByUsername_whenSearchMemberDoestExists_thenReturnsErrorResponse() {
 	// g
 	String route = "%s/member-details/unknown@none.com".formatted(this.baseRoute);
@@ -269,7 +362,7 @@ class MemberControllerIntegrationTest {
     @ParameterizedTest
     @ValueSource(strings = {MediaType.APPLICATION_JSON_VALUE, 
 	    MediaType.APPLICATION_XML_VALUE, _APPLICATION_YAML_VALUE})
-    @Order(6)
+    @Order(9)
     void testGetMemberByUsername_whenRequestWithAcceptedMediaTypes_thenReturnHTTP200(String mediaTypeAccepted) {
 	// g
 	String route = "%s/member-details/ayrton.senna@bravo.com".formatted(this.baseRoute);
@@ -293,7 +386,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Get Member Full Details By Username_when Member Authorized_then Returns HTTP 200")
     @Test
-    @Order(7)
+    @Order(10)
     void testGetMemberFullDetailsByUsername_whenMemberAuthorized_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-full-details/ayrton.senna@bravo.com".formatted(this.baseRoute);
@@ -322,7 +415,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Get Member Full Details By Username_when Search Member Doest Exists_then Returns Error Response")
     @Test
-    @Order(8)
+    @Order(11)
     void testGetMemberFullDetailsByUsername_whenSearchMemberDoestExists_thenReturnsErrorResponse() {
 	// g
 	String route = "%s/member-full-details/unknown@none.com".formatted(this.baseRoute);
@@ -354,7 +447,7 @@ class MemberControllerIntegrationTest {
     @ParameterizedTest
     @ValueSource(strings = {MediaType.APPLICATION_JSON_VALUE, 
 	    MediaType.APPLICATION_XML_VALUE, _APPLICATION_YAML_VALUE})
-    @Order(9)
+    @Order(12)
     void testGetMemberFullDetailsByUsername_whenRequestWithAcceptedMediaTypes_thenReturnHTTP200(String mediaTypeAccepted) {
 	// g
 	String route = "%s/member-full-details/ayrton.senna@bravo.com".formatted(this.baseRoute);
@@ -378,7 +471,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Get Me_when Member Authenticated_then Returns HTTP 200")
     @Test
-    @Order(10)
+    @Order(13)
     void testMe_whenMemberAuthenticated_thenReturnsHTTP200() {
 	// g
 	String route = "%s/me".formatted(this.baseRoute);
@@ -409,7 +502,7 @@ class MemberControllerIntegrationTest {
     @ParameterizedTest
     @ValueSource(strings = {MediaType.APPLICATION_JSON_VALUE, 
 	    MediaType.APPLICATION_XML_VALUE, _APPLICATION_YAML_VALUE})
-    @Order(11)
+    @Order(14)
     void testMe_whenRequestWithAcceptedMediaTypes_thenReturnHTTP200(String mediaTypeAccepted) {
 	// g
 	String route = "%s/me".formatted(this.baseRoute);
@@ -439,7 +532,7 @@ class MemberControllerIntegrationTest {
     
     @DisplayName("test Update Member Password_when Authenticated_then Returns HTTP 200")
     @Test
-    @Order(12)
+    @Order(15)
     void testUpdateMemberPassword_whenAuthenticated_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-password".formatted(this.baseRoute);
@@ -478,7 +571,7 @@ class MemberControllerIntegrationTest {
     
     @DisplayName("test Manage Member Password_when Authenticated_then Returns HTTP 200")
     @Test
-    @Order(13)
+    @Order(16)
     void testManageMemberPassword_whenAuthenticated_thenReturnsHTTP200() {
 	// g
 	String route = "%s/manage-member-password".formatted(this.baseRoute);
@@ -518,7 +611,7 @@ class MemberControllerIntegrationTest {
     
     @DisplayName("test Manage Member Password_when Search Member Doest Exists_then Returns Error Response")
     @Test
-    @Order(13)
+    @Order(17)
     void testManageMemberPassword_whenSearchMemberDoestExists_thenReturnsErrorResponse() {
 	// g
 	String route = "%s/manage-member-password".formatted(this.baseRoute);
@@ -552,7 +645,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Inactivate Member_when Right Privileges_then Returns HTTP 200")
     @Test
-    @Order(14)
+    @Order(18)
     void testInactivateMember_whenRightPrivileges_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-disable/3".formatted(this.baseRoute);
@@ -577,7 +670,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Inactivate Member_when Search Member Doest Exists_then Returns Error Response")
     @Test
-    @Order(15)
+    @Order(19)
     void testInactivateMember_whenSearchMemberDoestExists_thenReturnsErrorResponse() {
 	// g
 	String route = "%s/member-disable/1000".formatted(this.baseRoute);
@@ -607,7 +700,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Activate Member_when Right Privileges_then Returns HTTP 200")
     @Test
-    @Order(15)
+    @Order(20)
     void testActivateMember_whenRightPrivileges_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-enable/3".formatted(this.baseRoute);
@@ -632,7 +725,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Activate Member_when Search Member Doest Exists_then Returns Error Response")
     @Test
-    @Order(16)
+    @Order(21)
     void testActivateMember_whenSearchMemberDoestExists_thenReturnsErrorResponse() {
 	// g
 	String route = "%s/member-enable/1000".formatted(this.baseRoute);
@@ -662,7 +755,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Lock Member Account_when Right Privileges_then Returns HTTP 200")
     @Test
-    @Order(16)
+    @Order(22)
     void testLockMemberAccount_whenRightPrivileges_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-lock/3".formatted(this.baseRoute);
@@ -687,7 +780,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Lock Member Account_when Search Member Doest Exists_then Returns Error Response")
     @Test
-    @Order(17)
+    @Order(23)
     void testLockMemberAccount_whenSearchMemberDoestExists_thenReturnsErrorResponse() {
 	// g
 	String route = "%s/member-lock/1000".formatted(this.baseRoute);
@@ -717,7 +810,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Unlock Member Account_when Right Privileges_then Returns HTTP 200")
     @Test
-    @Order(18)
+    @Order(24)
     void testUnlockMemberAccount_whenRightPrivileges_thenReturnsHTTP200() {
 	// g
 	String route = "%s/member-unlock/3".formatted(this.baseRoute);
@@ -742,7 +835,7 @@ class MemberControllerIntegrationTest {
 
     @DisplayName("test Unlock Member Account_when Search Member Doest Exists_then Returns Error Response")
     @Test
-    @Order(19)
+    @Order(25)
     void testUnlockMemberAccount_whenSearchMemberDoestExists_thenReturnsErrorResponse() {
 	// g
 	String route = "%s/member-unlock/1000".formatted(this.baseRoute);
