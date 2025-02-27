@@ -10,8 +10,10 @@ import com.thoseop.api.members.http.request.MemberCreateRequest;
 import com.thoseop.api.members.http.request.MemberManagePasswordRequest;
 import com.thoseop.api.members.http.request.MemberUpdatePasswordRequest;
 import com.thoseop.api.members.http.request.MemberUpdateRequest;
+import com.thoseop.api.members.http.response.MemberAccountLockedResponse;
 import com.thoseop.api.members.http.response.MemberCreatedResponse;
 import com.thoseop.api.members.http.response.MemberDetailsResponse;
+import com.thoseop.api.members.http.response.MemberEnabledResponse;
 import com.thoseop.api.members.http.response.MemberResponse;
 import com.thoseop.exception.response.OtterAPIErrorResponse;
 
@@ -194,13 +196,13 @@ public interface MemberController {
 	    description = "Activates a member - it has to be run after member creation", 
 	    tags = { "MemberController" }, 
 	    responses = {
-		    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = MemberResponse.class))),
+		    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = MemberEnabledResponse.class))),
 		    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
 		    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
 		    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
 		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))), 
     		})
-    public ResponseEntity<MemberResponse> activateMember(Long id) throws Exception;
+    public ResponseEntity<MemberEnabledResponse> activateMember(Long id) throws Exception;
     
     /**
      * 
@@ -211,13 +213,13 @@ public interface MemberController {
 	    description = "Inactivates a member", 
 	    tags = { "MemberController" }, 
 	    responses = {
-		    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = MemberResponse.class))),
+		    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = MemberEnabledResponse.class))),
 		    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
 		    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
 		    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
 		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))), 
     		})
-    public ResponseEntity<MemberResponse> inactivateMember(Long id) throws Exception;
+    public ResponseEntity<MemberEnabledResponse> inactivateMember(Long id) throws Exception;
 
     /**
      * 
@@ -228,13 +230,13 @@ public interface MemberController {
 	    description = "Lock member's account", 
 	    tags = { "MemberController" }, 
 	    responses = {
-		    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = MemberResponse.class))),
+		    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = MemberAccountLockedResponse.class))),
 		    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
 		    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
 		    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
 		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))), 
     		})
-    public ResponseEntity<MemberResponse> lockMemberAccount(Long id) throws Exception;
+    public ResponseEntity<MemberAccountLockedResponse> lockMemberAccount(Long id) throws Exception;
     
     /**
      * 
@@ -245,11 +247,11 @@ public interface MemberController {
 	    description = "Unlock member's account", 
 	    tags = { "MemberController" }, 
 	    responses = {
-		    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = MemberResponse.class))),
+		    @ApiResponse(description = "Success", responseCode = "200", content = @Content(schema = @Schema(implementation = MemberAccountLockedResponse.class))),
 		    @ApiResponse(description = "Bad Request", responseCode = "400", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
 		    @ApiResponse(description = "Unauthorized", responseCode = "401", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
 		    @ApiResponse(description = "Not Found", responseCode = "404", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))),
 		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))), 
     		})
-    public ResponseEntity<MemberResponse> unlockMemberAccount(Long id) throws Exception;
+    public ResponseEntity<MemberAccountLockedResponse> unlockMemberAccount(Long id) throws Exception;
 }
