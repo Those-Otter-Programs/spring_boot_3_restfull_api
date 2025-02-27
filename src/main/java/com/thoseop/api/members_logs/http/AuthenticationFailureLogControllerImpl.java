@@ -83,7 +83,7 @@ public class AuthenticationFailureLogControllerImpl implements AuthenticationFai
 	    @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "8") Integer size,
 	    @RequestParam(defaultValue = "asc") String sort) { 
 	
-        log.info("AuthenticationFailureLogControllerImpl - reading all members");
+        log.info("AuthenticationFailureLogControllerImpl - retrieving all member logs");
 
 	var sortDirection = "desc".equalsIgnoreCase(sort) ? Direction.DESC : Direction.ASC;
 	Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "id"));
@@ -129,6 +129,8 @@ public class AuthenticationFailureLogControllerImpl implements AuthenticationFai
 		    MediaType.APPLICATION_XML_VALUE })
     public @ResponseBody ResponseEntity<AuthenticationFailureLogResponse> getLogById(
 	    @PathVariable Long id) {
+
+	log.info("AuthenticationFailureLogControllerImpl - searching log by id");
 
 	AuthenticationFailureLogResponse authLog = authFailLogService.readlogById(id);
 	authLog.add(linkTo(methodOn(AuthenticationFailureLogControllerImpl.class)
