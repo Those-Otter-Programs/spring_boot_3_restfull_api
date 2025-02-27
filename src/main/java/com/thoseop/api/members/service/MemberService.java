@@ -10,15 +10,21 @@ import org.springframework.stereotype.Service;
 
 import com.thoseop.api.members.entity.AuthorityEntity;
 import com.thoseop.api.members.entity.MemberEntity;
-import com.thoseop.api.members.entity.enums.MemberStatus;
+import com.thoseop.api.members.entity.enums.MemberEnabledStatus;
+import com.thoseop.api.members.entity.enums.MemberExpiredStatus;
+import com.thoseop.api.members.entity.enums.MemberLockedStatus;
 import com.thoseop.api.members.exception.MemberNotFoundException;
 import com.thoseop.api.members.exception.PasswordNotChangedException;
 import com.thoseop.api.members.http.request.MemberCreateRequest;
 import com.thoseop.api.members.http.request.MemberManagePasswordRequest;
 import com.thoseop.api.members.http.request.MemberUpdatePasswordRequest;
 import com.thoseop.api.members.http.request.MemberUpdateRequest;
+import com.thoseop.api.members.http.response.MemberAccountExpiredResponse;
+import com.thoseop.api.members.http.response.MemberAccountLockedResponse;
 import com.thoseop.api.members.http.response.MemberCreatedResponse;
+import com.thoseop.api.members.http.response.MemberCredentialsExpiredResponse;
 import com.thoseop.api.members.http.response.MemberDetailsResponse;
+import com.thoseop.api.members.http.response.MemberEnabledResponse;
 import com.thoseop.api.members.http.response.MemberResponse;
 import com.thoseop.api.members.mapper.MemberMapper;
 import com.thoseop.api.members.repository.MemberRepository;
@@ -185,7 +191,7 @@ public class MemberService {
      * @param id
      * @return
      */
-    public MemberResponse changeMemberAccountExpiredStatus(Long id, MemberStatus status) throws Exception {
+    public MemberAccountExpiredResponse changeMemberAccountExpiredStatus(Long id, MemberExpiredStatus status) throws Exception {
         log.info("Changing member id[{}] status to {}", id, status.getStatus());
 
         // try to find user by its id
@@ -199,10 +205,8 @@ public class MemberService {
 	if (this.memberRepository.setMemberAccountExpiredStatus(id, status.getStatus()) == 1) 
 	    throw new Exception("An error occurred, and the Member's account expiration status could not be modified");
 
-        MemberResponse response = this.memberMapper.mapToResponse(entity.get()).setMessage("Password updated");
-	return (status == MemberStatus.ENABLE) ?
-                response.setMessage("User's account not expired") :
-                response.setMessage("User's account expired");
+        return this.memberMapper.mapToAccountExpiredResponse(entity.get())
+        	.setMemberAccountNotExpired(status.getStatus());
     }
     
     /**
@@ -210,7 +214,7 @@ public class MemberService {
      * @param id
      * @return
      */
-    public MemberResponse changeMemberCredentialsExpiredStatus(Long id, MemberStatus status) throws Exception {
+    public MemberCredentialsExpiredResponse changeMemberCredentialsExpiredStatus(Long id, MemberExpiredStatus status) throws Exception {
         log.info("Changing member id[{}] status to {}", id, status.getStatus());
 
         // try to find user by its id
@@ -224,10 +228,8 @@ public class MemberService {
 	if (this.memberRepository.setMemberCredentialsExpiredStatus(id, status.getStatus()) == 0) 
 	    throw new Exception("An error occurred, and the Member's credentials expiration status could not be modified");
 	
-        MemberResponse response = this.memberMapper.mapToResponse(entity.get());
-        return (status == MemberStatus.ENABLE) ?
-            response.setMessage("User's credentials not expired") :
-            response.setMessage("User's credentials expired");
+	return this.memberMapper.mapToCredentialsExpiredResponse(entity.get())
+		.setMemberCredentialsNotExpired(status.getStatus());
     }
     
     /**
@@ -235,8 +237,8 @@ public class MemberService {
      * @param id
      * @return
      */
-    public MemberResponse changeMemberAccountLockedStatus(Long id, MemberStatus status) throws Exception {
-        log.info("Changing member (id[{}]) account locked status to {}", id, status.getStatus());
+    public MemberAccountLockedResponse changeMemberAccountLockedStatus(Long id, MemberLockedStatus status) throws Exception {
+        log.info("Changing member id[{}] account locked status to {}", id, status.getStatus());
 
         // try to find user by its id
 	Optional<MemberEntity> entity = this.memberRepository.findOneById(id);
@@ -249,10 +251,8 @@ public class MemberService {
 	if (this.memberRepository.setMemberAccountLockedStatus(id, status.getStatus()) == 0) 
 	    throw new Exception("An error occurred, and the Member's account locked status could not be modified");
 
-        MemberResponse response = this.memberMapper.mapToResponse(entity.get());
-        return (status == MemberStatus.ENABLE) ?
-            response.setMessage("User's account was unlocked") :
-            response.setMessage("User's account was locked");
+        return this.memberMapper.mapToAccountLockedResponse(entity.get())
+        	.setMemberAccountNotLocked(status.getStatus());
     }
     
     /**
@@ -260,8 +260,8 @@ public class MemberService {
      * @param id
      * @return
      */
-    public MemberResponse changeMemberEnabledStatus(Long id, MemberStatus status) throws Exception {
-        log.info("Changing member (id[{}]) enabled status to {}", id, status.getStatus());
+    public MemberEnabledResponse changeMemberEnabledStatus(Long id, MemberEnabledStatus status) throws Exception {
+        log.info("Changing member id[{}] enabled status to {}", id, status.getStatus());
 
         // try to find user by its id
 	Optional<MemberEntity> entity = this.memberRepository.findOneById(id);
@@ -274,9 +274,7 @@ public class MemberService {
 	if (this.memberRepository.setMemberEnabledStatus(id, status.getStatus()) == 0)
 	    throw new Exception("An error occurred, and the Member's enabled status could not be modified");
 
-        MemberResponse response = this.memberMapper.mapToResponse(entity.get());
-        return (status == MemberStatus.ENABLE) ?
-            response.setMessage("User's account was enabled") :
-            response.setMessage("User's account was disabled");
+        return this.memberMapper.mapToEnabledResponse(entity.get())
+        	.setMemberEnabled(status.getStatus());
     }
 }
