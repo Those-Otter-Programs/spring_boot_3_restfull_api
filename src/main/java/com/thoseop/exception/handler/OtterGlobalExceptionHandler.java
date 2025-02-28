@@ -16,10 +16,22 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.thoseop.exception.InvalidSortByException;
 import com.thoseop.exception.response.OtterAPIErrorResponse;
 
 @RestControllerAdvice
 public class OtterGlobalExceptionHandler {
+
+    @ExceptionHandler(InvalidSortByException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    public OtterAPIErrorResponse handleAccessDeniedException(InvalidSortByException ex) {
+	return new OtterAPIErrorResponse(
+		new Date().toString(), 
+		HttpStatus.NOT_ACCEPTABLE.value(),
+		ex.getClass().getName(), 
+		ex.getMessage(), 
+		ex.getMessage());
+    }
 
     @ExceptionHandler({ UsernameNotFoundException.class })
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
