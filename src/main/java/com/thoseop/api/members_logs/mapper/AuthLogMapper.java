@@ -13,7 +13,7 @@ public interface AuthLogMapper {
 
    @Mappings({
         @Mapping(target = "logId", source = "id"), 
-        @Mapping(target = "logMemberUsername", source = "username"), 
+        @Mapping(target = "logUsername", source = "username"), 
         @Mapping(target = "logEventResult", source = "eventResult"), 
         @Mapping(target = "logRemoteIpAddress", source = "remoteIpAddress"), 
         @Mapping(target = "logMessage", source = "message"), 
