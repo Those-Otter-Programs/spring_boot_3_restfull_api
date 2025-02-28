@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -85,15 +87,21 @@ class AuthenticationFailureLogControllerTest {
 		() -> "The returned http status code was not the expected.");
 	Assertions.assertNotNull(this.jwtAuthToken, 
 		() -> "Response should contain the JWT token in the Authorization header field");
-	Assertions.assertEquals(response.getBody().get("token"), this.jwtAuthToken);
+	Assertions.assertEquals(response.getBody().get("token"), this.jwtAuthToken, 
+		() -> "Token receive is differente than expected");
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {
+	    "/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sortDir=asc&sortBy=logAuthTime",
+	    "/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sortDir=asc",
+	    "/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8",
+	    "/api/authentication-failure/v1/member/ayrton.senna@bravo.com"
+	    })
     @Order(2)
-    void testGetMemberAuthenticationFailures() throws JsonMappingException, JsonProcessingException {
+    void testGetMemberAuthenticationFailures(String route) throws JsonMappingException, JsonProcessingException {
 	// g
 	String username = "ayrton.senna@bravo.com";
-	String route = "%s/member/%s?page=0".formatted(this.baseRoute, username);
 
 	// creating the headers for the request
 	HttpHeaders headers = new HttpHeaders();
@@ -109,6 +117,8 @@ class AuthenticationFailureLogControllerTest {
 		});
 
 	PagedModel<EntityModel<AuthenticationFailureLogResponse>> pagedMembers = response.getBody();        
+	
+//	System.out.println(pagedMembers.toString());
         
         List<EntityModel<AuthenticationFailureLogResponse>> logEM = pagedMembers.getContent().stream().collect(Collectors.toList());
         AuthenticationFailureLogResponse l1 = logEM.get(0).getContent();
@@ -126,10 +136,18 @@ class AuthenticationFailureLogControllerTest {
 	Assertions.assertEquals(0, pagedMembers.getMetadata().getNumber(), 
 		() -> "The page number was not the expected");
 	
-	Assertions.assertEquals(username, l1.getLogMemberUsername(), 
+	Assertions.assertEquals(username, l1.getLogUsername(), 
 		() -> "The username was not the expected.");
 	Assertions.assertEquals(AuthStatus.FAILURE.toString(), l1.getLogEventResult(), 
 		() -> "The event result was not the expected.");
+	Assertions.assertNotNull(l1.getLogRemoteIpAddress(), 
+		() -> "The log's remoteIpAddress data should not be null.");
+	Assertions.assertNotNull(l1.getLogMessage(), 
+		() -> "The log's logMessage data should not be null.");
+	Assertions.assertNotNull(l1.getLogAuthTime(), 
+		() -> "The log's logAuthTime data should not be null.");
+	Assertions.assertNotNull(l1.getLogCreatedAt(), 
+		() -> "The log's logCreatedAt data should not be null.");
     }
 
     @Test
@@ -153,7 +171,17 @@ class AuthenticationFailureLogControllerTest {
 	// t
 	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
 		() -> "The returned http status code was not the expected.");
-	Assertions.assertEquals(username, response.getBody().getLogMemberUsername(), 
+	Assertions.assertEquals(username, response.getBody().getLogUsername(), 
 		() -> "The username was not the expected.");
+	Assertions.assertEquals(AuthStatus.FAILURE.toString(), response.getBody().getLogEventResult(), 
+		() -> "The event result was not the expected.");
+	Assertions.assertNotNull(response.getBody().getLogRemoteIpAddress(), 
+		() -> "The log's remoteIpAddress data should not be null.");
+	Assertions.assertNotNull(response.getBody().getLogMessage(), 
+		() -> "The log's logMessage data should not be null.");
+	Assertions.assertNotNull(response.getBody().getLogAuthTime(), 
+		() -> "The log's logAuthTime data should not be null.");
+	Assertions.assertNotNull(response.getBody().getLogCreatedAt(), 
+		() -> "The log's logCreatedAt data should not be null.");
     }
 }
