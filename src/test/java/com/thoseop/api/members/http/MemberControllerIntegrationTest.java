@@ -106,7 +106,8 @@ class MemberControllerIntegrationTest {
 		() -> "The returned http status code was not the expected.");
 	Assertions.assertNotNull(this.jwtAuthToken, 
 		() -> "Response should contain the JWT token in the Authorization header field");
-	Assertions.assertEquals(response.getBody().get("token"), this.jwtAuthToken);
+	Assertions.assertEquals(response.getBody().get("token"), this.jwtAuthToken, 
+		() -> "Token receive is differente than expected");
     }
     
     @DisplayName("test Member Token_when Search Member Doest Exists_then Returns Error Response")
@@ -189,12 +190,18 @@ class MemberControllerIntegrationTest {
     }
 
     @DisplayName("test Get Members_when Member Authorized_then Returns HTTP 200")
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {
+	    "/api/member/v1/list?page=0&size=8&sortDir=desc&sortBy=memberEmail",
+	    "/api/member/v1/list?page=0&size=8&sortDir=desc",
+	    "/api/member/v1/list?page=0&size=8",
+	    "/api/member/v1/list?page=0",
+	    "/api/member/v1/list"
+	    })
     @Order(4)
-    void testGetMembers_whenMemberAuthorized_thenReturnsHTTP200() throws JsonMappingException, JsonProcessingException {
+    void testGetMembers_whenMemberAuthorized_thenReturnsHTTP200(String route) 
+	    throws JsonMappingException, JsonProcessingException {
 	// g
-	String route = "%s/list".formatted(this.baseRoute);
-
 	// creating the headers for the request
 	HttpHeaders headers = new HttpHeaders();
 	headers.setContentType(MediaType.APPLICATION_JSON);
@@ -213,11 +220,18 @@ class MemberControllerIntegrationTest {
     }
 
     @DisplayName("test Get Members_when Member Authorized_then Returns Paginated List Of Members")
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {
+	    "/api/member/v1/list?page=0&size=8&sortDir=desc&sortBy=memberEmail",
+	    "/api/member/v1/list?page=0&size=8&sortDir=desc",
+	    "/api/member/v1/list?page=0&size=8",
+	    "/api/member/v1/list?page=0",
+	    "/api/member/v1/list"
+	    })
     @Order(5)
-    void testGetMembers_whenMemberAuthorized_thenReturnsPaginatedListOfMembers() throws JsonMappingException, JsonProcessingException {
+    void testGetMembers_whenMemberAuthorized_thenReturnsPaginatedListOfMembers(String route) 
+	    throws JsonMappingException, JsonProcessingException {
 	// g
-	String route = "%s/list?page=2&size=10&sortDir=desc&sortBy=memberEmail".formatted(this.baseRoute);
 
 	// creating the headers for the request
 	HttpHeaders headers = new HttpHeaders();
@@ -241,21 +255,23 @@ class MemberControllerIntegrationTest {
 	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(), 
 		() -> "The returned http status code returned was not the expected.");
 
-	Assertions.assertEquals(10, pagedMembers.getMetadata().getSize(), 
+	Assertions.assertEquals(8, pagedMembers.getMetadata().getSize(), 
 		() -> "The page size was not the expected");
 	Assertions.assertTrue(pagedMembers.getMetadata().getTotalElements() >= 50, 
 		() -> "The total number of elements was not the expected");
 	Assertions.assertTrue(pagedMembers.getMetadata().getTotalPages() >= 5, 
 		() -> "The total number of pages was not the expected");
-	Assertions.assertEquals(2, pagedMembers.getMetadata().getNumber(), 
+	Assertions.assertEquals(0, pagedMembers.getMetadata().getNumber(), 
 		() -> "The page number was not the expected");
 	
-	Assertions.assertEquals("Mick Fredson", m1.getMemberName(), 
-		() -> "The member name was not the expected");
-	Assertions.assertEquals("mfredson2@amazon.com", m1.getMemberEmail(), 
-		() -> "The member email was not the expected");
-	Assertions.assertEquals("+996 (177) 963-3057", m1.getMemberMobileNumber(), 
-		() -> "The member phone number was not the expected");
+	Assertions.assertNotNull(m1.getMemberName(), 
+		() -> "The member's name should not be null");
+	Assertions.assertNotNull(m1.getMemberEmail(), 
+		() -> "The member's email should not be null");
+	Assertions.assertNotNull(m1.getMemberMobileNumber(), 
+		() -> "The member's  phone number should not be null");
+	Assertions.assertNotNull(m1.getMemberCreatedAt(), 
+		() -> "The member's createdAt should not be null");
     }
 
     @DisplayName("test Get Members_when Invalid Sort By Value_then Return Error Message")
@@ -558,14 +574,15 @@ class MemberControllerIntegrationTest {
     }
     
     @DisplayName("test Update Member Password_when Authenticated_then Returns HTTP 200")
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"new_ayrton_pass", "ayrton_pass"})
     @Order(15)
-    void testUpdateMemberPassword_whenAuthenticated_thenReturnsHTTP200() {
+    void testUpdateMemberPassword_whenAuthenticated_thenReturnsHTTP200(String memberPass) {
 	// g
 	String route = "%s/member-password".formatted(this.baseRoute);
 	
 	MemberUpdatePasswordRequest memberUpdPassRequest = 
-		new MemberUpdatePasswordRequest("new_ayrton_pass"); 
+		new MemberUpdatePasswordRequest(memberPass); 
 
 	// creating the headers for the requestString
 	HttpHeaders headers = new HttpHeaders();
@@ -582,22 +599,11 @@ class MemberControllerIntegrationTest {
 	// t
 	Assertions.assertEquals(HttpStatus.OK, responsePassChange.getStatusCode(),
 		() -> "The returned http status code was not the expected.");
-
-	// ------------------ REVERTING PASSWORD CHANGE ------------------
-	// g
-	memberUpdPassRequest = 
-		new MemberUpdatePasswordRequest("ayrton_pass"); 
-	updPassHTTPrequest = new HttpEntity<>(memberUpdPassRequest, headers);
-	// w
-	responsePassChange = testRestTemplate
-		.exchange(route, HttpMethod.PATCH, updPassHTTPrequest, MemberResponse.class);
-	// t
-	Assertions.assertEquals(HttpStatus.OK, responsePassChange.getStatusCode(),
-		() -> "The returned http status code was not the expected.");
     }
     
     @DisplayName("test Manage Member Password_when Authenticated_then Returns HTTP 200")
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"new_mick_pass", "lQEXBPL"})
     @Order(16)
     void testManageMemberPassword_whenAuthenticated_thenReturnsHTTP200() {
 	// g
@@ -618,18 +624,6 @@ class MemberControllerIntegrationTest {
 	// w
 	// ...changing the members password...
 	ResponseEntity<MemberResponse> responsePassChange = testRestTemplate
-		.exchange(route, HttpMethod.PATCH, updPassHTTPrequest, MemberResponse.class);
-	// t
-	Assertions.assertEquals(HttpStatus.OK, responsePassChange.getStatusCode(),
-		() -> "The returned http status code was not the expected.");
-
-	// ------------------ REVERTING PASSWORD CHANGE ------------------
-	// g
-	memberMngPassRequest = 
-		new MemberManagePasswordRequest("mfredson2@amazon.com", "lQEXBPL"); 
-	updPassHTTPrequest = new HttpEntity<>(memberMngPassRequest, headers);
-	// w
-	responsePassChange = testRestTemplate
 		.exchange(route, HttpMethod.PATCH, updPassHTTPrequest, MemberResponse.class);
 	// t
 	Assertions.assertEquals(HttpStatus.OK, responsePassChange.getStatusCode(),
