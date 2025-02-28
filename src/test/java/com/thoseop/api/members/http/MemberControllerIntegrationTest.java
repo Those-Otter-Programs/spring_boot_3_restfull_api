@@ -142,17 +142,17 @@ class MemberControllerIntegrationTest {
 
     static Stream<Arguments> memberSeed() {
 	return Stream.of(
-		Arguments.of(new MemberCreateRequest("Santos Dumont", "santos.dumont@test.com",
-			"(11) 94567-8901", "dumont_pass", Set.of("ROLE_ADMIN", "ROLE_INVENTOR"))),
-		Arguments.of(new MemberCreateRequest("Tom Jobim", "tom.jobim@test.com",
-			"(11) 95678-9012", "jobim_pass", Set.of("ROLE_ADMIN", "ROLE_MUSICIAN"))),
-		Arguments.of(new MemberCreateRequest("Pele", "pele@test.com",
-			"(11) 92345-6789", "pele_pass", Set.of("ROLE_ADMIN", "ROLE_ATHLETE"))),
-		Arguments.of(new MemberCreateRequest("Vitor Belfort", "vitor.belfort@test.com",
-			"(11) 91234-5678", "belfort_pass", Set.of("ROLE_MANAGER", "ROLE_WARRIOR"))),
-		Arguments.of(new MemberCreateRequest("Cláudia Abreu", "claudia.abreu@test.com",
-			"(11) 93456-7890", "abreu_pass", Set.of("ROLE_MANAGER", "ROLE_HOTEST")))
-		);
+	    Arguments.of(new MemberCreateRequest("Santos Dumont", "santos.dumont@test.com",
+		    "(11) 94567-8901", "dumont_pass", Set.of("ROLE_ADMIN", "ROLE_INVENTOR"))),
+	    Arguments.of(new MemberCreateRequest("Tom Jobim", "tom.jobim@test.com",
+		    "(11) 95678-9012", "jobim_pass", Set.of("ROLE_ADMIN", "ROLE_MUSICIAN"))),
+	    Arguments.of(new MemberCreateRequest("Pele", "pele@test.com",
+		    "(11) 92345-6789", "pele_pass", Set.of("ROLE_ADMIN", "ROLE_ATHLETE"))),
+	    Arguments.of(new MemberCreateRequest("Vitor Belfort", "vitor.belfort@test.com",
+		    "(11) 91234-5678", "belfort_pass", Set.of("ROLE_MANAGER", "ROLE_WARRIOR"))),
+	    Arguments.of(new MemberCreateRequest("Cláudia Abreu", "claudia.abreu@test.com",
+		    "(11) 93456-7890", "abreu_pass", Set.of("ROLE_MANAGER", "ROLE_HOTEST")))
+	);
     }
 
     @DisplayName("test Create Member_when Member Authorized_then Returns HTTP 201")
