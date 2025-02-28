@@ -1,6 +1,7 @@
 package com.thoseop.api.members.http;
 
 import static com.thoseop.config.OtterWebMvcConfig._APPLICATION_YAML_VALUE;
+import static com.thoseop.utils.http.HttpPaginatedUtil.filteringSortBy;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.thoseop.api.members.entity.MemberEntity;
 import com.thoseop.api.members.entity.enums.MemberEnabledStatus;
 import com.thoseop.api.members.entity.enums.MemberLockedStatus;
 import com.thoseop.api.members.http.request.MemberCreateRequest;
@@ -180,22 +182,23 @@ public class MemberControllerImpl implements MemberController {
 	myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' -L -X GET 'http://localhost:8080/api/member/v1/token' | jq -r '.token'`
 
        	# ------------- JSON - PAGINATED --------------
-       	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sort=desc' | jq
+       	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sortDir=desc&sortBy=memberId' | jq
+       	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sortDir=desc' | jq
        	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8' | jq
        	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list?page=0' | jq
        	curl -s -H "Authorization: $myJWTToken" -L -X GET 'http://localhost:8080/api/member/v1/list' | jq
 
        	# -------------- XML - PAGINATED --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
-       		-L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sort=desc' | xmllint --format -
+       		-L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sortDir=desc&sortBy=memberId' | xmllint --format -
        
        	# ------------- YAML - PAGINATED --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
-       		-L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sort=desc' | yq
+       		-L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sortDir=desc&sortBy=memberId' | yq
 
        	# ------------- CORS - PAGINATED --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
-       		-L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sort=desc' | jq
+       		-L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sortDir=desc&sortBy=memberId' | jq
      */
     @Override
     @GetMapping(value = "/list", 
@@ -203,13 +206,18 @@ public class MemberControllerImpl implements MemberController {
 		    MediaType.APPLICATION_JSON_VALUE,
 		    MediaType.APPLICATION_XML_VALUE })
     public @ResponseBody ResponseEntity<PagedModel<EntityModel<MemberResponse>>> getMembers(
-	    @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "8") Integer size,
-	    @RequestParam(defaultValue = "asc") String sort) { 
+	    @RequestParam(defaultValue = "0") Integer page, 
+	    @RequestParam(defaultValue = "8") Integer size,
+	    @RequestParam(defaultValue = "asc") String sortDir,
+	    @RequestParam(defaultValue = "memberEmail") String sortBy
+	    ) throws Exception { 	
 	
         log.info("MemberController - reading all members");
-
-	var sortDirection = "desc".equalsIgnoreCase(sort) ? Direction.DESC : Direction.ASC;
-	Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "email"));
+        
+        sortBy = filteringSortBy(sortBy, "member", new MemberEntity());
+        
+	Direction sortDirection = "desc".equalsIgnoreCase(sortDir) ? Direction.DESC : Direction.ASC;
+	Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
 	Page<MemberResponse> members = memberService.readMembers(pageable);
 	
 	members.map(m -> m.add(linkTo(methodOn(MemberControllerImpl.class)
@@ -217,7 +225,10 @@ public class MemberControllerImpl implements MemberController {
 	
 	Link link = linkTo(methodOn(MemberControllerImpl.class)
 		.getMembers(pageable.getPageNumber(), 
-			pageable.getPageSize(), "asc")).withSelfRel();
+			pageable.getPageSize(), 
+			(sortDirection == Direction.DESC)? "desc": "asc",
+			sortBy
+			)).withSelfRel();
 
 	return ResponseEntity.ok(membersPage_Assembler.toModel(members, link));
     }

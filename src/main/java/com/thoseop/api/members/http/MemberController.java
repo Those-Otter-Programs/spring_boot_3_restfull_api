@@ -96,7 +96,7 @@ public interface MemberController {
 		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))), 
     		})
     public ResponseEntity<PagedModel<EntityModel<MemberResponse>>> getMembers(
-	    Integer page, Integer size, String sort);
+	    Integer page, Integer size, String sortDir, String sortBy) throws Exception;
 
     /**
      * 
