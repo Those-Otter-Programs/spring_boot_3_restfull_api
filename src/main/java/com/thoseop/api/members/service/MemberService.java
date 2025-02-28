@@ -47,16 +47,16 @@ public class MemberService {
      * @return
      */
     public MemberCreatedResponse saveMember(MemberCreateRequest request) {
-	log.info("Saving member");
+	log.info("MemberService - saving member");
 
         MemberEntity entity = this.memberMapper.mapRequestToEntity(request);
 
         String hashPwd = this.passwordEncoder.encode(request.getMemberPassword());
         entity.setPassword(hashPwd);
-        entity.setAccountNotExpired(true)
-        	.setAccountNotLocked(true)
-        	.setCredentialsNotExpired(true)
-        	.setEnabled(false)
+        entity.setAccountNotExpired(MemberExpiredStatus.NON_EXPIRED.getStatus())
+        	.setAccountNotLocked(MemberLockedStatus.UNLOCKED.getStatus())
+        	.setCredentialsNotExpired(MemberExpiredStatus.NON_EXPIRED.getStatus())
+        	.setEnabled(MemberEnabledStatus.ENABLED.getStatus())
         	.setCreatedAt(new Date())
         	.setUpdatedAt(new Date());
 
@@ -75,7 +75,7 @@ public class MemberService {
      * @return
      */
     public MemberResponse modifyMember(MemberUpdateRequest request) {
-	log.info("Updating member {}", request.getMemberEmail());
+	log.info("MemberService - updating member {}", request.getMemberEmail());
 
         MemberEntity entity = this.memberMapper.mapRequestToEntity(request);
 
@@ -94,7 +94,7 @@ public class MemberService {
      * @return
      */
     public Page<MemberResponse> readMembers(Pageable pageable) {
-	log.info("Reading all members - paginated");
+	log.info("MemberService - reading all members - paginated");
 
 	Page<MemberEntity> membersList = memberRepository.findAll(pageable);
 	Page<MemberResponse> resultList = membersList.map(u -> 
@@ -110,10 +110,11 @@ public class MemberService {
      * @return
      */
     public MemberDetailsResponse readMemberDetailsByEmail(String email) {
-	log.info("Reading member by email");
+	log.info("MemberService - reading member by email");
 
 	Optional<MemberEntity> entity = this.memberRepository.findByEmail(email);
 
+	// check if user exists
 	if (entity.isPresent())
 	    return this.memberMapper.mapToDetailsResponse(entity.get());
 	else
@@ -126,12 +127,14 @@ public class MemberService {
      * @return
      */
     public MemberResponse readMemberByEmail(String email) {
-	log.info("Reading member by email");
+	log.info("MemberService - reading member by email");
 
 	Optional<MemberEntity> entity = this.memberRepository.findByEmail(email);
 
+	// check if user exists
 	if (entity.isPresent())
-	    return this.memberMapper.mapToResponse(entity.get());
+	    return this.memberMapper.mapToResponse(entity.get())
+		    .setMessage("Those Otter Programs by James Mallon");
 	else	
 	    throw new MemberNotFoundException("Member not found"); 
     }
@@ -143,7 +146,7 @@ public class MemberService {
      * @return
      */
     public MemberResponse changeMemberPassword(String username, MemberUpdatePasswordRequest request) {
-	log.info("Updating member {} password", username);
+	log.info("MemberService - updating member {} password", username);
 
         // try to find user by its email (username)
 	Optional<MemberEntity> entity = this.memberRepository.findByEmail(username);
@@ -168,7 +171,7 @@ public class MemberService {
      * @return
      */
     public MemberResponse manageMemberPassword(MemberManagePasswordRequest request) {
-	log.info("Managing member {} password", request.getMemberUsername());
+	log.info("MemberService - managing member {} password", request.getMemberUsername());
 
         // try to find user by its email (username)
 	Optional<MemberEntity> entity = this.memberRepository.findByEmail(request.getMemberUsername());
@@ -192,7 +195,7 @@ public class MemberService {
      * @return
      */
     public MemberAccountExpiredResponse changeMemberAccountExpiredStatus(Long id, MemberExpiredStatus status) throws Exception {
-        log.info("Changing member id[{}] status to {}", id, status.getStatus());
+        log.info("MemberService - changing member id[{}] status to {}", id, status.getStatus());
 
         // try to find user by its id
 	Optional<MemberEntity> entity = this.memberRepository.findOneById(id);
@@ -215,7 +218,7 @@ public class MemberService {
      * @return
      */
     public MemberCredentialsExpiredResponse changeMemberCredentialsExpiredStatus(Long id, MemberExpiredStatus status) throws Exception {
-        log.info("Changing member id[{}] status to {}", id, status.getStatus());
+        log.info("MemberService - changing member id[{}] status to {}", id, status.getStatus());
 
         // try to find user by its id
 	Optional<MemberEntity> entity = this.memberRepository.findOneById(id);
@@ -238,7 +241,7 @@ public class MemberService {
      * @return
      */
     public MemberAccountLockedResponse changeMemberAccountLockedStatus(Long id, MemberLockedStatus status) throws Exception {
-        log.info("Changing member id[{}] account locked status to {}", id, status.getStatus());
+        log.info("MemberService - changing member id[{}] account locked status to {}", id, status.getStatus());
 
         // try to find user by its id
 	Optional<MemberEntity> entity = this.memberRepository.findOneById(id);
@@ -261,7 +264,7 @@ public class MemberService {
      * @return
      */
     public MemberEnabledResponse changeMemberEnabledStatus(Long id, MemberEnabledStatus status) throws Exception {
-        log.info("Changing member id[{}] enabled status to {}", id, status.getStatus());
+        log.info("MemberService - changing member id[{}] enabled status to {}", id, status.getStatus());
 
         // try to find user by its id
 	Optional<MemberEntity> entity = this.memberRepository.findOneById(id);
