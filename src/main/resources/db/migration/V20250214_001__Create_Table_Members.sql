@@ -4,7 +4,11 @@ CREATE TABLE `members` (
   `email` varchar(45) NOT NULL,
   `mobile_number` VARCHAR(20) NOT NULL,
   `password` varchar(200) NOT NULL,
-  `created_at` date DEFAULT NULL,
-  `updated_at` date DEFAULT NULL,
+  `enabled` boolean DEFAULT false,
+  `account_not_expired` boolean DEFAULT true,
+  `account_not_locked` boolean DEFAULT true,
+  `credentials_not_expired` boolean DEFAULT true,
+  `created_at` date DEFAULT CURRENT_TIMESTAMP(),
+  `updated_at` date DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB; 
