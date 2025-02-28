@@ -39,10 +39,10 @@ public class AuthenticationFailureLogResponse extends RepresentationModel<Authen
     private String logRemoteIpAddress;
     
     @Schema( description = "The log's error message", example = "User account is locked")
-    private String authLogMessage;
+    private String logMessage;
     
     @Schema( description = "The time when the authentication was triggered", example = "2025-02-25 20:46:23.932")
-    private Date authLogTime;
+    private Date logAuthTime;
 
     @Schema( description = "The time when the database registry was created", example = "2025-02-25 20:46:23.932")
     private Date logCreatedAt;
