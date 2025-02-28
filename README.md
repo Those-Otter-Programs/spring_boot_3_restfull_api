@@ -347,6 +347,21 @@ curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
 
 ### REQUESTS /api/member/v1/list:
 
+Paginated params for this request:
+
+- **page**: *(default: 0)* the page number to be shown (determined by the quantity of members in the database divided by the value of the '**size**' param, which is explained bellow)
+- **size**: *(default: 8)* the quantity of members to be showed per page
+- **sortDir**: *(default: asc)* the sorting direction, if asc or desc.
+- **sortBy**: *(default: memberEmail)* the data wich the sorting must be based (memberEmail, memberId, and so on..)
+
+##### OBSERVATIONS:
+
+**sortDir:** 
+It selects 'asc' (ascending) sort direction, in case an invalid sorting direction is received.
+
+**sortBy:** 
+It throws a custom exception (InvalidSortByException) in case the value is not a member data, which would make it an unsortable data.
+
 
 ```bash
 
@@ -356,34 +371,34 @@ myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
 
 # run cURL using the variable as the authorization token:
 
-# ------------- JSON --------------
-curl -s -H "Authorization: $myJWTToken" \
-    -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sort=desc' | jq
-        
-curl -s -H "Authorization: $myJWTToken" \
-    -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sort=desc' | jq
-       
-curl -s -H "Authorization: $myJWTToken" \
+# ------------- JSON - PAGINATED --------------
+curl -s -H "Authorization: $myJWTToken" 
+    -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sortDir=desc&sortBy=memberId' | jq
+
+curl -s -H "Authorization: $myJWTToken" 
+    -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sortDir=desc' | jq
+
+curl -s -H "Authorization: $myJWTToken" 
     -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8' | jq
 
-curl -s -H "Authorization: $myJWTToken" \
+curl -s -H "Authorization: $myJWTToken" 
     -L -X GET 'http://localhost:8080/api/member/v1/list?page=0' | jq
 
-curl -s -H "Authorization: $myJWTToken" \
-    -L -X GET 'http://localhost:8080/api/member/v1/list' | jq
+curl -s -H "Authorization: $myJWTToken" 
+-L -X GET 'http://localhost:8080/api/member/v1/list' | jq
 
-# ------------- XML --------------
+# -------------- XML - PAGINATED --------------
 curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
-    -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sort=desc' \
-    | xmllint --format -
+    -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sortDir=desc&sortBy=memberId' | xmllint --format -
 
-# ------------- YAML --------------
+# ------------- YAML - PAGINATED --------------
 curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
-    -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sort=desc' | yq
+    -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sortDir=desc&sortBy=memberId' | yq
 
-# ------------- CORS --------------
+# ------------- CORS - PAGINATED --------------
 curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
-    -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sort=desc' | jq
+    -L -X GET 'http://localhost:8080/api/member/v1/list?page=0&size=8&sortDir=desc&sortBy=memberId' | jq
+
 ```
 
 ### REQUESTS /api/member/v1/member-full-details/{username} 
@@ -762,6 +777,21 @@ This controller implements routes to manage Members (Users), and also the action
 
 ### REQUESTS /api/authentication-failure/v1/member/{username}:
 
+Paginated params for this request:
+
+- **page**: *(default: 0)* the page number to be shown (determined by the quantity of a member's logs in the database divided by the value of the '**size**' param, which is explained bellow)
+- **size**: *(default: 8)* the quantity of a member's authentication failure logs to be showed per page
+- **sortDir**: *(default: asc)* the sorting direction, if asc or desc.
+- **sortBy**: *(default: memberEmail)* the data wich the sorting must be based (memberEmail, memberId, and so on..)
+
+##### OBSERVATIONS:
+
+**sortDir:** 
+It selects 'asc' (ascending) sort direction, in case an invalid sorting direction is received.
+
+**sortBy:** 
+It throws a custom exception (InvalidSortByException) in case the value is not a member's log data, which would make it an unsortable data.
+
 
 ```bash
 
@@ -771,9 +801,12 @@ myJWTToken=`curl -s -u 'ayrton.senna@bravo.com:ayrton_pass' \
 
 # run cURL using the variable as the authorization token:
 
-# ------------- JSON --------------
+# ------------- JSON - PAGINATED --------------
 curl -s -H "Authorization: $myJWTToken" \
-    -L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sort=desc' | jq
+    -L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sortDir=desc&sortBy=logAuthTime' | jq
+    
+curl -s -H "Authorization: $myJWTToken" \
+    -L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sortDir=desc' | jq
 
 curl -s -H "Authorization: $myJWTToken" \
     -L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8' | jq
@@ -786,18 +819,19 @@ curl -s -H "Authorization: $myJWTToken" \
 
 # -------------- XML - PAGINATED --------------
 curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
-    -L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sort=desc' \
+    -L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sortDir=desc&sortBy=logAuthTime' \
     | xmllint --format -
 
 # ------------- YAML - PAGINATED --------------
 curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
-    -L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sort=desc' \
+    -L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sortDir=desc&sortBy=logAuthTime' \
     | yq
 
 # ------------- CORS - PAGINATED --------------
 curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
-    -L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sort=desc' \
+    -L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sortDir=desc&sortBy=logAuthTime' \
     | jq
+
 ```
 
 ### REQUESTS /api/authentication-failure/v1/log/{id}
