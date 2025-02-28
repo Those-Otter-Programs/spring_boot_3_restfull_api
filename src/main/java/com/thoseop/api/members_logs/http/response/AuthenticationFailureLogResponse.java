@@ -30,7 +30,7 @@ public class AuthenticationFailureLogResponse extends RepresentationModel<Authen
     private Long logId;
     
     @Schema( description = "The member's username", example = "johnwart")
-    private String logMemberUsername;
+    private String logUsername;
     
     @Schema( description = "The result of authentication", example = "SUCCESS/FAILURE")
     private String logEventResult;
