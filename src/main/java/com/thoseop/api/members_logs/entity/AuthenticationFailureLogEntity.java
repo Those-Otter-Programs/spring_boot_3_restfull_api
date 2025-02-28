@@ -37,29 +37,28 @@ public class AuthenticationFailureLogEntity implements Serializable {
     private String username;
     
     @Column(name = "event_result")
-//    @Enumerated(EnumType.STRING)
     private String eventResult;
     
     @Column(name = "remote_address")
     private String remoteIpAddress;
     
-    @Column(name = "log_message")
-    private String logMessage;
+    @Column(name = "message")
+    private String message;
     
-    @Column(name = "log_time")
-    private Date logTime;
+    @Column(name = "auth_time")
+    private Date authTime;
 
     // useful when using threads - log_time and created_at wont be the same
     @Column(name = "created_at")
     private Date createdAt;
 
     public AuthenticationFailureLogEntity(String username, String eventResult, String remoteIpAddress,
-	    String logMessage, Date logTime) {
+	    String message, Date authTime) {
 	this.username = username;
 	this.eventResult = eventResult;
 	this.remoteIpAddress = remoteIpAddress;
-	this.logMessage = logMessage;
-	this.logTime = logTime;
+	this.message = message;
+	this.authTime = authTime;
 	this.createdAt = new Date();
     }
 }
