@@ -1,6 +1,7 @@
 package com.thoseop.api.members_logs.http;
 
 import static com.thoseop.config.OtterWebMvcConfig._APPLICATION_YAML_VALUE;
+import static com.thoseop.utils.http.HttpPaginatedUtil.filteringSortBy;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.thoseop.api.members_logs.entity.AuthenticationFailureLogEntity;
 import com.thoseop.api.members_logs.http.response.AuthenticationFailureLogResponse;
 import com.thoseop.api.members_logs.service.AuthenticationFailureLogService;
 
@@ -47,7 +49,10 @@ public class AuthenticationFailureLogControllerImpl implements AuthenticationFai
         
         # ------------- JSON - PAGINATED --------------
      	curl -s -H "Authorization: $myJWTToken" \
-     		-L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sort=desc' | jq
+     		-L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sortDir=desc&sortBy=logAuthTime' | jq
+     		
+     	curl -s -H "Authorization: $myJWTToken" \
+     		-L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sortDir=desc' | jq
 
        	curl -s -H "Authorization: $myJWTToken" \
        		-L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8' | jq
@@ -60,17 +65,17 @@ public class AuthenticationFailureLogControllerImpl implements AuthenticationFai
 
        	# -------------- XML - PAGINATED --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/xml' \
-       		-L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sort=desc' \
+       		-L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sortDir=desc&sortBy=logAuthTime' \
        		| xmllint --format -
        
        	# ------------- YAML - PAGINATED --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Accept: application/x-yaml' \
-       		-L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sort=desc' \
+       		-L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sortDir=desc&sortBy=logAuthTime' \
        		| yq
 
        	# ------------- CORS - PAGINATED --------------
        	curl -s -H "Authorization: $myJWTToken" -H 'Origin: http://localhost:3000' \
-       		-L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sort=desc' \
+       		-L -X GET 'http://localhost:8080/api/authentication-failure/v1/member/ayrton.senna@bravo.com?page=0&size=8&sortDir=desc&sortBy=logAuthTime' \
        		| jq
      */
     @Override
@@ -80,21 +85,30 @@ public class AuthenticationFailureLogControllerImpl implements AuthenticationFai
 		    MediaType.APPLICATION_XML_VALUE })
     public @ResponseBody ResponseEntity<PagedModel<EntityModel<AuthenticationFailureLogResponse>>> getMemberAuthenticationFailures(
 	    @PathVariable String username,
-	    @RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "8") Integer size,
-	    @RequestParam(defaultValue = "asc") String sort) { 
+	    @RequestParam(defaultValue = "0") Integer page, 
+	    @RequestParam(defaultValue = "8") Integer size,
+	    @RequestParam(defaultValue = "asc") String sortDir,
+	    @RequestParam(defaultValue = "memberUsername") String sortBy
+	    ) throws Exception { 	
 	
         log.info("AuthenticationFailureLogControllerImpl - retrieving all member logs");
 
-	var sortDirection = "desc".equalsIgnoreCase(sort) ? Direction.DESC : Direction.ASC;
-	Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "id"));
+        sortBy = filteringSortBy(sortBy, "log", new AuthenticationFailureLogEntity());
+
+	Direction sortDirection = "desc".equalsIgnoreCase(sortDir) ? Direction.DESC : Direction.ASC;
+	Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
 	Page<AuthenticationFailureLogResponse> memberAuthFailures = authFailLogService.readMemberAuthenticationFailLogs(username, pageable);
 	
 	memberAuthFailures.map(l -> l.add(linkTo(methodOn(AuthenticationFailureLogControllerImpl.class)
 		.getLogById(l.getLogId())).withSelfRel()));
 	
 	Link link = linkTo(methodOn(AuthenticationFailureLogControllerImpl.class)
-		.getMemberAuthenticationFailures(username, pageable.getPageNumber(), 
-			pageable.getPageSize(), "asc")).withSelfRel();
+		.getMemberAuthenticationFailures(username, 
+			pageable.getPageNumber(), 
+			pageable.getPageSize(), 
+			(sortDirection == Direction.DESC)? "desc": "asc",
+			sortBy
+			)).withSelfRel();
 
 	return ResponseEntity.ok(authFailLogsPage_Assembler.toModel(memberAuthFailures, link));
     }

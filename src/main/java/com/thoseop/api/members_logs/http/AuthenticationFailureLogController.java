@@ -37,7 +37,7 @@ public interface AuthenticationFailureLogController {
 		    @ApiResponse(description = "Internal Error", responseCode = "500", content = @Content(schema = @Schema(implementation = OtterAPIErrorResponse.class))), 
     		})
     public ResponseEntity<PagedModel<EntityModel<AuthenticationFailureLogResponse>>> getMemberAuthenticationFailures(
-	    String username, Integer page, Integer size, String sort); 
+	    String username, Integer page, Integer size, String sortDir, String sortBy) throws Exception;
     
     /**
      * 
