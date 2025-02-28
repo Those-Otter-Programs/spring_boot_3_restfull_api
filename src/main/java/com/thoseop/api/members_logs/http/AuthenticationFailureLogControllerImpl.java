@@ -88,7 +88,7 @@ public class AuthenticationFailureLogControllerImpl implements AuthenticationFai
 	    @RequestParam(defaultValue = "0") Integer page, 
 	    @RequestParam(defaultValue = "8") Integer size,
 	    @RequestParam(defaultValue = "asc") String sortDir,
-	    @RequestParam(defaultValue = "memberUsername") String sortBy
+	    @RequestParam(defaultValue = "logAuthTime") String sortBy
 	    ) throws Exception { 	
 	
         log.info("AuthenticationFailureLogControllerImpl - retrieving all member logs");
