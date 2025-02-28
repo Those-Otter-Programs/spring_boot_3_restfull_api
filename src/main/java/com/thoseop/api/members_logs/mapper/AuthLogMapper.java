@@ -16,8 +16,8 @@ public interface AuthLogMapper {
         @Mapping(target = "logMemberUsername", source = "username"), 
         @Mapping(target = "logEventResult", source = "eventResult"), 
         @Mapping(target = "logRemoteIpAddress", source = "remoteIpAddress"), 
-        @Mapping(target = "authLogMessage", source = "logMessage"), 
-        @Mapping(target = "authLogTime", source = "logTime"), 
+        @Mapping(target = "logMessage", source = "message"), 
+        @Mapping(target = "logAuthTime", source = "authTime"), 
         @Mapping(target = "logCreatedAt", source = "createdAt"), 
         @Mapping(target = "links", ignore = true), 
    })
