@@ -1,6 +1,7 @@
 package com.thoseop.api.members.repository;
 
 import java.util.NoSuchElementException;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -42,8 +45,7 @@ class MemberRepositoryTest {
     private MemberRepository repository;
 
     @BeforeEach
-    void setUp() throws Exception {
-    }
+    void setUp() throws Exception {}
 
     @DisplayName("test Find One By Id_when Existent Id_then Return Member Data")
     @ParameterizedTest
@@ -58,11 +60,32 @@ class MemberRepositoryTest {
 		() -> "Member's id should not be null");
 	Assertions.assertEquals(memberId, entity.getId(), 
 		() -> "Member's id was not the expected");
+	
+	Assertions.assertNotNull(entity.getName(), 
+            () -> "Member's name should not be null");
+	Assertions.assertNotNull(entity.getEmail(),  
+            () -> "Member's email should not be null");
+	Assertions.assertNotNull(entity.getMobileNumber(), 
+            () -> "Member's mobile number should not be null");
+	Assertions.assertNotNull(entity.getPassword(), 
+            () -> "Member's password should not be null");
+	Assertions.assertTrue(entity.getAccountNotExpired(), 
+            () -> "Member's accountNotExpired should be true");
+	Assertions.assertTrue(entity.getCredentialsNotExpired(), 
+            () -> "Member's credentialsNotExpired should be true");
+	Assertions.assertTrue(entity.getAccountNotLocked(), 
+            () -> "Member's accountNotLocked should be true");
+	Assertions.assertTrue(entity.getEnabled(), 
+            () -> "Member's enabled should be true");
+	Assertions.assertNotNull(entity.getCreatedAt(), 
+            () -> "Member's createdAt should not be null");
+	Assertions.assertNotNull(entity.getUpdatedAt(), 
+            () -> "Member's updatedAt should not be null");
     }
 
     @DisplayName("test Find One By Id_when Non Existent Id_then Throw No Such Element Exception")
     @Test
-    @Order(1)
+    @Order(2)
     void testFindOneById_whenNonExistentId_thenThrowNoSuchElementException() {
 	// g
 	Long memberId = 1000L;
@@ -77,7 +100,7 @@ class MemberRepositoryTest {
     @ParameterizedTest
     @ValueSource(strings = {"ayrton.senna@bravo.com", "carlos.gracie@bravo.com", 
 	    "mfredson2@amazon.com", "bgavagan3@slideshare.net", "akhrishtafovich4@cmu.edu"})
-    @Order(2)
+    @Order(3)
     void testFindByEmail_whenExistentEmail_thenReturnMemberData() {
 	// g
 	String memberEmail = "ayrton.senna@bravo.com";
@@ -92,7 +115,7 @@ class MemberRepositoryTest {
 
     @DisplayName("test Find By Email_when Non Existent Email_then Throw No Such Element Exception") 
     @Test
-    @Order(2)
+    @Order(4)
     void testFindByEmail_whenNonExistentEmail_thenThrowNoSuchElementException() {
 	// g
 	String memberEmail = "non.existent@test.com";
@@ -105,7 +128,7 @@ class MemberRepositoryTest {
 
     @DisplayName("test Find All Pageable_when Valid Pagination Params_then Return Members Data")
     @Test
-    @Order(3)
+    @Order(5)
     void testFindAllPageable_whenValidPaginationParams_thenReturnMembersData() {
 	// g
         Pageable pageable = PageRequest.of(0, 8, Sort.by(Direction.ASC, "id"));
@@ -113,51 +136,81 @@ class MemberRepositoryTest {
         MemberEntity entity = repository.findAll(pageable).getContent().get(0);
         // t
 	Assertions.assertNotNull(entity.getId(), 
-		() -> "Member's id should not be null");
+            () -> "Member's id should not be null");
 	Assertions.assertEquals(1L, entity.getId(), 
-		() -> "Member's id was not the expected");
-	
+            () -> "Member's id was not the expected");
 	Assertions.assertNotNull(entity.getName(), 
-		() -> "Member's name should not be null");
+            () -> "Member's name should not be null");
 	Assertions.assertEquals("Ayrton Senna", entity.getName(), 
-		() -> "Member's name was not the expected");
-	
+            () -> "Member's name was not the expected");
 	Assertions.assertNotNull(entity.getEmail(), 
-		() -> "Member's email should not be null");
+            () -> "Member's email should not be null");
 	Assertions.assertEquals("ayrton.senna@bravo.com", entity.getEmail(), 
-		() -> "Member's email was not the expected");
-	
+            () -> "Member's email was not the expected");
 	Assertions.assertNotNull(entity.getMobileNumber(), 
-		() -> "Member's mobile number should not be null");
+            () -> "Member's mobile number should not be null");
 	Assertions.assertEquals("(11) 98765-4321", entity.getMobileNumber(), 
-		() -> "Member's mobile number was not the expected");
-	
+            () -> "Member's mobile number was not the expected");
 	Assertions.assertNotNull(entity.getPassword(), 
-		() -> "Member's password should not be null");
-	
+            () -> "Member's password should not be null");
 	Assertions.assertTrue(entity.getAccountNotExpired(), 
-		() -> "Member's accountNotExpired should be true");
-	
+            () -> "Member's accountNotExpired should be true");
 	Assertions.assertTrue(entity.getCredentialsNotExpired(), 
-		() -> "Member's credentialsNotExpired should be true");
-	
+            () -> "Member's credentialsNotExpired should be true");
 	Assertions.assertTrue(entity.getAccountNotLocked(), 
-		() -> "Member's accountNotLocked should be true");
-	
+            () -> "Member's accountNotLocked should be true");
 	Assertions.assertTrue(entity.getEnabled(), 
-		() -> "Member's enabled should be true");
-	
+            () -> "Member's enabled should be true");
 	Assertions.assertNotNull(entity.getCreatedAt(), 
-		() -> "Member's createdAt should not be null");
-	
+            () -> "Member's createdAt should not be null");
 	Assertions.assertNotNull(entity.getUpdatedAt(), 
-		() -> "Member's updatedAt should not be null");
+            () -> "Member's updatedAt should not be null");
     }
 
+    static Stream<Arguments> pageableSeed() {
+	return Stream.of(
+		Arguments.of(PageRequest.of(2, 4, Sort.by(Direction.DESC, "id"))),
+		Arguments.of(PageRequest.of(0, 8, Sort.by(Direction.ASC, "email"))),
+		Arguments.of(PageRequest.of(1, 2, Sort.by(Direction.DESC, "name")))
+            );
+    }
+
+    @DisplayName("test Find All Pageable_when Parameterized Valid Pagination Params_then Return Members Data")
+    @ParameterizedTest
+    @MethodSource("pageableSeed")
+    @Order(6)
+    void testFindAllPageable_whenParameterizedValidPaginationParams_thenReturnMembersData(Pageable pageable) {
+	// g   
+	// w
+        MemberEntity entity = repository.findAll(pageable).getContent().get(0);
+        // t
+        Assertions.assertNotNull(entity.getId(),
+                () -> "Member's id should not be null");
+        Assertions.assertNotNull(entity.getName(),
+                () -> "Member's name should not be null");
+        Assertions.assertNotNull(entity.getEmail(),
+                () -> "Member's email should not be null");
+        Assertions.assertNotNull(entity.getMobileNumber(),
+                () -> "Member's mobile number should not be null");
+        Assertions.assertNotNull(entity.getPassword(),
+                () -> "Member's password should not be null");
+        Assertions.assertTrue(entity.getAccountNotExpired(),
+                () -> "Member's accountNotExpired should be true");
+        Assertions.assertTrue(entity.getCredentialsNotExpired(),
+                () -> "Member's credentialsNotExpired should be true");
+        Assertions.assertTrue(entity.getAccountNotLocked(),
+                () -> "Member's accountNotLocked should be true");
+        Assertions.assertTrue(entity.getEnabled(),
+                () -> "Member's enabled should be true");
+        Assertions.assertNotNull(entity.getCreatedAt(),
+                () -> "Member's createdAt should not be null");
+        Assertions.assertNotNull(entity.getUpdatedAt(),
+                () -> "Member's updatedAt should not be null");
+    }
 
     @DisplayName("test Find All Pageable_when Invalid Pagination Params_then Throws Property Reference Exception")
     @Test
-    @Order(3)
+    @Order(7)
     void testFindAllPageable_whenInvalidPaginationParams_thenThrowsPropertyReferenceException() {
 	// g
         Pageable pageable = PageRequest.of(0, 8, Sort.by(Direction.ASC, "notsortable"));
@@ -171,7 +224,7 @@ class MemberRepositoryTest {
     @DisplayName("test Set Member Account Expired Status_when Existent User Id_then Return New Account Expired Status")
     @ParameterizedTest
     @ValueSource(booleans = {false, true})
-    @Order(4)
+    @Order(8)
     void testSetMemberAccountExpiredStatus_whenExistentUserId_thenReturnNewAccountExpiredStatus(boolean status) {
 	// g
 	Long memberId = 3l;
@@ -185,7 +238,7 @@ class MemberRepositoryTest {
     @DisplayName("test Set Member Credentials Expired Status_when Existent User Id_then Return New Credentials Expired Status")
     @ParameterizedTest
     @ValueSource(booleans = {false, true})
-    @Order(5)
+    @Order(9)
     void testSetMemberCredentialsExpiredStatus_whenExistentUserId_thenReturnNewCredentialsExpiredStatus(boolean status) {
 	// g
 	Long memberId = 3l;
@@ -199,7 +252,7 @@ class MemberRepositoryTest {
     @DisplayName("test Set Member Account Locked Status_when Existent User Id_then Return New Account Locked Status")
     @ParameterizedTest
     @ValueSource(booleans = {false, true})
-    @Order(6)
+    @Order(10)
     void testSetMemberAccountLockedStatus_whenExistentUserId_thenReturnNewAccountLockedStatus(boolean status) {
 	// g
 	Long memberId = 3l;
@@ -213,7 +266,7 @@ class MemberRepositoryTest {
     @DisplayName("test Set Member Enabled Status_when Existent User Id_thenReturn Enabled Status")
     @ParameterizedTest
     @ValueSource(booleans = {false, true})
-    @Order(7)
+    @Order(11)
     void testSetMemberEnabledStatus_whenExistentUserId_thenReturnEnabledStatus(boolean status) {
 	// g
 	Long memberId = 3l;
@@ -227,7 +280,7 @@ class MemberRepositoryTest {
     @DisplayName("test Set Member Password_when Existent User Email And Bcrypt Pass_then Return HTTP 200")
     @ParameterizedTest
     @ValueSource(strings = {"new_mick_pass", "mick_pass"})
-    @Order(8)
+    @Order(12)
     void testSetMemberPassword_whenExistentUserEmailAndBcryptPass_thenReturnHTTP200(String memberPass) {
 	// g
 	String memberEmail = "mfredson2@amazon.com";
@@ -243,7 +296,7 @@ class MemberRepositoryTest {
     @DisplayName("test Set Member Password_when Existent User Email And Noop Pass_then Return HTTP 200")
     @ParameterizedTest
     @ValueSource(strings = {"{noop}new_mick_pass", "{noop}mick_pass"})
-    @Order(8)
+    @Order(13)
     void testSetMemberPassword_whenExistentUserEmailAndNoopPass_thenReturnHTTP200(String memberPass) {
 	// g
 	String memberEmail = "mfredson2@amazon.com";
