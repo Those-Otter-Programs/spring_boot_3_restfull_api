@@ -217,7 +217,7 @@ class MemberControllerIntegrationTest {
     @Order(5)
     void testGetMembers_whenMemberAuthorized_thenReturnsPaginatedListOfMembers() throws JsonMappingException, JsonProcessingException {
 	// g
-	String route = "%s/list?page=2&size=10&sort=desc".formatted(this.baseRoute);
+	String route = "%s/list?page=2&size=10&sortDir=desc&sortBy=memberEmail".formatted(this.baseRoute);
 
 	// creating the headers for the request
 	HttpHeaders headers = new HttpHeaders();
@@ -256,6 +256,29 @@ class MemberControllerIntegrationTest {
 		() -> "The member email was not the expected");
 	Assertions.assertEquals("+996 (177) 963-3057", m1.getMemberMobileNumber(), 
 		() -> "The member phone number was not the expected");
+    }
+
+    @DisplayName("test Get Members_when Invalid Sort By Value_then Return Error Message")
+    @Test
+    @Order(6)
+    void testGetMembers_whenInvalidSortByValue_thenReturnErrorMessage() throws JsonMappingException, JsonProcessingException {
+	// g
+	String route = "%s/list?page=2&size=10&sortDir=desc&sortBy=something".formatted(this.baseRoute);
+
+	// creating the headers for the request
+	HttpHeaders headers = new HttpHeaders();
+	headers.setContentType(MediaType.APPLICATION_JSON);
+	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Authorization", this.jwtAuthToken);
+
+	HttpEntity<?> request = new HttpEntity<>(null, headers);
+	// w
+	ResponseEntity<OtterAPIErrorResponse> response = testRestTemplate
+		.exchange(route, HttpMethod.GET, request, OtterAPIErrorResponse.class);
+        // t
+        Assertions.assertEquals("received sortBy is not a sortable data", 
+        	response.getBody().getMessage(), 
+        	() -> "Error message was not the expected.");
     }
 
      // NOT SO GOOD APPROACH...
@@ -667,7 +690,8 @@ class MemberControllerIntegrationTest {
 	// t
 	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
 		() -> "The returned http status code was not the expected.");
-	Assertions.assertEquals(MemberEnabledStatus.DISABLED.getStatus(), response.getBody().getMemberEnabled(),
+	Assertions.assertEquals(MemberEnabledStatus.DISABLED.getStatus(), 
+		response.getBody().getMemberEnabled(),
 		() -> "The member should be disabled.");
     }
 
@@ -722,7 +746,8 @@ class MemberControllerIntegrationTest {
 	// t
 	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
 		() -> "The returned http status code was not the expected.");
-	Assertions.assertEquals(MemberEnabledStatus.ENABLED.getStatus(), response.getBody().getMemberEnabled(),
+	Assertions.assertEquals(MemberEnabledStatus.ENABLED.getStatus(), 
+		response.getBody().getMemberEnabled(),
 		() -> "The member enabled should be enabled.");
     }
 
@@ -777,7 +802,8 @@ class MemberControllerIntegrationTest {
 	// t
 	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
 		() -> "The returned http status code was not the expected.");
-	Assertions.assertEquals(MemberLockedStatus.LOCKED.getStatus(), response.getBody().getMemberAccountNotLocked(),
+	Assertions.assertEquals(MemberLockedStatus.LOCKED.getStatus(), 
+		response.getBody().getMemberAccountNotLocked(),
 		() -> "The member's account should be locked.");
     }
 
@@ -832,7 +858,8 @@ class MemberControllerIntegrationTest {
 	// t
 	Assertions.assertEquals(HttpStatus.OK, response.getStatusCode(),
 		() -> "The returned http status code was not the expected.");
-	Assertions.assertEquals(MemberLockedStatus.UNLOCKED.getStatus(), response.getBody().getMemberAccountNotLocked(),
+	Assertions.assertEquals(MemberLockedStatus.UNLOCKED.getStatus(), 
+		response.getBody().getMemberAccountNotLocked(),
 		() -> "The member's account should be unlocked");
     }
 
