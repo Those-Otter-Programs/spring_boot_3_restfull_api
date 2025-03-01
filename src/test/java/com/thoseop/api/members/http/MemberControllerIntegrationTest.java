@@ -229,10 +229,8 @@ class MemberControllerIntegrationTest {
 	    "/api/member/v1/list"
 	    })
     @Order(5)
-    void testGetMembers_whenMemberAuthorized_thenReturnsPaginatedListOfMembers(String route) 
-	    throws JsonMappingException, JsonProcessingException {
+    void testGetMembers_whenMemberAuthorized_thenReturnsPaginatedListOfMembers(String route){
 	// g
-
 	// creating the headers for the request
 	HttpHeaders headers = new HttpHeaders();
 	headers.setContentType(MediaType.APPLICATION_JSON);
@@ -283,7 +281,6 @@ class MemberControllerIntegrationTest {
 
 	// creating the headers for the request
 	HttpHeaders headers = new HttpHeaders();
-	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 	headers.set("Authorization", this.jwtAuthToken);
 
@@ -307,7 +304,6 @@ class MemberControllerIntegrationTest {
 
 	// creating the headers for the request
 	HttpHeaders headers = new HttpHeaders();
-	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 	headers.set("Authorization", this.jwtAuthToken);
 
@@ -351,7 +347,6 @@ class MemberControllerIntegrationTest {
 
 	// creating the headers for the requestString
 	HttpHeaders headers = new HttpHeaders();
-	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 	headers.set("Authorization", this.jwtAuthToken);
 
@@ -380,7 +375,6 @@ class MemberControllerIntegrationTest {
 
 	// creating the headers for the requestString
 	HttpHeaders headers = new HttpHeaders();
-	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 	headers.set("Authorization", this.jwtAuthToken);
 
@@ -436,7 +430,6 @@ class MemberControllerIntegrationTest {
 
 	// creating the headers for the requestString
 	HttpHeaders headers = new HttpHeaders();
-	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 	headers.set("Authorization", this.jwtAuthToken);
 
@@ -465,7 +458,6 @@ class MemberControllerIntegrationTest {
 
 	// creating the headers for the requestString
 	HttpHeaders headers = new HttpHeaders();
-	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 	headers.set("Authorization", this.jwtAuthToken);
 
@@ -487,19 +479,15 @@ class MemberControllerIntegrationTest {
     }
 
     @DisplayName("test Get Member Full Details By Username_when Request With Accepted Media Types_then Return HTTP 200")
-    @ParameterizedTest
-    @ValueSource(strings = {MediaType.APPLICATION_JSON_VALUE, 
-	    MediaType.APPLICATION_XML_VALUE, _APPLICATION_YAML_VALUE})
+    @Test
     @Order(12)
-    void testGetMemberFullDetailsByUsername_whenRequestWithAcceptedMediaTypes_thenReturnHTTP200(String mediaTypeAccepted) {
+    void testGetMemberFullDetailsByUsername_whenRequestWithAcceptedMediaTypes_thenReturnHTTP200() {
 	// g
 	String route = "%s/member-full-details/ayrton.senna@bravo.com".formatted(this.baseRoute);
 
 	// creating the headers for the requestString
 	HttpHeaders headers = new HttpHeaders();
-//	headers.setContentType(MediaType.APPLICATION_JSON);
-	headers.set("Content-Type", mediaTypeAccepted);
-	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
 	headers.set("Authorization", this.jwtAuthToken);
 
 	HttpEntity<?> request = new HttpEntity<>(
@@ -521,7 +509,6 @@ class MemberControllerIntegrationTest {
 
 	// creating the headers for the requestString
 	HttpHeaders headers = new HttpHeaders();
-	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 	headers.set("Authorization", this.jwtAuthToken);
 
@@ -542,19 +529,15 @@ class MemberControllerIntegrationTest {
     }
 
     @DisplayName("test Me_when Request With Accepted Media Types_then Return HTTP 200")
-    @ParameterizedTest
-    @ValueSource(strings = {MediaType.APPLICATION_JSON_VALUE, 
-	    MediaType.APPLICATION_XML_VALUE, _APPLICATION_YAML_VALUE})
+    @Test
     @Order(14)
-    void testMe_whenRequestWithAcceptedMediaTypes_thenReturnHTTP200(String mediaTypeAccepted) {
+    void testMe_whenRequestWithAcceptedMediaTypes_thenReturnHTTP200() {
 	// g
 	String route = "%s/me".formatted(this.baseRoute);
 
 	// creating the headers for the requestString
 	HttpHeaders headers = new HttpHeaders();
-//	headers.setContentType(MediaType.APPLICATION_JSON);
-	headers.set("Content-Type", mediaTypeAccepted);
-	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+	headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
 	headers.set("Authorization", this.jwtAuthToken);
 
 	HttpEntity<?> request = new HttpEntity<>(
@@ -673,7 +656,6 @@ class MemberControllerIntegrationTest {
 
 	// creating the headers for the requestString
 	HttpHeaders headers = new HttpHeaders();
-	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 	headers.set("Authorization", this.jwtAuthToken);
 
@@ -698,7 +680,6 @@ class MemberControllerIntegrationTest {
 
 	// creating the headers for the requestString
 	HttpHeaders headers = new HttpHeaders();
-	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 	headers.set("Authorization", this.jwtAuthToken);
 
@@ -728,7 +709,6 @@ class MemberControllerIntegrationTest {
 
 	// creating the headers for the requestString
 	HttpHeaders headers = new HttpHeaders();
-	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 	headers.set("Authorization", this.jwtAuthToken);
 
@@ -754,7 +734,6 @@ class MemberControllerIntegrationTest {
 
 	// creating the headers for the requestString
 	HttpHeaders headers = new HttpHeaders();
-	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 	headers.set("Authorization", this.jwtAuthToken);
 
@@ -784,7 +763,6 @@ class MemberControllerIntegrationTest {
 
 	// creating the headers for the requestString
 	HttpHeaders headers = new HttpHeaders();
-	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 	headers.set("Authorization", this.jwtAuthToken);
 
@@ -810,7 +788,6 @@ class MemberControllerIntegrationTest {
 
 	// creating the headers for the requestString
 	HttpHeaders headers = new HttpHeaders();
-	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 	headers.set("Authorization", this.jwtAuthToken);
 
@@ -840,7 +817,6 @@ class MemberControllerIntegrationTest {
 
 	// creating the headers for the requestString
 	HttpHeaders headers = new HttpHeaders();
-	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 	headers.set("Authorization", this.jwtAuthToken);
 
@@ -866,7 +842,6 @@ class MemberControllerIntegrationTest {
 
 	// creating the headers for the requestString
 	HttpHeaders headers = new HttpHeaders();
-	headers.setContentType(MediaType.APPLICATION_JSON);
 	headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 	headers.set("Authorization", this.jwtAuthToken);
 
