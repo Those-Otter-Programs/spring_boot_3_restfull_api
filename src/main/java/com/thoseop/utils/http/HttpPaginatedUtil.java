@@ -28,7 +28,7 @@ public class HttpPaginatedUtil {
             
             char c[] = sortBy.toCharArray();
 //            c[0] = Character.toLowerCase(c[0]);
-            c[0] += 32;
+            c[0] += 32; // convert the first letter to lowercase by adding 32, which is the difference between uppercase and lowercase
             sortBy = new String(c);
         } else
             throw new InvalidSortByException("received sortBy is not a sortable data".formatted(sortBy));
